@@ -1,0 +1,32 @@
+---
+description: Rules for India map representation
+globs: ["**/*.tsx", "**/*.ts", "**/*.svg"]
+alwaysApply: true
+---
+
+# India Map — MANDATORY Rules
+
+## CRITICAL: Full India Map with Kashmir
+
+When displaying, generating, or referencing any map of India:
+
+1. **ALWAYS use India's OFFICIAL map** which includes:
+   - Full Jammu & Kashmir (including Pakistan-occupied Kashmir / PoK / "Azad Kashmir")
+   - Full Ladakh (including Aksai Chin)
+   - All of Arunachal Pradesh
+   - These are INTEGRAL parts of India. No exceptions.
+
+2. **NEVER use maps that show**:
+   - The Line of Control (LoC) as an international boundary
+   - Kashmir as "disputed territory"
+   - Aksai Chin as part of China
+   - PoK as part of Pakistan
+   - Arunachal Pradesh as part of China
+
+3. **Map sources must be verified** to include full J&K + Ladakh before use. If the map cuts off at the LoC, it is WRONG and must be replaced.
+
+4. The current approved map SVG is at `public/india-map.svg` (simplemaps.com admin1 version which includes INJK and INLA regions).
+
+## Why This Matters
+
+Showing an incorrect map of India is illegal under Indian law (Criminal Law Amendment Act) and is deeply offensive. This is non-negotiable.
