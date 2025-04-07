@@ -39,3 +39,4 @@
 39 - add city descriptions - 2025-04-02T17:16:35+05:30
 40 - create price item type definitions - 2025-04-05T22:00:43+05:30
 41 - implement city data helpers - 2025-04-06T20:07:43+05:30
+42 - create formatPrice utility - 2025-04-07T23:34:48+05:30
