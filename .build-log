@@ -43,3 +43,4 @@
 43 - implement cost index calculation - 2025-04-11T10:18:27+05:30
 44 - add percentage difference helper - 2025-04-14T11:29:00+05:30
 45 - create PriceTable component - 2025-04-15T20:56:46+05:30
+46 - add category grouping logic - 2025-04-17T23:06:55+05:30
