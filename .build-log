@@ -61,3 +61,4 @@
 61 - add sidebar with compare links - 2025-05-23T16:57:33+05:30
 62 - add other cities sidebar section - 2025-05-24T16:07:15+05:30
 63 - scaffold compare page route - 2025-05-26T12:04:21+05:30
+64 - create city selector component - 2025-06-01T12:37:14+05:30
