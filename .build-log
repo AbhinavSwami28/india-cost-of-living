@@ -71,3 +71,4 @@
 71 - implement click-to-edit price flow - 2025-06-14T10:06:42+05:30
 72 - add DiffBadge percentage component - 2025-06-15T15:22:27+05:30
 73 - implement comparison table layout - 2025-06-16T15:29:55+05:30
+74 - add table header with city names - 2025-06-18T15:46:21+05:30
