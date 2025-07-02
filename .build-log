@@ -78,3 +78,4 @@
 78 - add budget item toggle checkboxes - 2025-06-26T12:55:59+05:30
 79 - implement budget total calculation - 2025-06-27T10:28:51+05:30
 80 - add comparison URL routing - 2025-06-28T22:54:35+05:30
+81 - generate static params for city pairs - 2025-07-02T17:53:00+05:30
