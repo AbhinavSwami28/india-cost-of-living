@@ -82,3 +82,4 @@
 82 - add related comparisons section - 2025-07-07T10:59:48+05:30
 83 - add metadata for comparison pages - 2025-07-10T16:30:13+05:30
 84 - create budget calculator page route - 2025-07-12T22:25:57+05:30
+85 - implement BudgetCalculator component - 2025-07-17T09:24:16+05:30
