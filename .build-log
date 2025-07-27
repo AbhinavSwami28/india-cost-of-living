@@ -86,3 +86,4 @@
 86 - add location selection step - 2025-07-19T23:50:50+05:30
 87 - add state and district dropdowns - 2025-07-25T19:45:31+05:30
 88 - implement item selection with checkboxes - 2025-07-26T11:12:18+05:30
+89 - add editable quantities per item - 2025-07-27T12:03:37+05:30
