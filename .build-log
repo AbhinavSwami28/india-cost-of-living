@@ -108,3 +108,4 @@
 108 - batch generate remaining city images - 2025-09-05T18:51:41+05:30
 109 - optimize images to webp format - 2025-09-07T17:00:42+05:30
 110 - add images to CityCard component - 2025-09-09T22:35:19+05:30
+111 - implement image hover zoom effect - 2025-09-10T23:06:47+05:30
