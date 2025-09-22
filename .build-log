@@ -115,3 +115,4 @@
 115 - create IndiaMap component - 2025-09-19T13:57:58+05:30
 116 - plot city markers on map - 2025-09-20T22:03:05+05:30
 117 - add hover tooltips with city stats - 2025-09-21T19:27:53+05:30
+118 - fix map coordinate alignment - 2025-09-22T13:02:00+05:30
