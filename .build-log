@@ -116,3 +116,4 @@
 116 - plot city markers on map - 2025-09-20T22:03:05+05:30
 117 - add hover tooltips with city stats - 2025-09-21T19:27:53+05:30
 118 - fix map coordinate alignment - 2025-09-22T13:02:00+05:30
+119 - calibrate positions from svg reference points - 2025-09-25T11:47:28+05:30
