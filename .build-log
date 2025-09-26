@@ -117,3 +117,4 @@
 117 - add hover tooltips with city stats - 2025-09-21T19:27:53+05:30
 118 - fix map coordinate alignment - 2025-09-22T13:02:00+05:30
 119 - calibrate positions from svg reference points - 2025-09-25T11:47:28+05:30
+120 - declutter overlapping city dots - 2025-09-26T17:45:27+05:30
