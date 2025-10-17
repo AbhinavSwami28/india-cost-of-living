@@ -124,3 +124,4 @@
 124 - override common light classes for dark - 2025-10-09T09:19:23+05:30
 125 - fix scrollbar colors in dark mode - 2025-10-11T23:59:50+05:30
 126 - swap orange accents to teal for dark mode - 2025-10-16T19:15:42+05:30
+127 - fix hero gradient for dark mode - 2025-10-17T10:22:49+05:30
