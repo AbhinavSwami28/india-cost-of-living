@@ -143,3 +143,4 @@
 143 - compact stats bar for small screens - 2025-11-23T15:22:46+05:30
 144 - create CityExplorer with search - 2025-11-29T10:24:57+05:30
 145 - add state filter dropdown - 2025-11-30T18:12:16+05:30
+146 - limit city cards to top 12 with expand - 2025-12-01T09:45:27+05:30
