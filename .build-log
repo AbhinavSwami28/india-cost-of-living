@@ -145,3 +145,4 @@
 145 - add state filter dropdown - 2025-11-30T18:12:16+05:30
 146 - limit city cards to top 12 with expand - 2025-12-01T09:45:27+05:30
 147 - fix mobile nav menu spacing - 2025-12-07T19:46:47+05:30
+148 - improve table horizontal scroll on mobile - 2025-12-09T20:42:12+05:30
