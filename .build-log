@@ -147,3 +147,4 @@
 147 - fix mobile nav menu spacing - 2025-12-07T19:46:47+05:30
 148 - improve table horizontal scroll on mobile - 2025-12-09T20:42:12+05:30
 149 - reduce font sizes for mobile readability - 2025-12-10T18:20:42+05:30
+150 - fix typescript strict mode warnings - 2025-12-12T22:07:46+05:30
