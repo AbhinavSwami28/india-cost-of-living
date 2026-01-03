@@ -156,3 +156,4 @@
 156 - fix accommodation price display - 2025-12-26T09:19:18+05:30
 157 - clean up console warnings - 2025-12-28T12:27:50+05:30
 158 - optimize bundle size - 2025-12-29T18:38:41+05:30
+159 - fix hydration mismatch in theme - 2026-01-03T19:13:32+05:30
