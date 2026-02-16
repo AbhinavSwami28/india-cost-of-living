@@ -105,6 +105,11 @@ export default function BudgetCalculator() {
       // Skip per-km items
       const isPerKm =
         p.item.includes("per km") || p.item === "Ola/Uber Mini (per km)";
+      // Only select ONE accommodation (1 BHK Outside City Centre), deselect all others
+      const isAccommodation =
+        p.category === "Accommodation - Rent (Monthly)" ||
+        p.category === "PG / Shared Accommodation (Monthly)";
+      const isDefaultAccommodation = p.item === "1 BHK Outside City Centre";
 
       return {
         item: p.item,
@@ -112,7 +117,7 @@ export default function BudgetCalculator() {
         unit: p.unit,
         basePrice: p.price,
         customPrice: p.price,
-        selected: !isVehicle && !isPerKm,
+        selected: isAccommodation ? isDefaultAccommodation : (!isVehicle && !isPerKm),
         quantity: qty,
       };
     });
