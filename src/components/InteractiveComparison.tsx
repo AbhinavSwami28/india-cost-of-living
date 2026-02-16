@@ -164,7 +164,7 @@ export default function InteractiveComparison({
 
   // Accommodation selection
   const [selectedAccommodation, setSelectedAccommodation] = useState(
-    "PG - Double Sharing (with meals)"
+    "1 BHK Outside City Centre"
   );
 
   // Budget items selection (which items to include in monthly budget)
@@ -173,7 +173,7 @@ export default function InteractiveComparison({
     Object.values(MONTHLY_BUDGET_ITEMS).forEach(({ items }) => {
       items.forEach((item) => initial.add(item));
     });
-    initial.add("PG - Double Sharing (with meals)");
+    initial.add("1 BHK Outside City Centre");
     return initial;
   });
 
