@@ -24,6 +24,7 @@ export const CATEGORIES = [
   "Utilities (Monthly)",
   "Accommodation - Rent (Monthly)",
   "PG / Shared Accommodation (Monthly)",
+  "Household Help & Misc",
   "Lifestyle & Entertainment",
 ] as const;
 
@@ -36,15 +37,17 @@ export const CATEGORY_ICONS: Record<Category, string> = {
   "Utilities (Monthly)": "💡",
   "Accommodation - Rent (Monthly)": "🏠",
   "PG / Shared Accommodation (Monthly)": "🏘️",
+  "Household Help & Misc": "🧹",
   "Lifestyle & Entertainment": "🎬",
 };
 
 export const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
   "Restaurants & Dining": "Average prices at local restaurants, street food stalls, and cafes",
-  "Groceries": "Prices at local markets and grocery stores",
+  "Groceries": "Prices at local markets and grocery stores, including health supplements",
   "Transportation": "Public transport, ride-hailing, and fuel costs",
-  "Utilities (Monthly)": "Monthly bills for a typical 2BHK apartment",
+  "Utilities (Monthly)": "Monthly bills for electricity, water, internet, and mobile",
   "Accommodation - Rent (Monthly)": "Monthly rent for apartments in different areas",
   "PG / Shared Accommodation (Monthly)": "Paying Guest accommodations popular with students and young professionals",
+  "Household Help & Misc": "Cook, maid, and other monthly household expenses",
   "Lifestyle & Entertainment": "Gym, movies, streaming, and personal care",
 };

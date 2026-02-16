@@ -39,9 +39,12 @@ const MONTHLY_BUDGET_ITEMS: Record<string, { items: string[]; multiplier?: numbe
   "Transportation": { items: ["Metro / Local Train (monthly pass)", "Petrol"], pickOne: true },
   "Utilities (Monthly)": {
     items: [
-      "Electricity (2BHK, avg usage)", "Water Bill", "Cooking Gas (LPG Cylinder)",
-      "Broadband Internet (100 Mbps)", "Mobile Plan (Jio/Airtel, 2GB/day)",
+      "Electricity", "Water Bill", "Cooking Gas (LPG Cylinder)",
+      "Broadband Internet", "Mobile Plan (Jio/Airtel)",
     ],
+  },
+  "Household Help & Misc": {
+    items: ["Cook (part-time, 2 meals/day)", "Maid / Cleaning Help", "Miscellaneous Monthly Spend"],
   },
   "Lifestyle & Entertainment": { items: ["Gym Membership", "Netflix (Standard Plan)", "Spotify Premium"] },
 };
@@ -117,6 +120,11 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
   const [visibleCategories, setVisibleCategories] = useState<Set<string>>(new Set(CATEGORIES));
   const [customPrices, setCustomPrices] = useState<Record<string, number>>({});
   const [excludedItems, setExcludedItems] = useState<Set<string>>(new Set());
+  const [vegMode, setVegMode] = useState(false);
+
+  const NON_VEG_ITEMS = [
+    "Non-Veg Thali (local restaurant)", "Biryani (chicken)", "Chicken", "Eggs",
+  ];
   const [quantities, setQuantities] = useState<Record<string, number>>(() => ({ ...DEFAULT_QUANTITIES }));
   const [selectedAccommodation, setSelectedAccommodation] = useState("1 BHK Outside City Centre");
   const [budgetItems, setBudgetItems] = useState<Set<string>>(() => {
@@ -134,6 +142,17 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
   };
   const toggleExcluded = (item: string) => {
     setExcludedItems((prev) => { const next = new Set(prev); next.has(item) ? next.delete(item) : next.add(item); return next; });
+  };
+  const toggleVegMode = () => {
+    setVegMode((prev) => {
+      const next = !prev;
+      setExcludedItems((ex) => {
+        const updated = new Set(ex);
+        NON_VEG_ITEMS.forEach((item) => next ? updated.add(item) : updated.delete(item));
+        return updated;
+      });
+      return next;
+    });
   };
   const toggleBudgetItem = (item: string) => {
     setBudgetItems((prev) => { const next = new Set(prev); next.has(item) ? next.delete(item) : next.add(item); return next; });
@@ -257,6 +276,21 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
 
       {/* ====== COMPARE TAB ====== */}
       {activeTab === "compare" && <>
+        {/* Veg Mode + Category Filters */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleVegMode}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
+              vegMode
+                ? "bg-green-50 border-green-400 text-green-700"
+                : "bg-white border-gray-200 text-gray-600 hover:border-green-300"
+            }`}
+          >
+            🌱 Veg Mode {vegMode ? "ON" : "OFF"}
+          </button>
+          {vegMode && <span className="text-xs text-green-600">Non-veg items excluded from comparison & budget</span>}
+        </div>
+
         {/* Category Filters */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">

@@ -18,12 +18,22 @@ function makePrices(p: {
   pgPvtM: number; pgPvtNm: number; pgDblM: number; pgDblNm: number; pgTrpM: number; pgTrpNm: number;
   gym: number; movie: number; netflix: number; spotify: number; haircut: number; beer: number; importBeer: number;
 }) {
+  // Derive new items from cost profile (tier-based scaling)
+  const costScale = p.rent1c / 15000; // relative to a mid-tier city
+  const specialtyCoffee = Math.round(200 + costScale * 100);
+  const wheyProtein = Math.round(1800 + costScale * 400);
+  const cook = Math.round(4000 + costScale * 4000);
+  const maid = Math.round(1500 + costScale * 1500);
+  const laundry = Math.round(800 + costScale * 700);
+  const misc = Math.round(1500 + costScale * 1500);
+
   return [
     { category: "Restaurants & Dining", item: "Veg Thali (local restaurant)", unit: "per plate", price: p.vegThali },
     { category: "Restaurants & Dining", item: "Non-Veg Thali (local restaurant)", unit: "per plate", price: p.nonVegThali },
     { category: "Restaurants & Dining", item: "Meal for Two (high-end restaurant)", unit: "per meal", price: p.mealForTwo },
     { category: "Restaurants & Dining", item: "Chai (regular cup)", unit: "per cup", price: p.chai },
     { category: "Restaurants & Dining", item: "Coffee (Cappuccino)", unit: "per cup", price: p.coffee },
+    { category: "Restaurants & Dining", item: "Specialty Coffee (Third Wave)", unit: "per cup", price: specialtyCoffee },
     { category: "Restaurants & Dining", item: "Street Food (Vada Pav / Samosa)", unit: "per piece", price: p.streetFood },
     { category: "Restaurants & Dining", item: "Biryani (chicken)", unit: "per plate", price: p.biryani },
     { category: "Restaurants & Dining", item: "Dosa (plain)", unit: "per plate", price: p.dosa },
@@ -45,6 +55,7 @@ function makePrices(p: {
     { category: "Groceries", item: "Apples (Shimla)", unit: "1 kg", price: p.apples },
     { category: "Groceries", item: "Bananas", unit: "1 dozen", price: p.bananas },
     { category: "Groceries", item: "Bread (White, Sliced)", unit: "1 loaf", price: p.bread },
+    { category: "Groceries", item: "Whey Protein (1 kg)", unit: "per kg", price: wheyProtein },
     { category: "Transportation", item: "Auto Rickshaw (minimum fare)", unit: "per ride", price: p.autoMin },
     { category: "Transportation", item: "Auto Rickshaw (per km after min)", unit: "per km", price: p.autoKm },
     { category: "Transportation", item: "Metro / Local Train (monthly pass)", unit: "per month", price: p.metroPass },
@@ -54,11 +65,11 @@ function makePrices(p: {
     { category: "Transportation", item: "Diesel", unit: "1 litre", price: p.diesel },
     { category: "Transportation", item: "Honda Activa (new)", unit: "on-road price", price: p.activa },
     { category: "Transportation", item: "Maruti Swift (base model, new)", unit: "on-road price", price: p.swift },
-    { category: "Utilities (Monthly)", item: "Electricity (2BHK, avg usage)", unit: "per month", price: p.electricity },
+    { category: "Utilities (Monthly)", item: "Electricity", unit: "per month", price: p.electricity },
     { category: "Utilities (Monthly)", item: "Water Bill", unit: "per month", price: p.waterBill },
     { category: "Utilities (Monthly)", item: "Cooking Gas (LPG Cylinder)", unit: "per cylinder", price: p.lpg },
-    { category: "Utilities (Monthly)", item: "Broadband Internet (100 Mbps)", unit: "per month", price: p.broadband },
-    { category: "Utilities (Monthly)", item: "Mobile Plan (Jio/Airtel, 2GB/day)", unit: "per month", price: p.mobile },
+    { category: "Utilities (Monthly)", item: "Broadband Internet", unit: "per month", price: p.broadband },
+    { category: "Utilities (Monthly)", item: "Mobile Plan (Jio/Airtel)", unit: "per month", price: p.mobile },
     { category: "Accommodation - Rent (Monthly)", item: "1 BHK in City Centre", unit: "per month", price: p.rent1c },
     { category: "Accommodation - Rent (Monthly)", item: "1 BHK Outside City Centre", unit: "per month", price: p.rent1o },
     { category: "Accommodation - Rent (Monthly)", item: "2 BHK in City Centre", unit: "per month", price: p.rent2c },
@@ -71,6 +82,10 @@ function makePrices(p: {
     { category: "PG / Shared Accommodation (Monthly)", item: "PG - Double Sharing (without meals)", unit: "per month", price: p.pgDblNm },
     { category: "PG / Shared Accommodation (Monthly)", item: "PG - Triple Sharing (with meals)", unit: "per month", price: p.pgTrpM },
     { category: "PG / Shared Accommodation (Monthly)", item: "PG - Triple Sharing (without meals)", unit: "per month", price: p.pgTrpNm },
+    { category: "Household Help & Misc", item: "Cook (part-time, 2 meals/day)", unit: "per month", price: cook },
+    { category: "Household Help & Misc", item: "Maid / Cleaning Help", unit: "per month", price: maid },
+    { category: "Household Help & Misc", item: "Laundry / Ironing (dhobi)", unit: "per month", price: laundry },
+    { category: "Household Help & Misc", item: "Miscellaneous Monthly Spend", unit: "per month", price: misc },
     { category: "Lifestyle & Entertainment", item: "Gym Membership", unit: "per month", price: p.gym },
     { category: "Lifestyle & Entertainment", item: "Movie Ticket (Multiplex)", unit: "per ticket", price: p.movie },
     { category: "Lifestyle & Entertainment", item: "Netflix (Standard Plan)", unit: "per month", price: p.netflix },
