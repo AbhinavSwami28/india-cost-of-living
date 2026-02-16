@@ -70,16 +70,17 @@ export default function Navbar() {
 
               {cityDropdownOpen && (
                 <div className="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-[#171717] rounded-lg shadow-lg border border-gray-200 dark:border-[#2a2a2a] py-2 max-h-80 overflow-y-auto">
-                  {cities.map((city) => (
-                    <Link
-                      key={city.slug}
-                      href={`/cost-of-living/${city.slug}`}
+                  {cities.slice(0, 15).map((city) => (
+                    <Link key={city.slug} href={`/cost-of-living/${city.slug}`}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 transition-colors"
-                      onClick={() => setCityDropdownOpen(false)}
-                    >
-                      {city.name}, {city.state}
+                      onClick={() => setCityDropdownOpen(false)}>
+                      {city.name}
                     </Link>
                   ))}
+                  <Link href="/#cities" className="block px-4 py-2 text-sm text-orange-500 font-medium hover:bg-orange-50"
+                    onClick={() => setCityDropdownOpen(false)}>
+                    All {cities.length} cities →
+                  </Link>
                 </div>
               )}
             </div>

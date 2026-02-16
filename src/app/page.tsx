@@ -27,16 +27,22 @@ export default function HomePage() {
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="#cities"
+                href="/offer"
                 className="bg-white text-orange-600 px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-orange-50 transition-colors text-sm sm:text-base"
               >
-                Explore Cities
+                Should I Take This Offer?
               </Link>
               <Link
                 href="/compare"
                 className="bg-orange-700/50 backdrop-blur-sm text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-orange-700/70 transition-colors border border-orange-400/30 text-sm sm:text-base"
               >
-                Compare Two Cities
+                Compare Cities
+              </Link>
+              <Link
+                href="#cities"
+                className="text-white/80 hover:text-white px-3 py-2.5 text-sm sm:text-base font-medium transition-colors"
+              >
+                Explore Cities ↓
               </Link>
             </div>
           </div>

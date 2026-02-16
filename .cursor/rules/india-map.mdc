@@ -11,7 +11,7 @@ alwaysApply: true
 When displaying, generating, or referencing any map of India:
 
 1. **ALWAYS use India's OFFICIAL map** which includes:
-   - Full Jammu & Kashmir (including Pakistan-occupied Kashmir / PoK / "Azad Kashmir")
+   - Full Jammu & Kashmir (including Pakistan-occupied Kashmir / PoK)
    - Full Ladakh (including Aksai Chin)
    - All of Arunachal Pradesh
    - These are INTEGRAL parts of India. No exceptions.
@@ -25,7 +25,7 @@ When displaying, generating, or referencing any map of India:
 
 3. **Map sources must be verified** to include full J&K + Ladakh before use. If the map cuts off at the LoC, it is WRONG and must be replaced.
 
-4. The current approved map SVG is at `public/india-map.svg` (simplemaps.com admin1 version which includes INJK and INLA regions).
+4. The current map uses `react-simple-maps` with TopoJSON at `public/india.topo.json`. Verify any replacement TopoJSON includes full J&K and Ladakh.
 
 ## Why This Matters
 

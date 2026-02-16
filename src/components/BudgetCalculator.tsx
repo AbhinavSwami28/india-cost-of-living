@@ -3,7 +3,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { CATEGORIES, CATEGORY_ICONS, CATEGORY_DESCRIPTIONS, Category } from "@/lib/types";
 import { formatPrice, cities } from "@/lib/data";
-import { getStates, getDistricts, getCities as getGeoCities } from "@/lib/geography";
 
 // Which items make sense as "monthly" expenses
 const MONTHLY_ITEMS = new Set([
@@ -71,23 +70,10 @@ interface BudgetItem {
 }
 
 export default function BudgetCalculator() {
-  // Location
   const [selectedBaseCity, setSelectedBaseCity] = useState("");
-  const [userState, setUserState] = useState("");
-  const [userDistrict, setUserDistrict] = useState("");
-  const [userCity, setUserCity] = useState("");
   const [locationName, setLocationName] = useState("");
-
-  // Budget items
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
   const [initialized, setInitialized] = useState(false);
-
-  const states = useMemo(() => getStates(), []);
-  const districts = useMemo(() => (userState ? getDistricts(userState) : []), [userState]);
-  const geoCities = useMemo(
-    () => (userState && userDistrict ? getGeoCities(userState, userDistrict) : []),
-    [userState, userDistrict]
-  );
 
   // Initialize budget items from a base city
   const initializeFromCity = useCallback((citySlug: string) => {
@@ -200,7 +186,7 @@ export default function BudgetCalculator() {
     (i) => i.customPrice !== i.basePrice
   ).length;
 
-  const displayLocation = userCity || userDistrict || userState || locationName;
+  const displayLocation = locationName;
 
   return (
     <div className="space-y-6">
