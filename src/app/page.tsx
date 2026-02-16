@@ -75,11 +75,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* India Map */}
+      {/* Cities by Region */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
-        <div className="bg-white dark:bg-[var(--card)] rounded-xl border border-gray-200 dark:border-[var(--card-border)] p-5 sm:p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-gray-900 mb-1">Cities We Cover</h2>
-          <p className="text-xs text-gray-500 mb-4">Hover over a city to see quick stats. Click to explore.</p>
+        <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-gray-900 mb-1">Browse by Region</h2>
+          <p className="text-xs text-gray-500 mb-4">{cities.length} cities across India. Click any city for full price breakdown.</p>
           <IndiaMap cities={cities} />
         </div>
       </section>

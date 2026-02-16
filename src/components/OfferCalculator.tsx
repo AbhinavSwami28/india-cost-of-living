@@ -109,10 +109,10 @@ export default function OfferCalculator() {
             verdict === "neutral" ? "text-yellow-600" :
             "text-red-600"
           }`}>
-            {verdict === "yes" ? "YES, Take It!" :
-             verdict === "maybe" ? "Slightly Better" :
-             verdict === "neutral" ? "About the Same" :
-             "Think Twice"}
+            {verdict === "yes" ? "✓ YES, Take It!" :
+             verdict === "maybe" ? "↗ Slightly Better" :
+             verdict === "neutral" ? "≈ About the Same" :
+             "✗ Think Twice"}
           </div>
           <p className="text-gray-700 text-sm mb-4">
             {diff > 0
@@ -158,7 +158,8 @@ export default function OfferCalculator() {
       {!hasInput && (
         <div className="text-center py-8 text-gray-400">
           <div className="text-4xl mb-3">🤔</div>
-          <p className="text-sm">Fill in both sections above to get your verdict</p>
+          <p className="text-sm mb-3">Fill in both sections above to get your verdict</p>
+          <p className="text-xs text-gray-300">Example: ₹50,000/month in Pune → offered ₹75,000 in Bangalore</p>
         </div>
       )}
     </div>

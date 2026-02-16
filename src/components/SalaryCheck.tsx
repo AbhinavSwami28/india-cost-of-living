@@ -67,6 +67,9 @@ export default function SalaryCheck({ cities }: { cities: CityData[] }) {
               </div>
             </div>
           </div>
+          <p className="text-[10px] text-gray-400 mt-2 text-center">
+            Includes rent (1BHK), food, groceries, transport, utilities, lifestyle. <a href={`/cost-of-living/${city.slug}`} className="text-orange-500 underline">See full breakdown →</a>
+          </p>
         </div>
       )}
     </div>

@@ -271,7 +271,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
           </div>
           <div className="flex items-center justify-center sm:pb-2">
             <button onClick={() => { const t = city1Slug; handleCityChange("city1", city2Slug); setTimeout(() => handleCityChange("city2", t), 0); }}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Swap cities">
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Swap cities" aria-label="Swap cities">
               <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
             </button>
           </div>
@@ -304,6 +304,16 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
             Salary equivalence: {formatPrice(salary1)} in {city1Data.name} ≈ <strong className="text-emerald-700">{formatPrice(salaryEquivalent(salary1, city1Data, city2Data))}</strong> in {city2Data.name}
           </p>
         )}
+        <div className="flex flex-wrap gap-2 mt-3">
+          <button onClick={() => setActiveTab("calculator")} className="text-xs text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-lg font-medium transition-colors">
+            Calculate your budget →
+          </button>
+          {salary1 === 0 && (
+            <button onClick={() => setActiveTab("calculator")} className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-lg font-medium transition-colors">
+              Enter salary for personalized comparison
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ====== COMPARE TAB ====== */}
@@ -320,7 +330,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
           >
             🌱 Veg Mode {vegMode ? "ON" : "OFF"}
           </button>
-          {vegMode && <span className="text-xs text-green-600">Non-veg items excluded from comparison & budget</span>}
+          {vegMode && <span className="text-xs text-green-600">{NON_VEG_ITEMS.length} non-veg items excluded (chicken, eggs, biryani, non-veg thali)</span>}
         </div>
 
         {/* Category Filters */}
@@ -375,7 +385,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
                       <p className="text-sm text-gray-500">{CATEGORY_DESCRIPTIONS[category as Category]}</p>
                     </div>
                   </div>
-                  <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                  <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm scroll-hint">
                     <div className="overflow-x-auto">
                       <table className="w-full min-w-[650px]">
                         <thead>
@@ -408,10 +418,10 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
                                     <span className="text-xs text-gray-400">{item1.unit}</span>
                                     <div className="inline-flex items-center gap-0.5 ml-1">
                                       <button onClick={() => setQty(item1.item, qty - 1)} disabled={qty <= 1}
-                                        className="w-7 h-7 sm:w-5 sm:h-5 flex items-center justify-center rounded text-xs sm:text-[10px] font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">−</button>
-                                      <span className={`text-xs sm:text-[11px] font-semibold min-w-[20px] text-center ${qty !== (DEFAULT_QUANTITIES[item1.item] ?? 1) ? "text-orange-600" : "text-gray-500"}`}>×{qty}</span>
+                                        className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center rounded-md text-sm sm:text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors" aria-label={`Decrease ${item1.item} quantity`}>−</button>
+                                      <span className={`text-xs font-semibold min-w-[22px] text-center ${qty !== (DEFAULT_QUANTITIES[item1.item] ?? 1) ? "text-orange-600" : "text-gray-500"}`}>×{qty}</span>
                                       <button onClick={() => setQty(item1.item, qty + 1)}
-                                        className="w-7 h-7 sm:w-5 sm:h-5 flex items-center justify-center rounded text-xs sm:text-[10px] font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors">+</button>
+                                        className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center rounded-md text-sm sm:text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300 transition-colors" aria-label={`Increase ${item1.item} quantity`}>+</button>
                                     </div>
                                   </div>
                                 </td>

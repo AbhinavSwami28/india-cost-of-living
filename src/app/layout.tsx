@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ThemeProvider from "@/components/ThemeProvider";
 import BackToTop from "@/components/BackToTop";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -75,7 +76,9 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <Navbar />
-          <main className="min-h-screen">{children}</main>
+          <main id="main-content" className="min-h-screen">
+            <ErrorBoundary>{children}</ErrorBoundary>
+          </main>
           <Footer />
           <BackToTop />
         </ThemeProvider>

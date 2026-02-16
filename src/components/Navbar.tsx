@@ -13,7 +13,7 @@ function ThemeToggle() {
       value={theme}
       onChange={(e) => setTheme(e.target.value as "light" | "dark" | "system")}
       className="text-xs bg-transparent border border-gray-200 dark:border-gray-700 rounded-md px-2 py-1.5 text-gray-600 dark:text-gray-400 focus:ring-1 focus:ring-orange-500 focus:outline-none cursor-pointer"
-      title="Theme"
+      title="Theme" aria-label="Change theme"
     >
       <option value="light">☀️ Light</option>
       <option value="dark">🌙 Dark</option>
@@ -30,6 +30,9 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md border-b border-gray-200 dark:border-[#2a2a2a]">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-orange-500 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm">
+        Skip to content
+      </a>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -51,7 +54,7 @@ export default function Navbar() {
             <div className="relative">
               <button
                 onClick={() => setCityDropdownOpen(!cityDropdownOpen)}
-                onBlur={() => setTimeout(() => setCityDropdownOpen(false), 200)}
+                onBlur={() => setTimeout(() => setCityDropdownOpen(false), 300)}
                 className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors flex items-center gap-1"
               >
                 Cities
@@ -134,17 +137,18 @@ export default function Navbar() {
               My Budget Calculator
             </Link>
             <div className="mt-2 pt-2 border-t border-gray-100">
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">Cities</p>
-              {cities.map((city) => (
-                <Link
-                  key={city.slug}
-                  href={`/cost-of-living/${city.slug}`}
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">Top Cities</p>
+              {cities.slice(0, 8).map((city) => (
+                <Link key={city.slug} href={`/cost-of-living/${city.slug}`}
                   className="block py-1.5 text-sm text-gray-600 hover:text-orange-600"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {city.name}, {city.state}
+                  onClick={() => setMenuOpen(false)}>
+                  {city.name}
                 </Link>
               ))}
+              <Link href="/#cities" className="block py-1.5 text-sm text-orange-500 font-medium"
+                onClick={() => setMenuOpen(false)}>
+                View all {cities.length} cities →
+              </Link>
             </div>
           </div>
         )}

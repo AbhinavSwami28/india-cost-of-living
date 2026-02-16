@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { getCityBySlug, getAllCitySlugs, calculateCostIndex, formatPrice, cities } from "@/lib/data";
+import HeroImage from "@/components/HeroImage";
 import { CATEGORIES, Category, CATEGORY_ICONS } from "@/lib/types";
 import PriceTable from "@/components/PriceTable";
 import AdBanner from "@/components/AdBanner";
@@ -64,15 +64,9 @@ export default async function CityPage({ params }: PageProps) {
     <div>
       {/* Hero */}
       <section className="relative text-white overflow-hidden">
-        {/* Background image */}
-        <div className="absolute inset-0">
-          <Image
-            src={city.image}
-            alt={`${city.name} landmark`}
-            fill
-            className="object-cover"
-            priority
-          />
+        {/* Background: image with fallback gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-600 to-amber-700">
+          <HeroImage src={city.image} alt={`${city.name} landmark`} />
           <div className="absolute inset-0 bg-black/40" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
@@ -203,16 +197,16 @@ export default async function CityPage({ params }: PageProps) {
             <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
               <h3 className="font-bold text-gray-900 mb-3">Other Cities</h3>
               <div className="space-y-1.5">
-                {otherCities.map((other) => (
-                  <Link
-                    key={other.slug}
-                    href={`/cost-of-living/${other.slug}`}
-                    className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-600 hover:text-gray-900"
-                  >
+                {otherCities.slice(0, 10).map((other) => (
+                  <Link key={other.slug} href={`/cost-of-living/${other.slug}`}
+                    className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-600 hover:text-gray-900">
                     <span>{other.name}</span>
                     <span className="text-xs text-gray-400">{other.state}</span>
                   </Link>
                 ))}
+                <Link href="/#cities" className="block text-center py-2 text-sm text-orange-500 font-medium hover:text-orange-600">
+                  View all {otherCities.length} cities →
+                </Link>
               </div>
             </div>
           </aside>

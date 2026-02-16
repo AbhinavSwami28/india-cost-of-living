@@ -63,6 +63,40 @@ html {
 
 table tr { transition: background-color 0.15s ease; }
 
+/* Table scroll indicator */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.overflow-x-auto::after {
+  content: "";
+  position: sticky;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  pointer-events: none;
+}
+@media (max-width: 768px) {
+  .scroll-hint { position: relative; }
+  .scroll-hint::after {
+    content: "Scroll →";
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    font-size: 10px;
+    color: #9ca3af;
+    background: rgba(255,255,255,0.9);
+    padding: 2px 8px;
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 5;
+    animation: fadeOut 3s forwards;
+  }
+  .dark .scroll-hint::after { background: rgba(23,23,23,0.9); color: #666; }
+}
+@keyframes fadeOut { 0%,70% { opacity: 1; } 100% { opacity: 0; } }
+
 *:focus-visible {
   outline: 2px solid #f97316;
   outline-offset: 2px;
