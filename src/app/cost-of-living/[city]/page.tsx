@@ -6,6 +6,7 @@ import { getCityBySlug, getAllCitySlugs, calculateCostIndex, formatPrice, cities
 import { CATEGORIES, Category, CATEGORY_ICONS } from "@/lib/types";
 import PriceTable from "@/components/PriceTable";
 import AdBanner from "@/components/AdBanner";
+import CityCompareDropdown from "@/components/CityCompareDropdown";
 
 interface PageProps {
   params: Promise<{ city: string }>;
@@ -35,6 +36,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       `triple sharing PG ${city.name}`,
       `${city.name} expenses`,
     ],
+    openGraph: {
+      title: `Cost of Living in ${city.name} — Prices & Rent 2026`,
+      description: `1BHK: ${rent1bhk ? formatPrice(rent1bhk.price) : "N/A"}/mo, PG: ${pgDouble ? formatPrice(pgDouble.price) : "N/A"}/mo. Full breakdown of ${city.name} expenses.`,
+    },
   };
 }
 
@@ -177,19 +182,17 @@ export default async function CityPage({ params }: PageProps) {
 
           {/* Sidebar */}
           <aside className="lg:w-80 space-y-6">
-            {/* Compare */}
+            {/* Quick Compare */}
             <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
               <h3 className="font-bold text-gray-900 mb-3">Compare {city.name} with</h3>
-              <div className="space-y-2">
-                {otherCities.slice(0, 6).map((other) => (
-                  <Link
-                    key={other.slug}
-                    href={`/compare/${city.slug}-vs-${other.slug}`}
-                    className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-orange-50 transition-colors group"
-                  >
-                    <span className="text-sm text-gray-700 group-hover:text-orange-700">
-                      {city.name} vs {other.name}
-                    </span>
+              <div className="mb-3">
+                <CityCompareDropdown currentSlug={city.slug} cities={otherCities} />
+              </div>
+              <div className="space-y-1.5">
+                {otherCities.slice(0, 5).map((other) => (
+                  <Link key={other.slug} href={`/compare/${city.slug}-vs-${other.slug}`}
+                    className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-orange-50 transition-colors group text-sm">
+                    <span className="text-gray-700 group-hover:text-orange-700">{city.name} vs {other.name}</span>
                     <span className="text-orange-400 text-xs">→</span>
                   </Link>
                 ))}

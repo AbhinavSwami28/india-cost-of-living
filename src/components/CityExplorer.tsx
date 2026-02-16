@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { CityData } from "@/lib/types";
+import { calculateCostIndex } from "@/lib/data";
 import CityCard from "./CityCard";
 
 const STATES = [
@@ -15,10 +16,11 @@ const STATES = [
 export default function CityExplorer({ cities }: { cities: CityData[] }) {
   const [search, setSearch] = useState("");
   const [state, setState] = useState("All States");
+  const [sortBy, setSortBy] = useState("default");
   const [showAll, setShowAll] = useState(false);
 
   const filtered = useMemo(() => {
-    return cities.filter((city) => {
+    let result = cities.filter((city) => {
       const matchesSearch =
         search === "" ||
         city.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -26,7 +28,13 @@ export default function CityExplorer({ cities }: { cities: CityData[] }) {
       const matchesState = state === "All States" || city.state === state;
       return matchesSearch && matchesState;
     });
-  }, [cities, search, state]);
+
+    if (sortBy === "cheapest") result = [...result].sort((a, b) => calculateCostIndex(a) - calculateCostIndex(b));
+    else if (sortBy === "expensive") result = [...result].sort((a, b) => calculateCostIndex(b) - calculateCostIndex(a));
+    else if (sortBy === "name") result = [...result].sort((a, b) => a.name.localeCompare(b.name));
+
+    return result;
+  }, [cities, search, state, sortBy]);
 
   const isFiltering = search !== "" || state !== "All States";
 
@@ -74,14 +82,18 @@ export default function CityExplorer({ cities }: { cities: CityData[] }) {
         </div>
 
         {/* State filter */}
-        <select
-          value={state}
-          onChange={(e) => setState(e.target.value)}
-          className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white sm:w-52"
-        >
-          {availableStates.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
+        <select value={state} onChange={(e) => setState(e.target.value)}
+          className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white sm:w-44">
+          {availableStates.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
+
+        {/* Sort */}
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}
+          className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white sm:w-40">
+          <option value="default">Default order</option>
+          <option value="cheapest">Cheapest first</option>
+          <option value="expensive">Most expensive</option>
+          <option value="name">A → Z</option>
         </select>
       </div>
 

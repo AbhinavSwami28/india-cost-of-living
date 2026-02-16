@@ -408,10 +408,10 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
                                     <span className="text-xs text-gray-400">{item1.unit}</span>
                                     <div className="inline-flex items-center gap-0.5 ml-1">
                                       <button onClick={() => setQty(item1.item, qty - 1)} disabled={qty <= 1}
-                                        className="w-4 h-4 flex items-center justify-center rounded text-[10px] font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">−</button>
-                                      <span className={`text-[11px] font-semibold min-w-[18px] text-center ${qty !== (DEFAULT_QUANTITIES[item1.item] ?? 1) ? "text-orange-600" : "text-gray-500"}`}>×{qty}</span>
+                                        className="w-7 h-7 sm:w-5 sm:h-5 flex items-center justify-center rounded text-xs sm:text-[10px] font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">−</button>
+                                      <span className={`text-xs sm:text-[11px] font-semibold min-w-[20px] text-center ${qty !== (DEFAULT_QUANTITIES[item1.item] ?? 1) ? "text-orange-600" : "text-gray-500"}`}>×{qty}</span>
                                       <button onClick={() => setQty(item1.item, qty + 1)}
-                                        className="w-4 h-4 flex items-center justify-center rounded text-[10px] font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors">+</button>
+                                        className="w-7 h-7 sm:w-5 sm:h-5 flex items-center justify-center rounded text-xs sm:text-[10px] font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors">+</button>
                                     </div>
                                   </div>
                                 </td>

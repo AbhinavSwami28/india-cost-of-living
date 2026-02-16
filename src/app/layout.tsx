@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ThemeProvider from "@/components/ThemeProvider";
+import BackToTop from "@/components/BackToTop";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -39,8 +40,16 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IN",
-    siteName: "India Cost of Living",
+    siteName: "Cost of Living India",
+    url: "https://costoflivingindia.com",
+    description: "Compare cost of living across 54 Indian cities. Rent, PG, groceries, transport — find out what life really costs.",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cost of Living India — Compare 54 Cities",
+    description: "Interactive comparison of rent, PG, groceries, transport across Indian cities.",
+  },
+  metadataBase: new URL("https://costoflivingindia.com"),
 };
 
 export default function RootLayout({
@@ -68,6 +77,7 @@ export default function RootLayout({
           <Navbar />
           <main className="min-h-screen">{children}</main>
           <Footer />
+          <BackToTop />
         </ThemeProvider>
 
         <Analytics />

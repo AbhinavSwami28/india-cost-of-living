@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { cities } from "@/lib/data";
 import { useTheme } from "./ThemeProvider";
 
@@ -24,6 +25,8 @@ function ThemeToggle() {
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
+  const pathname = usePathname();
+  const isActive = (path: string) => pathname === path || pathname.startsWith(path + "/");
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md border-b border-gray-200 dark:border-[#2a2a2a]">
@@ -39,10 +42,8 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            <Link
-              href="/"
-              className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
-            >
+            <Link href="/"
+              className={`text-sm font-medium transition-colors ${pathname === "/" ? "text-orange-600" : "text-gray-600 hover:text-gray-900"}`}>
               Home
             </Link>
 
@@ -80,17 +81,16 @@ export default function Navbar() {
               )}
             </div>
 
-            <Link
-              href="/compare"
-              className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
-            >
-              Compare Cities
+            <Link href="/compare"
+              className={`text-sm font-medium transition-colors ${isActive("/compare") ? "text-orange-600" : "text-gray-600 hover:text-gray-900"}`}>
+              Compare
             </Link>
-
-            <Link
-              href="/calculator"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            >
+            <Link href="/offer"
+              className={`text-sm font-medium transition-colors ${isActive("/offer") ? "text-orange-600" : "text-gray-600 hover:text-gray-900"}`}>
+              Job Offer
+            </Link>
+            <Link href="/calculator"
+              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
               My Budget
             </Link>
             <ThemeToggle />
@@ -124,18 +124,13 @@ export default function Navbar() {
             >
               Home
             </Link>
-            <Link
-              href="/compare"
-              className="block py-2 text-gray-700 hover:text-orange-600"
-              onClick={() => setMenuOpen(false)}
-            >
+            <Link href="/compare" className="block py-2 text-gray-700 hover:text-orange-600" onClick={() => setMenuOpen(false)}>
               Compare Cities
             </Link>
-            <Link
-              href="/calculator"
-              className="block py-2 text-gray-700 hover:text-orange-600"
-              onClick={() => setMenuOpen(false)}
-            >
+            <Link href="/offer" className="block py-2 text-gray-700 hover:text-orange-600" onClick={() => setMenuOpen(false)}>
+              Should I Take This Offer?
+            </Link>
+            <Link href="/calculator" className="block py-2 text-gray-700 hover:text-orange-600" onClick={() => setMenuOpen(false)}>
               My Budget Calculator
             </Link>
             <div className="mt-2 pt-2 border-t border-gray-100">

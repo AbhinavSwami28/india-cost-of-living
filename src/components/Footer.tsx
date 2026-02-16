@@ -69,6 +69,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/offer" className="text-sm text-gray-400 hover:text-orange-400 transition-colors">
+                  Should I Take This Offer?
+                </Link>
+              </li>
+              <li>
                 <Link href="/calculator" className="text-sm text-gray-400 hover:text-orange-400 transition-colors">
                   Budget Calculator
                 </Link>
@@ -101,6 +106,12 @@ export default function Footer() {
                 <Link href="/privacy" className="text-sm text-gray-400 hover:text-orange-400 transition-colors">
                   Privacy Policy
                 </Link>
+              </li>
+              <li>
+                <a href="mailto:swami.abhinav28@gmail.com?subject=Data%20Correction%20-%20costoflivingindia.com&body=City:%0AItem:%0ACurrent%20Price:%0ACorrect%20Price:%0ASource:"
+                  className="text-sm text-orange-400 hover:text-orange-300 transition-colors font-medium">
+                  Correct a Price
+                </a>
               </li>
             </ul>
           </div>
