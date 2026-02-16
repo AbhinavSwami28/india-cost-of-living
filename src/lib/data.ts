@@ -995,15 +995,34 @@ export function getPricesByCategory(prices: PriceItem[]): Record<string, PriceIt
   );
 }
 
+// Items to EXCLUDE from cost index (same price everywhere, distort comparison)
+const INDEX_EXCLUDE = new Set([
+  "Two Wheeler EMI (avg)", "Car EMI (avg)", "Home Loan EMI (2BHK avg)",
+  "Men's Casual Shirt (Zara/H&M)", "Women's Dress (Myntra/Zara)",
+  "Running Shoes (Nike/Adidas)", "Skincare Basics (Nykaa avg)",
+  "Amazon Prime Membership", "Whey Protein (1 kg)",
+  "Netflix (Standard Plan)", "Spotify Premium",
+  "Cooking Gas (LPG Cylinder)", "Air Purifier Electricity (Delhi/NCR)",
+]);
+
 export function calculateCostIndex(city: CityData): number {
-  // Calculate a cost of living index relative to Mumbai (base = 100)
   const mumbai = cities.find((c) => c.slug === "mumbai");
   if (!mumbai || city.slug === "mumbai") return 100;
 
-  const cityTotal = city.prices.reduce((sum, p) => sum + p.price, 0);
-  const mumbaiTotal = mumbai.prices.reduce((sum, p) => sum + p.price, 0);
+  const relevantTotal = (c: CityData) =>
+    c.prices
+      .filter((p) => !INDEX_EXCLUDE.has(p.item))
+      .reduce((sum, p) => sum + p.price, 0);
+
+  const cityTotal = relevantTotal(city);
+  const mumbaiTotal = relevantTotal(mumbai);
+  if (mumbaiTotal === 0) return 0;
 
   return Math.round((cityTotal / mumbaiTotal) * 100);
+}
+
+export function getPriceByItem(city: CityData, itemName: string): number {
+  return city.prices.find((p) => p.item === itemName)?.price ?? 0;
 }
 
 const RENT_CATEGORIES = [

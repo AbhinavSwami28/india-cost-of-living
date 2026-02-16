@@ -77,7 +77,7 @@ function makePrices(p: {
     { category: "Accommodation - Rent (Monthly)", item: "2 BHK Outside City Centre", unit: "per month", price: p.rent2o },
     { category: "Accommodation - Rent (Monthly)", item: "3 BHK in City Centre", unit: "per month", price: p.rent3c },
     { category: "Accommodation - Rent (Monthly)", item: "3 BHK Outside City Centre", unit: "per month", price: p.rent3o },
-    { category: "Accommodation - Rent (Monthly)", item: "Home Loan EMI (2BHK avg)", unit: "per month", price: Math.round(p.rent2c * 20) },
+    { category: "Accommodation - Rent (Monthly)", item: "Home Loan EMI (2BHK avg)", unit: "per month", price: Math.round(p.rent2c * 2) },
     { category: "PG / Shared Accommodation (Monthly)", item: "PG - Private Room (with meals)", unit: "per month", price: p.pgPvtM },
     { category: "PG / Shared Accommodation (Monthly)", item: "PG - Private Room (without meals)", unit: "per month", price: p.pgPvtNm },
     { category: "PG / Shared Accommodation (Monthly)", item: "PG - Double Sharing (with meals)", unit: "per month", price: p.pgDblM },

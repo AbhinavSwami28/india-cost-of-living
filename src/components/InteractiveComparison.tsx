@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { CityData, CATEGORIES, CATEGORY_ICONS, CATEGORY_DESCRIPTIONS, Category } from "@/lib/types";
 import { formatPrice, getPercentageDifference, getPricesByCategory, cities } from "@/lib/data";
@@ -62,7 +62,7 @@ const DEFAULT_QUANTITIES: Record<string, number> = {
   "Domestic Beer (pint, restaurant)": 4, "Imported Beer (bottle, restaurant)": 2,
 };
 
-function EditablePrice({ value, onChange, isEdited }: {
+const EditablePrice = React.memo(function EditablePrice({ value, onChange, isEdited }: {
   value: number; onChange: (val: number) => void; isEdited: boolean;
 }) {
   const [editing, setEditing] = useState(false);
@@ -101,9 +101,9 @@ function EditablePrice({ value, onChange, isEdited }: {
       )}
     </button>
   );
-}
+});
 
-function DiffBadge({ diff }: { diff: number }) {
+const DiffBadge = React.memo(function DiffBadge({ diff }: { diff: number }) {
   if (diff === 0) return <span className="text-xs text-gray-400">same</span>;
   const isPositive = diff > 0;
   return (
@@ -111,7 +111,7 @@ function DiffBadge({ diff }: { diff: number }) {
       {isPositive ? "+" : ""}{diff}%
     </span>
   );
-}
+});
 
 export default function InteractiveComparison({ initialCity1, initialCity2 }: InteractiveComparisonProps) {
   const router = useRouter();
@@ -158,13 +158,13 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
   const emi1 = calculateEMI(propPrice1 * (1 - loanDownPct / 100), loanRate, loanTenure);
   const emi2 = calculateEMI(propPrice2 * (1 - loanDownPct / 100), loanRate, loanTenure);
 
-  const toggleCategory = (cat: string) => {
+  const toggleCategory = useCallback((cat: string) => {
     setVisibleCategories((prev) => { const next = new Set(prev); next.has(cat) ? next.delete(cat) : next.add(cat); return next; });
-  };
-  const toggleExcluded = (item: string) => {
+  }, []);
+  const toggleExcluded = useCallback((item: string) => {
     setExcludedItems((prev) => { const next = new Set(prev); next.has(item) ? next.delete(item) : next.add(item); return next; });
-  };
-  const toggleVegMode = () => {
+  }, []);
+  const toggleVegMode = useCallback(() => {
     setVegMode((prev) => {
       const next = !prev;
       setExcludedItems((ex) => {
@@ -174,15 +174,15 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
       });
       return next;
     });
-  };
-  const toggleBudgetItem = (item: string) => {
+  }, []);
+  const toggleBudgetItem = useCallback((item: string) => {
     setBudgetItems((prev) => { const next = new Set(prev); next.has(item) ? next.delete(item) : next.add(item); return next; });
-  };
+  }, []);
 
-  const getQty = (item: string) => quantities[item] ?? 1;
-  const setQty = (item: string, qty: number) => {
+  const getQty = useCallback((item: string) => quantities[item] ?? 1, [quantities]);
+  const setQty = useCallback((item: string, qty: number) => {
     setQuantities((prev) => ({ ...prev, [item]: Math.max(1, Math.min(99, qty)) }));
-  };
+  }, []);
 
   const getPrice = useCallback(
     (slug: string, item: string, original: number) => customPrices[`${slug}:${item}`] ?? original,
@@ -246,8 +246,8 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
     });
   };
 
-  const grouped1 = getPricesByCategory(city1Data.prices);
-  const grouped2 = getPricesByCategory(city2Data.prices);
+  const grouped1 = useMemo(() => getPricesByCategory(city1Data.prices), [city1Data.prices]);
+  const grouped2 = useMemo(() => getPricesByCategory(city2Data.prices), [city2Data.prices]);
   const budget1 = calculateMonthlyBudget(city1Data);
   const budget2 = calculateMonthlyBudget(city2Data);
   const budgetDiff = getPercentageDifference(budget1, budget2);
