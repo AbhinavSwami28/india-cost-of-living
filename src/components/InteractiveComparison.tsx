@@ -55,7 +55,8 @@ const DEFAULT_QUANTITIES: Record<string, number> = {
   "Onions": 3, "Tomatoes": 3, "Potatoes": 3,
   "Cooking Oil (Sunflower)": 2, "Sugar": 1, "Apples (Shimla)": 2,
   "Bananas": 2, "Bread (White, Sliced)": 4,
-  "Petrol": 15, "Diesel": 15,
+  "Auto Rickshaw (minimum fare)": 15, "Ola/Uber (avg ride)": 8,
+  "Petrol": 20, "Diesel": 15,
   "Movie Ticket (Multiplex)": 2, "Haircut (Men, basic salon)": 1,
   "Domestic Beer (pint, restaurant)": 4, "Imported Beer (bottle, restaurant)": 2,
 };
@@ -202,9 +203,9 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
 
   const applyProfile = (profile: "student" | "professional" | "family") => {
     const profiles = {
-      student: { acc: "PG - Double Sharing (with meals)", ex: ["Meal for Two (high-end restaurant)", "Honda Activa (new)", "Maruti Swift (base model, new)", "Diesel"] },
-      professional: { acc: "1 BHK in City Centre", ex: ["Honda Activa (new)", "Maruti Swift (base model, new)", "Diesel"] },
-      family: { acc: "2 BHK in City Centre", ex: ["Honda Activa (new)", "Maruti Swift (base model, new)", "PG - Private Room (with meals)", "PG - Private Room (without meals)", "PG - Double Sharing (with meals)", "PG - Double Sharing (without meals)", "PG - Triple Sharing (with meals)", "PG - Triple Sharing (without meals)"] },
+      student: { acc: "PG - Double Sharing (with meals)", ex: ["Meal for Two (high-end restaurant)", "Two Wheeler EMI (avg)", "Car EMI (avg)", "Diesel"] },
+      professional: { acc: "1 BHK in City Centre", ex: ["Two Wheeler EMI (avg)", "Car EMI (avg)", "Diesel"] },
+      family: { acc: "2 BHK in City Centre", ex: ["Two Wheeler EMI (avg)", "Car EMI (avg)", "PG - Private Room (with meals)", "PG - Private Room (without meals)", "PG - Double Sharing (with meals)", "PG - Double Sharing (without meals)", "PG - Triple Sharing (with meals)", "PG - Triple Sharing (without meals)"] },
     };
     const p = profiles[profile];
     setSelectedAccommodation(p.acc);

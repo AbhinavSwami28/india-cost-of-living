@@ -100,11 +100,10 @@ export default function BudgetCalculator() {
       else if (QUANTITY_ITEMS.has(p.item)) qty = 2;
       else if (MONTHLY_ITEMS.has(p.item)) qty = 1;
 
-      // Skip vehicle prices by default
-      const isVehicle = p.item.includes("Honda") || p.item.includes("Maruti");
-      // Skip per-km items
-      const isPerKm =
-        p.item.includes("per km") || p.item === "Ola/Uber Mini (per km)";
+      // EMI items are optional — user decides
+      const isVehicle = p.item.includes("EMI");
+      // Skip per-km items (auto per-km)
+      const isPerKm = p.item.includes("per km after min");
       // Only select ONE accommodation (1 BHK Outside City Centre), deselect all others
       const isAccommodation =
         p.category === "Accommodation - Rent (Monthly)" ||

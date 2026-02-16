@@ -21,7 +21,7 @@ function makePrices(p: {
   // Derive new items from cost profile (tier-based scaling)
   const costScale = p.rent1c / 15000; // relative to a mid-tier city
   const specialtyCoffee = Math.round(200 + costScale * 100);
-  const wheyProtein = Math.round(1800 + costScale * 400);
+  const wheyProtein = 3000;
   const cook = Math.round(4000 + costScale * 4000);
   const maid = Math.round(1500 + costScale * 1500);
   const laundry = Math.round(800 + costScale * 700);
@@ -60,16 +60,17 @@ function makePrices(p: {
     { category: "Transportation", item: "Auto Rickshaw (per km after min)", unit: "per km", price: p.autoKm },
     { category: "Transportation", item: "Metro / Local Train (monthly pass)", unit: "per month", price: p.metroPass },
     { category: "Transportation", item: "Bus (monthly pass)", unit: "per month", price: p.busPass },
-    { category: "Transportation", item: "Ola/Uber Mini (per km)", unit: "per km", price: p.olaKm },
+    { category: "Transportation", item: "Ola/Uber (avg ride)", unit: "per ride", price: Math.round(p.olaKm * 15) },
     { category: "Transportation", item: "Petrol", unit: "1 litre", price: p.petrol },
     { category: "Transportation", item: "Diesel", unit: "1 litre", price: p.diesel },
-    { category: "Transportation", item: "Honda Activa (new)", unit: "on-road price", price: p.activa },
-    { category: "Transportation", item: "Maruti Swift (base model, new)", unit: "on-road price", price: p.swift },
+    { category: "Transportation", item: "Two Wheeler EMI (avg)", unit: "per month", price: 3500 },
+    { category: "Transportation", item: "Car EMI (avg)", unit: "per month", price: 15000 },
     { category: "Utilities (Monthly)", item: "Electricity", unit: "per month", price: p.electricity },
     { category: "Utilities (Monthly)", item: "Water Bill", unit: "per month", price: p.waterBill },
     { category: "Utilities (Monthly)", item: "Cooking Gas (LPG Cylinder)", unit: "per cylinder", price: p.lpg },
     { category: "Utilities (Monthly)", item: "Broadband Internet", unit: "per month", price: p.broadband },
     { category: "Utilities (Monthly)", item: "Mobile Plan (Jio/Airtel)", unit: "per month", price: p.mobile },
+    { category: "Utilities (Monthly)", item: "Air Purifier Electricity (Delhi/NCR)", unit: "per month", price: 0 },
     { category: "Accommodation - Rent (Monthly)", item: "1 BHK in City Centre", unit: "per month", price: p.rent1c },
     { category: "Accommodation - Rent (Monthly)", item: "1 BHK Outside City Centre", unit: "per month", price: p.rent1o },
     { category: "Accommodation - Rent (Monthly)", item: "2 BHK in City Centre", unit: "per month", price: p.rent2c },
@@ -107,13 +108,13 @@ export const additionalCities: CityData[] = [
     name: "Gurgaon", slug: "gurgaon", state: "Haryana", population: "15 L",
     description: "India's millennium city and corporate hub, home to 300+ Fortune 500 offices. Part of Delhi NCR.",
     image: "/cities/gurgaon.webp", lastUpdated: "February 2026", contributors: 112,
-    prices: makePrices({ vegThali: 130, nonVegThali: 200, mealForTwo: 2000, chai: 15, coffee: 200, streetFood: 20, biryani: 250, dosa: 70, fastFood: 260, softDrink: 40, water: 20, rice: 105, atta: 52, dal: 155, milk: 62, eggs: 80, chicken: 260, paneer: 390, onions: 35, tomatoes: 45, potatoes: 30, oil: 158, sugar: 46, apples: 190, bananas: 50, bread: 48, autoMin: 25, autoKm: 13, metroPass: 1400, busPass: 800, olaKm: 14, petrol: 95, diesel: 88, activa: 83000, swift: 690000, electricity: 2400, waterBill: 400, lpg: 803, broadband: 750, mobile: 299, rent1c: 22000, rent1o: 13000, rent2c: 40000, rent2o: 24000, rent3c: 65000, rent3o: 38000, pgPvtM: 16000, pgPvtNm: 12000, pgDblM: 11000, pgDblNm: 8000, pgTrpM: 8000, pgTrpNm: 6000, gym: 2500, movie: 300, netflix: 649, spotify: 119, haircut: 200, beer: 250, importBeer: 430 }),
+    prices: makePrices({ vegThali: 130, nonVegThali: 200, mealForTwo: 2000, chai: 15, coffee: 200, streetFood: 20, biryani: 250, dosa: 70, fastFood: 260, softDrink: 40, water: 20, rice: 105, atta: 52, dal: 155, milk: 62, eggs: 80, chicken: 260, paneer: 390, onions: 35, tomatoes: 45, potatoes: 30, oil: 158, sugar: 46, apples: 190, bananas: 50, bread: 48, autoMin: 25, autoKm: 13, metroPass: 1400, busPass: 800, olaKm: 14, petrol: 95, diesel: 88, activa: 83000, swift: 690000, electricity: 2400, waterBill: 400, lpg: 803, broadband: 750, mobile: 299, rent1c: 22000, rent1o: 13000, rent2c: 40000, rent2o: 24000, rent3c: 65000, rent3o: 38000, pgPvtM: 16000, pgPvtNm: 12000, pgDblM: 11000, pgDblNm: 8000, pgTrpM: 8000, pgTrpNm: 6000, gym: 2500, movie: 300, netflix: 649, spotify: 119, haircut: 200, beer: 250, importBeer: 430 }).map(p => p.item === "Air Purifier Electricity (Delhi/NCR)" ? { ...p, price: 800 } : p),
   },
   {
     name: "Noida", slug: "noida", state: "Uttar Pradesh", population: "7 L",
     description: "Planned city in Delhi NCR known for IT parks, film studios, and modern infrastructure.",
     image: "/cities/noida.webp", lastUpdated: "February 2026", contributors: 88,
-    prices: makePrices({ vegThali: 120, nonVegThali: 190, mealForTwo: 1600, chai: 12, coffee: 180, streetFood: 15, biryani: 220, dosa: 65, fastFood: 250, softDrink: 40, water: 20, rice: 100, atta: 50, dal: 152, milk: 60, eggs: 78, chicken: 250, paneer: 380, onions: 32, tomatoes: 42, potatoes: 28, oil: 155, sugar: 45, apples: 185, bananas: 48, bread: 45, autoMin: 20, autoKm: 11, metroPass: 1300, busPass: 750, olaKm: 12, petrol: 95, diesel: 88, activa: 82000, swift: 680000, electricity: 2100, waterBill: 350, lpg: 803, broadband: 700, mobile: 299, rent1c: 16000, rent1o: 10000, rent2c: 28000, rent2o: 18000, rent3c: 48000, rent3o: 28000, pgPvtM: 13000, pgPvtNm: 10000, pgDblM: 9000, pgDblNm: 7000, pgTrpM: 7000, pgTrpNm: 5000, gym: 1800, movie: 280, netflix: 649, spotify: 119, haircut: 150, beer: 220, importBeer: 400 }),
+    prices: makePrices({ vegThali: 120, nonVegThali: 190, mealForTwo: 1600, chai: 12, coffee: 180, streetFood: 15, biryani: 220, dosa: 65, fastFood: 250, softDrink: 40, water: 20, rice: 100, atta: 50, dal: 152, milk: 60, eggs: 78, chicken: 250, paneer: 380, onions: 32, tomatoes: 42, potatoes: 28, oil: 155, sugar: 45, apples: 185, bananas: 48, bread: 45, autoMin: 20, autoKm: 11, metroPass: 1300, busPass: 750, olaKm: 12, petrol: 95, diesel: 88, activa: 82000, swift: 680000, electricity: 2100, waterBill: 350, lpg: 803, broadband: 700, mobile: 299, rent1c: 16000, rent1o: 10000, rent2c: 28000, rent2o: 18000, rent3c: 48000, rent3o: 28000, pgPvtM: 13000, pgPvtNm: 10000, pgDblM: 9000, pgDblNm: 7000, pgTrpM: 7000, pgTrpNm: 5000, gym: 1800, movie: 280, netflix: 649, spotify: 119, haircut: 150, beer: 220, importBeer: 400 }).map(p => p.item === "Air Purifier Electricity (Delhi/NCR)" ? { ...p, price: 800 } : p),
   },
   {
     name: "Navi Mumbai", slug: "navi-mumbai", state: "Maharashtra", population: "12 L",
