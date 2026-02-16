@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { CityData, CATEGORIES, CATEGORY_ICONS, CATEGORY_DESCRIPTIONS, Category } from "@/lib/types";
 import { formatPrice, getPercentageDifference, getPricesByCategory, cities } from "@/lib/data";
+import { decisionSummary, salaryEquivalent, affordabilityTier, TIER_CONFIG, calculateEMI, type AffordabilityTier as TierType } from "@/lib/decisions";
 
 interface InteractiveComparisonProps {
   initialCity1: CityData;
@@ -91,7 +92,13 @@ function EditablePrice({ value, onChange, isEdited }: {
       className={`text-sm font-semibold cursor-pointer group relative transition-colors ${isEdited ? "text-orange-600" : "text-gray-900"} hover:text-orange-500`}
       title="Click to edit price">
       {formatPrice(value)}
-      {isEdited && <span className="ml-1 text-[10px] text-orange-500 font-normal">(edited)</span>}
+      {isEdited ? (
+        <span className="ml-1 text-[10px] text-orange-500 font-normal">(edited)</span>
+      ) : (
+        <svg className="inline-block w-3 h-3 ml-1 text-gray-300 group-hover:text-orange-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+        </svg>
+      )}
     </button>
   );
 }
@@ -138,6 +145,19 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
   const [salary2, setSalary2] = useState(0);
   const [shareCopied, setShareCopied] = useState(false);
 
+  // Home Loan EMI
+  const [loanDownPct, setLoanDownPct] = useState(20);
+  const [loanTenure, setLoanTenure] = useState(20);
+  const [loanRate, setLoanRate] = useState(8.75);
+  const avgProp1 = city1Data.prices.find((p) => p.item === "Home Loan EMI (2BHK avg)")?.price ?? 0;
+  const avgProp2 = city2Data.prices.find((p) => p.item === "Home Loan EMI (2BHK avg)")?.price ?? 0;
+  // Reverse EMI to get approx property price (EMI ≈ rent2c * 20, so property ≈ EMI * tenure * 12 / some factor)
+  // Actually just use EMI * 240 / (rate factor) — simpler to store and show
+  const propPrice1 = Math.round(avgProp1 * 240 / 1.8);
+  const propPrice2 = Math.round(avgProp2 * 240 / 1.8);
+  const emi1 = calculateEMI(propPrice1 * (1 - loanDownPct / 100), loanRate, loanTenure);
+  const emi2 = calculateEMI(propPrice2 * (1 - loanDownPct / 100), loanRate, loanTenure);
+
   const toggleCategory = (cat: string) => {
     setVisibleCategories((prev) => { const next = new Set(prev); next.has(cat) ? next.delete(cat) : next.add(cat); return next; });
   };
@@ -178,7 +198,8 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
   const handleCityChange = (which: "city1" | "city2", slug: string) => {
     if (which === "city1") { setCity1Slug(slug); if (slug !== city2Slug) router.push(`/compare/${slug}-vs-${city2Slug}`, { scroll: false }); }
     else { setCity2Slug(slug); if (city1Slug !== slug) router.push(`/compare/${city1Slug}-vs-${slug}`, { scroll: false }); }
-    setCustomPrices({});
+    // Preserve edited prices — only clear prices for the city that changed
+    // (items are keyed as "citySlug:itemName" so other city's edits are safe)
   };
 
   const calculateMonthlyBudget = useCallback(
@@ -273,6 +294,16 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
             {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full" />}
           </button>
         ))}
+      </div>
+
+      {/* Decision Banner */}
+      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-5">
+        <p className="text-lg font-bold text-gray-900">{decisionSummary(city1Data, city2Data)}</p>
+        {salary1 > 0 && salary2 > 0 && (
+          <p className="text-sm text-gray-600 mt-1">
+            Salary equivalence: {formatPrice(salary1)} in {city1Data.name} ≈ <strong className="text-emerald-700">{formatPrice(salaryEquivalent(salary1, city1Data, city2Data))}</strong> in {city2Data.name}
+          </p>
+        )}
       </div>
 
       {/* ====== COMPARE TAB ====== */}
@@ -566,6 +597,98 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
               </div>
             </div>
           )}
+        </div>
+
+        {/* Salary Equivalence + Affordability Tiers */}
+        {(salary1 > 0 || salary2 > 0) && (
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-gray-900 mb-2">Salary Equivalence</h2>
+            <p className="text-sm text-gray-500 mb-4">What salary in one city equals the same lifestyle in another?</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              {salary1 > 0 && (
+                <div className="bg-gray-50 rounded-xl p-4 text-center">
+                  <div className="text-xs text-gray-500">{formatPrice(salary1)} in {city1Data.name} =</div>
+                  <div className="text-2xl font-bold text-emerald-600 mt-1">{formatPrice(salaryEquivalent(salary1, city1Data, city2Data))}</div>
+                  <div className="text-xs text-gray-500">in {city2Data.name}</div>
+                </div>
+              )}
+              {salary2 > 0 && (
+                <div className="bg-gray-50 rounded-xl p-4 text-center">
+                  <div className="text-xs text-gray-500">{formatPrice(salary2)} in {city2Data.name} =</div>
+                  <div className="text-2xl font-bold text-emerald-600 mt-1">{formatPrice(salaryEquivalent(salary2, city2Data, city1Data))}</div>
+                  <div className="text-xs text-gray-500">in {city1Data.name}</div>
+                </div>
+              )}
+            </div>
+
+            <h3 className="text-sm font-bold text-gray-900 mb-3">Affordability Tier</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                { salary: salary1, city: city1Data },
+                { salary: salary2, city: city2Data },
+              ].filter(({ salary }) => salary > 0).map(({ salary, city }) => {
+                const tier = affordabilityTier(salary, city);
+                const info = TIER_CONFIG[tier];
+                return (
+                  <div key={city.slug} className={`rounded-xl border p-4 ${info.bgColor}`}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`text-sm font-bold ${info.color}`}>{info.label}</span>
+                      <span className="text-xs text-gray-500">{city.name}</span>
+                    </div>
+                    <p className="text-xs text-gray-600">{info.description}</p>
+                    {/* Tier gauge */}
+                    <div className="flex gap-1 mt-3">
+                      {(["cannot_afford", "survival", "comfortable", "saving_well", "luxury"] as TierType[]).map((t) => (
+                        <div key={t} className={`h-2 flex-1 rounded-full ${t === tier ? "opacity-100" : "opacity-20"} ${
+                          t === "cannot_afford" ? "bg-red-400" : t === "survival" ? "bg-orange-400" : t === "comfortable" ? "bg-green-400" : t === "saving_well" ? "bg-emerald-400" : "bg-blue-400"
+                        }`} />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Home Loan EMI Calculator */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-gray-900 mb-2">Home Loan EMI (2BHK)</h2>
+          <p className="text-sm text-gray-500 mb-4">Based on average 2BHK apartment prices in each city</p>
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Down Payment %</label>
+              <input type="number" value={loanDownPct} onChange={(e) => setLoanDownPct(Number(e.target.value))} min={0} max={90}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Tenure (years)</label>
+              <input type="number" value={loanTenure} onChange={(e) => setLoanTenure(Number(e.target.value))} min={1} max={30}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Interest Rate %</label>
+              <input type="number" value={loanRate} onChange={(e) => setLoanRate(Number(e.target.value))} min={1} max={20} step={0.25}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[
+              { city: city1Data, price: propPrice1, emi: emi1 },
+              { city: city2Data, price: propPrice2, emi: emi2 },
+            ].map(({ city, price, emi }) => (
+              <div key={city.slug} className="bg-gray-50 rounded-xl p-4">
+                <div className="text-sm font-bold text-gray-900 mb-2">{city.name}</div>
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex justify-between"><span className="text-gray-500">Avg 2BHK Price</span><span className="font-semibold">{formatPrice(price)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Down Payment ({loanDownPct}%)</span><span className="font-semibold">{formatPrice(Math.round(price * loanDownPct / 100))}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Loan Amount</span><span className="font-semibold">{formatPrice(Math.round(price * (1 - loanDownPct / 100)))}</span></div>
+                  <div className="flex justify-between border-t border-gray-200 pt-1.5"><span className="text-gray-700 font-medium">Monthly EMI</span><span className="font-bold text-orange-600 text-sm">{formatPrice(emi.emi)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Total Interest</span><span className="font-semibold text-red-500">{formatPrice(emi.totalInterest)}</span></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Share */}

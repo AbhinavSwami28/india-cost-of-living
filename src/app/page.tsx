@@ -2,6 +2,7 @@ import { cities, calculateCostIndex, calculateRentIndex } from "@/lib/data";
 import CityExplorer from "@/components/CityExplorer";
 import CitySelector from "@/components/CitySelector";
 import IndiaMap from "@/components/IndiaMap";
+import SalaryCheck from "@/components/SalaryCheck";
 import AdBanner from "@/components/AdBanner";
 import Link from "next/link";
 
@@ -66,9 +67,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Compare Tool */}
+      {/* Compare Tool + Quick Salary Check */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <CitySelector />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <CitySelector />
+          <SalaryCheck cities={cities} />
+        </div>
       </section>
 
       {/* India Map */}
@@ -86,7 +90,7 @@ export default function HomePage() {
           {/* Cost of Living Index */}
           <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6 shadow-sm">
             <h2 className="text-lg font-bold text-gray-900 mb-1">Cost of Living Index</h2>
-            <p className="text-xs text-gray-500 mb-4">All items relative to Mumbai = 100</p>
+            <p className="text-xs text-gray-500 mb-4">Mumbai = 100. Score of 75 means ~25% cheaper than Mumbai.</p>
             <div className="space-y-2">
               {sortedCities.slice(0, 10).map((city) => {
                 const index = calculateCostIndex(city);

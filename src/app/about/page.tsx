@@ -81,6 +81,14 @@ export default function AboutPage() {
                 We welcome corrections and updates from local residents.
               </p>
             </div>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
+              <p className="text-xs text-yellow-800">
+                <strong>Tier-2/3 city disclaimer:</strong> Prices for cities beyond the top 10 metros are
+                derived using cost-scaling formulas based on rent levels and verified against available
+                online data. They may be less accurate than metro city prices. All prices are editable —
+                adjust them to match your local experience.
+              </p>
+            </div>
           </section>
 
           <section>
