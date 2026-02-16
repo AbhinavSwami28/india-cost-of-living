@@ -1,76 +1,107 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
+import {
+  ComposableMap,
+  Geographies,
+  Geography,
+  Marker,
+} from "react-simple-maps";
 import { CityData } from "@/lib/types";
 import { calculateCostIndex, formatPrice } from "@/lib/data";
 
-// Group cities by region for visual display
-const REGIONS: { name: string; states: string[] }[] = [
-  { name: "North", states: ["Delhi", "Haryana", "Punjab", "Uttar Pradesh", "Uttarakhand", "Rajasthan", "Chandigarh"] },
-  { name: "West", states: ["Maharashtra", "Gujarat", "Goa", "Madhya Pradesh"] },
-  { name: "South", states: ["Karnataka", "Tamil Nadu", "Kerala", "Telangana", "Andhra Pradesh"] },
-  { name: "East", states: ["West Bengal", "Bihar", "Jharkhand", "Odisha", "Assam", "Chhattisgarh"] },
-];
+const INDIA_TOPO = "/india.topo.json";
+const PROJECTION_CONFIG = { rotate: [-82, 0, 0] as [number, number, number], scale: 1000, center: [0, 22.5] as [number, number] };
 
-const REGION_COLORS: Record<string, string> = {
-  North: "bg-orange-500", West: "bg-blue-500", South: "bg-emerald-500", East: "bg-purple-500",
-};
-const REGION_LIGHT: Record<string, string> = {
-  North: "bg-orange-50 border-orange-200 hover:border-orange-400",
-  West: "bg-blue-50 border-blue-200 hover:border-blue-400",
-  South: "bg-emerald-50 border-emerald-200 hover:border-emerald-400",
-  East: "bg-purple-50 border-purple-200 hover:border-purple-400",
+// City coordinates [lng, lat] for markers
+const CITY_MARKERS: Record<string, [number, number]> = {
+  mumbai: [72.878, 19.076], delhi: [77.209, 28.614], bangalore: [77.595, 12.972],
+  chennai: [80.271, 13.083], hyderabad: [78.487, 17.385], pune: [73.857, 18.520],
+  kolkata: [88.364, 22.573], ahmedabad: [72.571, 23.023], jaipur: [75.787, 26.912],
+  lucknow: [80.946, 26.847], chandigarh: [76.779, 30.733], amritsar: [74.872, 31.634],
+  surat: [72.831, 21.170], indore: [75.858, 22.720], bhopal: [77.413, 23.260],
+  nagpur: [79.088, 21.146], coimbatore: [76.956, 11.017], kochi: [76.267, 9.931],
+  thiruvananthapuram: [76.937, 8.524], visakhapatnam: [83.219, 17.687],
+  vijayawada: [80.648, 16.506], mysuru: [76.639, 12.296], mangalore: [74.856, 12.914],
+  madurai: [78.120, 9.925], varanasi: [83.007, 25.318], agra: [78.008, 27.177],
+  kanpur: [80.332, 26.450], patna: [85.138, 25.609], ranchi: [85.310, 23.344],
+  bhubaneswar: [85.825, 20.296], guwahati: [91.736, 26.145], dehradun: [78.032, 30.317],
+  jodhpur: [73.024, 26.239], udaipur: [73.713, 24.585], goa: [73.828, 15.491],
+  raipur: [81.630, 21.251], siliguri: [88.395, 26.727],
 };
 
 export default function IndiaMap({ cities }: { cities: CityData[] }) {
-  const [hoveredCity, setHoveredCity] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const hoveredCity = hovered ? cities.find((c) => c.slug === hovered) : null;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {REGIONS.map((region) => {
-        const regionCities = cities.filter((c) => region.states.includes(c.state));
-        if (regionCities.length === 0) return null;
+    <div className="relative">
+      <ComposableMap
+        projection="geoMercator"
+        projectionConfig={PROJECTION_CONFIG}
+        width={500}
+        height={550}
+        className="w-full h-auto max-w-lg mx-auto"
+      >
+        <Geographies geography={INDIA_TOPO}>
+          {({ geographies }) =>
+            geographies.map((geo) => (
+              <Geography
+                key={geo.rsmKey}
+                geography={geo}
+                fill="#e8ede8"
+                stroke="#ccc"
+                strokeWidth={0.5}
+                className="outline-none dark:fill-[#1a1a1a] dark:stroke-[#333]"
+                style={{
+                  default: { outline: "none" },
+                  hover: { fill: "#fde68a", outline: "none" },
+                  pressed: { outline: "none" },
+                }}
+              />
+            ))
+          }
+        </Geographies>
 
+        {cities.map((city) => {
+          const coords = CITY_MARKERS[city.slug];
+          if (!coords) return null;
+          const isHovered = hovered === city.slug;
+
+          return (
+            <Marker key={city.slug} coordinates={coords}>
+              <Link href={`/cost-of-living/${city.slug}`}>
+                <circle
+                  r={isHovered ? 6 : 3}
+                  fill={isHovered ? "#f97316" : "#ea580c"}
+                  stroke="#fff"
+                  strokeWidth={isHovered ? 2 : 1}
+                  className="cursor-pointer transition-all duration-150"
+                  onMouseEnter={() => setHovered(city.slug)}
+                  onMouseLeave={() => setHovered(null)}
+                />
+              </Link>
+            </Marker>
+          );
+        })}
+      </ComposableMap>
+
+      {/* Tooltip */}
+      {hoveredCity && (() => {
+        const index = calculateCostIndex(hoveredCity);
+        const rent = hoveredCity.prices.find((p) => p.item === "1 BHK in City Centre");
         return (
-          <div key={region.name}>
-            <div className="flex items-center gap-2 mb-2">
-              <div className={`w-2.5 h-2.5 rounded-full ${REGION_COLORS[region.name]}`} />
-              <h3 className="text-sm font-bold text-gray-900">{region.name} India</h3>
-              <span className="text-xs text-gray-400">{regionCities.length} cities</span>
-            </div>
-            <div className="space-y-1">
-              {regionCities.map((city) => {
-                const index = calculateCostIndex(city);
-                const rent = city.prices.find((p) => p.item === "1 BHK in City Centre");
-                const isHovered = hoveredCity === city.slug;
-
-                return (
-                  <Link
-                    key={city.slug}
-                    href={`/cost-of-living/${city.slug}`}
-                    className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all text-sm ${
-                      isHovered ? REGION_LIGHT[region.name] : "border-transparent hover:bg-gray-50"
-                    }`}
-                    onMouseEnter={() => setHoveredCity(city.slug)}
-                    onMouseLeave={() => setHoveredCity(null)}
-                  >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="font-medium text-gray-900 truncate">{city.name}</span>
-                      <span className="text-xs text-gray-400 shrink-0">{city.state}</span>
-                    </div>
-                    <div className="flex items-center gap-3 shrink-0 ml-2">
-                      <span className="text-xs text-gray-500">COL {index}</span>
-                      {rent && <span className="text-xs font-medium text-gray-700">{formatPrice(rent.price)}</span>}
-                      <span className="text-orange-400 text-xs">→</span>
-                    </div>
-                  </Link>
-                );
-              })}
+          <div className="absolute top-4 right-4 z-20 bg-gray-900 text-white rounded-lg px-4 py-3 text-xs shadow-xl pointer-events-none">
+            <div className="font-bold text-sm">{hoveredCity.name}</div>
+            <div className="text-gray-400">{hoveredCity.state}</div>
+            <div className="mt-1.5 space-y-0.5">
+              <div>COL Index: <strong className="text-orange-400">{index}</strong></div>
+              {rent && <div>1BHK: <strong className="text-orange-400">{formatPrice(rent.price)}/mo</strong></div>}
             </div>
           </div>
         );
-      })}
+      })()}
     </div>
   );
 }

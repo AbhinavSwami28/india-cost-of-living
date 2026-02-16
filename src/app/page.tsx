@@ -75,11 +75,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Cities by Region */}
+      {/* Interactive India Map */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
         <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-gray-900 mb-1">Browse by Region</h2>
-          <p className="text-xs text-gray-500 mb-4">{cities.length} cities across India. Click any city for full price breakdown.</p>
+          <h2 className="text-lg font-bold text-gray-900 mb-1">Interactive Map</h2>
+          <p className="text-xs text-gray-500 mb-2">Hover over a city for quick stats. Click to explore.</p>
           <IndiaMap cities={cities} />
         </div>
       </section>
@@ -152,13 +152,12 @@ export default function HomePage() {
                 {[...cities].sort((a, b) => calculateRentIndex(b) - calculateRentIndex(a)).slice(10).map((city) => {
                   const index = calculateRentIndex(city);
                   return (
-                    <Link key={city.slug} href={`/cost-of-living/${city.slug}`} className="flex items-center gap-3 group">
-                      <span className="text-sm font-medium text-gray-700 w-24 shrink-0 group-hover:text-blue-600 transition-colors truncate">{city.name}</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-5 overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-end px-2" style={{ width: `${Math.max(index, 10)}%` }}>
-                          <span className="text-[11px] font-bold text-white">{index}</span>
-                        </div>
+                    <Link key={city.slug} href={`/cost-of-living/${city.slug}`} className="flex items-center gap-2 group">
+                      <span className="text-xs font-medium text-gray-700 w-20 shrink-0 group-hover:text-blue-600 transition-colors truncate">{city.name}</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full" style={{ width: `${Math.max(index, 10)}%` }} />
                       </div>
+                      <span className="text-xs font-bold text-gray-700 w-8 text-right shrink-0">{index}</span>
                     </Link>
                   );
                 })}
