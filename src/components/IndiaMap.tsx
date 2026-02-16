@@ -38,8 +38,8 @@ export default function IndiaMap({ cities }: { cities: CityData[] }) {
     <div className="relative">
       <ComposableMap
         projection="geoMercator"
-        projectionConfig={{ rotate: [-82, 0, 0] as [number, number, number], scale: 1000, center: [0, 23] as [number, number] }}
-        width={500}
+        projectionConfig={{ rotate: [-83, 0, 0] as [number, number, number], scale: 850, center: [0, 23] as [number, number] }}
+        width={550}
         height={580}
         className="w-full h-auto max-w-lg mx-auto"
       >
