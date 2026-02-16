@@ -25,6 +25,7 @@ export const CATEGORIES = [
   "Accommodation - Rent (Monthly)",
   "PG / Shared Accommodation (Monthly)",
   "Household Help & Misc",
+  "Shopping & Online",
   "Lifestyle & Entertainment",
 ] as const;
 
@@ -38,6 +39,7 @@ export const CATEGORY_ICONS: Record<Category, string> = {
   "Accommodation - Rent (Monthly)": "🏠",
   "PG / Shared Accommodation (Monthly)": "🏘️",
   "Household Help & Misc": "🧹",
+  "Shopping & Online": "🛍️",
   "Lifestyle & Entertainment": "🎬",
 };
 
@@ -49,5 +51,6 @@ export const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
   "Accommodation - Rent (Monthly)": "Monthly rent for apartments in different areas",
   "PG / Shared Accommodation (Monthly)": "Paying Guest accommodations popular with students and young professionals",
   "Household Help & Misc": "Cook, maid, and other monthly household expenses",
+  "Shopping & Online": "Clothing, personal care, and online shopping averages",
   "Lifestyle & Entertainment": "Gym, movies, streaming, and personal care",
 };
