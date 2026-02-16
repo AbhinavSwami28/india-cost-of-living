@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import OfferCalculator from "@/components/OfferCalculator";
+import dynamic from "next/dynamic";
+
+const OfferCalculator = dynamic(() => import("@/components/OfferCalculator"), {
+  loading: () => <div className="text-center py-16 text-gray-400"><div className="text-4xl mb-3">🤔</div><p>Loading...</p></div>,
+});
 
 export const metadata: Metadata = {
   title: "Should I Take This Job Offer? — Salary & City Comparison",

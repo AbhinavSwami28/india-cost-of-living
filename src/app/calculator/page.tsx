@@ -1,7 +1,11 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import BudgetCalculator from "@/components/BudgetCalculator";
+import dynamic from "next/dynamic";
 import AdBanner from "@/components/AdBanner";
+
+const BudgetCalculator = dynamic(() => import("@/components/BudgetCalculator"), {
+  loading: () => <div className="text-center py-16 text-gray-400"><div className="text-4xl mb-3">🧮</div><p>Loading calculator...</p></div>,
+});
 
 export const metadata: Metadata = {
   title: "Monthly Budget Calculator - India Cost of Living",

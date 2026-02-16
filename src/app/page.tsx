@@ -1,10 +1,14 @@
 import { cities, calculateCostIndex, calculateRentIndex } from "@/lib/data";
+import dynamic from "next/dynamic";
 import CityExplorer from "@/components/CityExplorer";
 import CitySelector from "@/components/CitySelector";
-import IndiaMap from "@/components/IndiaMap";
 import SalaryCheck from "@/components/SalaryCheck";
-import AdBanner from "@/components/AdBanner";
 import Link from "next/link";
+
+const IndiaMap = dynamic(() => import("@/components/IndiaMap"), {
+  loading: () => <div className="h-64 flex items-center justify-center text-gray-400 text-sm">Loading map...</div>,
+});
+const AdBanner = dynamic(() => import("@/components/AdBanner"));
 
 export default function HomePage() {
   // Sort cities by cost index (most expensive first)

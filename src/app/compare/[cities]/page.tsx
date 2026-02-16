@@ -36,17 +36,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+// Pre-build only top 10 cities' pairs (90 pages). Rest generated on-demand via ISR.
 export async function generateStaticParams() {
+  const top = cities.slice(0, 10);
   const params: { cities: string }[] = [];
-  for (let i = 0; i < cities.length; i++) {
-    for (let j = 0; j < cities.length; j++) {
-      if (i !== j) {
-        params.push({ cities: `${cities[i].slug}-vs-${cities[j].slug}` });
-      }
+  for (let i = 0; i < top.length; i++) {
+    for (let j = i + 1; j < top.length; j++) {
+      params.push({ cities: `${top[i].slug}-vs-${top[j].slug}` });
+      params.push({ cities: `${top[j].slug}-vs-${top[i].slug}` });
     }
   }
   return params;
 }
+
+// On-demand pages cached for 1 hour
+export const revalidate = 3600;
 
 export default async function ComparisonPage({ params }: PageProps) {
   const { cities: citiesParam } = await params;

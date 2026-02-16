@@ -12,9 +12,8 @@ import { CityData } from "@/lib/types";
 import { calculateCostIndex, formatPrice } from "@/lib/data";
 
 const INDIA_TOPO = "/india.topo.json";
-const PROJECTION_CONFIG = { rotate: [-82, 0, 0] as [number, number, number], scale: 1000, center: [0, 22.5] as [number, number] };
 
-// City coordinates [lng, lat] for markers
+// City coordinates [lng, lat]
 const CITY_MARKERS: Record<string, [number, number]> = {
   mumbai: [72.878, 19.076], delhi: [77.209, 28.614], bangalore: [77.595, 12.972],
   chennai: [80.271, 13.083], hyderabad: [78.487, 17.385], pune: [73.857, 18.520],
@@ -39,9 +38,9 @@ export default function IndiaMap({ cities }: { cities: CityData[] }) {
     <div className="relative">
       <ComposableMap
         projection="geoMercator"
-        projectionConfig={PROJECTION_CONFIG}
+        projectionConfig={{ rotate: [-82, 0, 0] as [number, number, number], scale: 1000, center: [0, 23] as [number, number] }}
         width={500}
-        height={550}
+        height={580}
         className="w-full h-auto max-w-lg mx-auto"
       >
         <Geographies geography={INDIA_TOPO}>
@@ -51,8 +50,8 @@ export default function IndiaMap({ cities }: { cities: CityData[] }) {
                 key={geo.rsmKey}
                 geography={geo}
                 fill="#e8ede8"
-                stroke="#ccc"
-                strokeWidth={0.5}
+                stroke="#bbb"
+                strokeWidth={0.4}
                 className="outline-none dark:fill-[#1a1a1a] dark:stroke-[#333]"
                 style={{
                   default: { outline: "none" },
@@ -73,10 +72,10 @@ export default function IndiaMap({ cities }: { cities: CityData[] }) {
             <Marker key={city.slug} coordinates={coords}>
               <Link href={`/cost-of-living/${city.slug}`}>
                 <circle
-                  r={isHovered ? 6 : 3}
+                  r={isHovered ? 5 : 2.5}
                   fill={isHovered ? "#f97316" : "#ea580c"}
                   stroke="#fff"
-                  strokeWidth={isHovered ? 2 : 1}
+                  strokeWidth={isHovered ? 1.5 : 0.8}
                   className="cursor-pointer transition-all duration-150"
                   onMouseEnter={() => setHovered(city.slug)}
                   onMouseLeave={() => setHovered(null)}
@@ -87,7 +86,6 @@ export default function IndiaMap({ cities }: { cities: CityData[] }) {
         })}
       </ComposableMap>
 
-      {/* Tooltip */}
       {hoveredCity && (() => {
         const index = calculateCostIndex(hoveredCity);
         const rent = hoveredCity.prices.find((p) => p.item === "1 BHK in City Centre");

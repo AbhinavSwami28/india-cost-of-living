@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { CityData } from "@/lib/types";
-import { calculateCostIndex, formatPrice } from "@/lib/data";
+import { calculateCostIndex, formatPrice, getPriceByItem } from "@/lib/data";
 
 interface CityCardProps {
   city: CityData;
@@ -9,9 +9,9 @@ interface CityCardProps {
 
 export default function CityCard({ city }: CityCardProps) {
   const index = calculateCostIndex(city);
-  const rent1bhk = city.prices.find((p) => p.item === "1 BHK in City Centre");
-  const pgDouble = city.prices.find((p) => p.item === "PG - Double Sharing (with meals)");
-  const thali = city.prices.find((p) => p.item === "Veg Thali (local restaurant)");
+  const rent1bhk = getPriceByItem(city, "1 BHK in City Centre");
+  const pgDouble = getPriceByItem(city, "PG - Double Sharing (with meals)");
+  const thali = getPriceByItem(city, "Veg Thali (local restaurant)");
 
   return (
     <Link
@@ -44,22 +44,22 @@ export default function CityCard({ city }: CityCardProps) {
       {/* Quick Stats */}
       <div className="px-4 py-3.5">
         <div className="space-y-2">
-          {thali && (
+          {thali > 0 && (
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">🍽️ Veg Thali</span>
-              <span className="text-sm font-semibold text-gray-900">{formatPrice(thali.price)}</span>
+              <span className="text-sm font-semibold text-gray-900">{formatPrice(thali)}</span>
             </div>
           )}
-          {rent1bhk && (
+          {rent1bhk > 0 && (
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">🏠 1BHK Rent</span>
-              <span className="text-sm font-semibold text-gray-900">{formatPrice(rent1bhk.price)}</span>
+              <span className="text-sm font-semibold text-gray-900">{formatPrice(rent1bhk)}</span>
             </div>
           )}
-          {pgDouble && (
+          {pgDouble > 0 && (
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">🏘️ PG Double</span>
-              <span className="text-sm font-semibold text-gray-900">{formatPrice(pgDouble.price)}</span>
+              <span className="text-sm font-semibold text-gray-900">{formatPrice(pgDouble)}</span>
             </div>
           )}
         </div>
