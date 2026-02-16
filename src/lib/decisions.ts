@@ -1,23 +1,46 @@
 import { CityData } from "./types";
 import { formatPrice } from "./data";
 
-// Basic monthly expense estimate for a single person (no rent)
-// Uses key items: thali×30, milk×15, groceries, transport pass, utilities, mobile, broadband
-function basicMonthlyExpense(city: CityData): number {
+// Comprehensive monthly expense for a single working professional
+// Includes: food, groceries, transport, utilities, lifestyle, household help, shopping, misc
+function comprehensiveMonthlyExpense(city: CityData): number {
   const get = (item: string) => city.prices.find((p) => p.item === item)?.price ?? 0;
 
-  const food = get("Veg Thali (local restaurant)") * 30;
+  // Food: mix of cooking at home + eating out
+  const food =
+    get("Veg Thali (local restaurant)") * 15 +  // eat out ~15 days
+    get("Chai (regular cup)") * 30 +              // daily chai
+    get("Coffee (Cappuccino)") * 10 +             // coffee 10x/month
+    get("Street Food (Vada Pav / Samosa)") * 8 +  // snacks
+    get("Dosa (plain)") * 4 +                     // occasional
+    get("Fast Food Combo (McDonald's)") * 2 +     // occasional
+    get("Bottled Water (1 litre)") * 15;           // water
+
+  // Groceries: monthly staples
   const groceries =
     get("Rice (Basmati)") * 5 +
     get("Wheat Flour (Atta)") * 3 +
     get("Toor Dal") * 2 +
     get("Milk (Full Cream)") * 15 +
-    get("Cooking Oil (Sunflower)") * 2 +
+    get("Eggs") * 3 +                             // 3 dozen
+    get("Paneer") * 1 +
     get("Onions") * 3 +
     get("Tomatoes") * 3 +
     get("Potatoes") * 3 +
-    get("Sugar") * 1;
-  const transport = get("Metro / Local Train (monthly pass)") || get("Bus (monthly pass)");
+    get("Cooking Oil (Sunflower)") * 2 +
+    get("Sugar") * 1 +
+    get("Apples (Shimla)") * 2 +
+    get("Bananas") * 2 +
+    get("Bread (White, Sliced)") * 4;
+
+  // Transport: metro pass + Ola rides + auto rides + petrol
+  const transport =
+    (get("Metro / Local Train (monthly pass)") || get("Bus (monthly pass)")) +
+    get("Ola/Uber (avg ride)") * 8 +              // 8 rides/month
+    get("Auto Rickshaw (minimum fare)") * 15 +     // 15 auto rides
+    get("Petrol") * 20;                            // 20L petrol
+
+  // Utilities
   const utilities =
     get("Electricity") +
     get("Water Bill") +
@@ -25,13 +48,33 @@ function basicMonthlyExpense(city: CityData): number {
     get("Broadband Internet") +
     get("Mobile Plan (Jio/Airtel)");
 
-  return food + groceries + transport + utilities;
+  // Household help
+  const household =
+    get("Maid / Cleaning Help") +
+    get("Laundry / Ironing (dhobi)") +
+    get("Miscellaneous Monthly Spend");
+
+  // Lifestyle
+  const lifestyle =
+    get("Gym Membership") +
+    get("Movie Ticket (Multiplex)") * 2 +
+    get("Netflix (Standard Plan)") +
+    get("Spotify Premium") +
+    get("Haircut (Men, basic salon)") +
+    get("Domestic Beer (pint, restaurant)") * 4;
+
+  // Shopping
+  const shopping =
+    get("Skincare Basics (Nykaa avg)") +
+    get("Amazon Prime Membership");
+
+  return food + groceries + transport + utilities + household + lifestyle + shopping;
 }
 
-// Full monthly cost including rent (1BHK outside city centre as default)
+// Full monthly cost including rent
 function fullMonthlyCost(city: CityData, accommodation = "1 BHK Outside City Centre"): number {
   const rent = city.prices.find((p) => p.item === accommodation)?.price ?? 0;
-  return basicMonthlyExpense(city) + rent;
+  return comprehensiveMonthlyExpense(city) + rent;
 }
 
 /**
@@ -62,11 +105,11 @@ export function affordabilityTier(salary: number, city: CityData): Affordability
 }
 
 export const TIER_CONFIG: Record<AffordabilityTier, { label: string; color: string; bgColor: string; description: string }> = {
-  cannot_afford: { label: "Cannot Afford", color: "text-red-600", bgColor: "bg-red-50 border-red-200", description: "Salary doesn't cover basic expenses + rent" },
-  survival: { label: "Tight Budget", color: "text-orange-600", bgColor: "bg-orange-50 border-orange-200", description: "Covers basics but very little savings" },
-  comfortable: { label: "Comfortable", color: "text-green-600", bgColor: "bg-green-50 border-green-200", description: "Good lifestyle with moderate savings" },
-  saving_well: { label: "Saving Well", color: "text-emerald-600", bgColor: "bg-emerald-50 border-emerald-200", description: "Strong savings, can invest and plan ahead" },
-  luxury: { label: "Very Comfortable", color: "text-blue-600", bgColor: "bg-blue-50 border-blue-200", description: "Premium lifestyle with significant surplus" },
+  cannot_afford: { label: "Cannot Afford", color: "text-red-600", bgColor: "bg-red-50 border-red-200", description: "Salary doesn't cover basic expenses + rent in this city" },
+  survival: { label: "Tight Budget", color: "text-orange-600", bgColor: "bg-orange-50 border-orange-200", description: "Covers expenses but very little savings. Cut lifestyle to save." },
+  comfortable: { label: "Comfortable", color: "text-green-600", bgColor: "bg-green-50 border-green-200", description: "Good lifestyle with moderate savings each month" },
+  saving_well: { label: "Saving Well", color: "text-emerald-600", bgColor: "bg-emerald-50 border-emerald-200", description: "Strong savings — can invest, build emergency fund" },
+  luxury: { label: "Very Comfortable", color: "text-blue-600", bgColor: "bg-blue-50 border-blue-200", description: "Premium lifestyle with significant surplus for investments" },
 };
 
 /**
@@ -120,6 +163,7 @@ export function calculateEMI(
 ): { emi: number; totalInterest: number; totalAmount: number } {
   const r = annualRate / 100 / 12;
   const n = tenureYears * 12;
+  if (principal <= 0 || r <= 0 || n <= 0) return { emi: 0, totalInterest: 0, totalAmount: 0 };
   const emi = Math.round(principal * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1));
   const totalAmount = emi * n;
   const totalInterest = totalAmount - principal;
