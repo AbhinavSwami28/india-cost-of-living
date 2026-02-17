@@ -120,6 +120,15 @@ export default async function ComparisonPage({ params }: PageProps) {
               ))}
           </div>
         </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Prices look different from your experience?{" "}
+            <Link href="/feedback" className="text-orange-500 hover:text-orange-600 font-medium">
+              Help us improve the data →
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

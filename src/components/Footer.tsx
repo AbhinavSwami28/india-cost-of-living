@@ -108,13 +108,24 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="mailto:swami.abhinav28@gmail.com?subject=Data%20Correction%20-%20costoflivingindia.com&body=City:%0AItem:%0ACurrent%20Price:%0ACorrect%20Price:%0ASource:"
+                <Link href="/feedback"
                   className="text-sm text-orange-400 hover:text-orange-300 transition-colors font-medium">
-                  Correct a Price
-                </a>
+                  Feedback & Corrections
+                </Link>
               </li>
             </ul>
           </div>
+        </div>
+
+        {/* Feedback CTA */}
+        <div className="mt-10 bg-gradient-to-r from-orange-600/20 to-amber-600/20 border border-orange-500/30 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 className="text-white font-semibold text-base mb-1">See something wrong? Help us fix it.</h3>
+            <p className="text-sm text-gray-400">Report incorrect prices, missing data, or suggest new features.</p>
+          </div>
+          <Link href="/feedback" className="shrink-0 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors">
+            Give Feedback
+          </Link>
         </div>
 
         <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">

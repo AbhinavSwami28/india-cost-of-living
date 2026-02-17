@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 
 const OfferCalculator = dynamic(() => import("@/components/OfferCalculator"), {
   loading: () => <div className="text-center py-16 text-gray-400"><div className="text-4xl mb-3">🤔</div><p>Loading...</p></div>,
@@ -31,6 +32,14 @@ export default function OfferPage() {
       </section>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <OfferCalculator />
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Think a city&apos;s prices are wrong?{" "}
+            <Link href="/feedback" className="text-orange-500 hover:text-orange-600 font-medium">
+              Help us correct them →
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

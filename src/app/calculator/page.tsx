@@ -52,6 +52,14 @@ export default function CalculatorPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <BudgetCalculator />
         <AdBanner adFormat="horizontal" className="mt-8" />
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Prices don&apos;t match your experience?{" "}
+            <Link href="/feedback" className="text-orange-500 hover:text-orange-600 font-medium">
+              Let us know →
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

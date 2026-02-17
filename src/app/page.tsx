@@ -237,6 +237,19 @@ export default function HomePage() {
         <AdBanner adFormat="horizontal" className="mb-6" />
       </div>
 
+      {/* Feedback CTA */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 border border-orange-200 dark:border-orange-800/50 rounded-xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Prices look off? Help us fix them.</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Your local knowledge makes this data better for everyone. Report corrections or suggest improvements.</p>
+          </div>
+          <Link href="/feedback" className="shrink-0 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors text-sm">
+            Give Feedback
+          </Link>
+        </div>
+      </section>
+
       {/* Popular Comparisons */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Popular Comparisons</h2>

@@ -70,6 +70,15 @@ export default function ComparePage() {
             })}
           </div>
         </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            See incorrect prices in a comparison?{" "}
+            <Link href="/feedback" className="text-orange-500 hover:text-orange-600 font-medium">
+              Help us fix them →
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

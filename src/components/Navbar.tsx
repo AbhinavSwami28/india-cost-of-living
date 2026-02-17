@@ -93,6 +93,10 @@ export default function Navbar() {
               className={`text-sm font-medium transition-colors ${isActive("/offer") ? "text-orange-600" : "text-gray-600 hover:text-gray-900"}`}>
               Job Offer
             </Link>
+            <Link href="/feedback"
+              className={`text-sm font-medium transition-colors ${isActive("/feedback") ? "text-orange-600" : "text-gray-600 hover:text-gray-900"}`}>
+              Feedback
+            </Link>
             <Link href="/calculator"
               className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
               My Budget
@@ -136,6 +140,9 @@ export default function Navbar() {
             </Link>
             <Link href="/calculator" className="block py-2 text-gray-700 hover:text-orange-600" onClick={() => setMenuOpen(false)}>
               My Budget Calculator
+            </Link>
+            <Link href="/feedback" className="block py-2 text-gray-700 hover:text-orange-600" onClick={() => setMenuOpen(false)}>
+              Feedback
             </Link>
             <div className="mt-2 pt-2 border-t border-gray-100">
               <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">Top Cities</p>
