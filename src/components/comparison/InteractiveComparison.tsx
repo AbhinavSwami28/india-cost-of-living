@@ -10,6 +10,7 @@ import { trackEvent } from "@/lib/analytics";
 import EditablePrice from "@/components/ui/EditablePrice";
 import DiffBadge from "@/components/ui/DiffBadge";
 import ProfilePills from "@/components/ui/ProfilePills";
+import CategoryFilter from "@/components/comparison/CategoryFilter";
 
 const NON_VEG_ITEMS = ["Non-Veg Thali (local restaurant)", "Biryani (chicken)", "Chicken", "Eggs"];
 
@@ -407,41 +408,15 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
 
       {/* ====== COMPARE TAB ====== */}
       {activeTab === "compare" && <>
-        {/* Veg Mode + Category Filters */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={toggleVegMode}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
-              vegMode
-                ? "bg-green-50 border-green-400 text-green-700"
-                : "bg-white dark:bg-[#171717] border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-green-300"
-            }`}
-          >
-            🌱 Veg Mode {vegMode ? "ON" : "OFF"}
-          </button>
-          {vegMode && <span className="text-xs text-green-600">{NON_VEG_ITEMS.length} non-veg items excluded</span>}
-        </div>
-
-        {/* Category Filters */}
-        <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Filter Categories</h2>
-            <div className="flex gap-2">
-              <button onClick={() => setVisibleCategories(new Set(CATEGORIES))} className="text-xs text-orange-600 hover:text-orange-700 font-medium">Select All</button>
-              <span className="text-gray-300">|</span>
-              <button onClick={() => setVisibleCategories(new Set())} className="text-xs text-gray-500 hover:text-gray-700 font-medium">Deselect All</button>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {CATEGORIES.map((cat) => (
-              <label key={cat} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${visibleCategories.has(cat) ? "border-orange-300 bg-orange-50 dark:bg-orange-950/30" : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 opacity-60"} hover:border-orange-400`}>
-                <input type="checkbox" checked={visibleCategories.has(cat)} onChange={() => toggleCategory(cat)} className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500 accent-orange-500" />
-                <span className="text-lg">{CATEGORY_ICONS[cat as Category]}</span>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{cat.split(" (")[0]}</span>
-              </label>
-            ))}
-          </div>
-        </div>
+        <CategoryFilter
+          visibleCategories={visibleCategories}
+          onToggle={toggleCategory}
+          onSelectAll={() => setVisibleCategories(new Set(CATEGORIES))}
+          onDeselectAll={() => setVisibleCategories(new Set())}
+          vegMode={vegMode}
+          onToggleVeg={toggleVegMode}
+          nonVegCount={NON_VEG_ITEMS.length}
+        />
 
         {/* Price Tables */}
         <div>

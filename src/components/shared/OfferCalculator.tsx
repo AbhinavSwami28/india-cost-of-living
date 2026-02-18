@@ -4,14 +4,9 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { cities, formatPrice } from "@/lib/data";
 import { salaryEquivalent, affordabilityTier, TIER_CONFIG, getEstimatedMonthlyCost } from "@/lib/decisions";
+import { getProfileAccommodation, type ProfileKey } from "@/lib/budgetConfig";
 import { trackEvent } from "@/lib/analytics";
-
-const LIFESTYLE_PROFILES = [
-  { key: "student", label: "Student", icon: "🎓", acc: "PG - Double Sharing (with meals)" },
-  { key: "professional", label: "Professional", icon: "💼", acc: "1 BHK in City Centre" },
-  { key: "couple", label: "Newly Married", icon: "💑", acc: "1 BHK in City Centre" },
-  { key: "family", label: "Family", icon: "👨‍👩‍👧", acc: "2 BHK in City Centre" },
-];
+import ProfilePills from "@/components/ui/ProfilePills";
 
 export default function OfferCalculator() {
   const [currentCity, setCurrentCity] = useState("");
@@ -19,9 +14,9 @@ export default function OfferCalculator() {
   const [currentEMI, setCurrentEMI] = useState(0);
   const [newCity, setNewCity] = useState("");
   const [newSalary, setNewSalary] = useState(0);
-  const [profile, setProfile] = useState("professional");
+  const [profile, setProfile] = useState<ProfileKey>("professional");
 
-  const acc = useMemo(() => LIFESTYLE_PROFILES.find((p) => p.key === profile)?.acc, [profile]);
+  const acc = useMemo(() => getProfileAccommodation(profile, true), [profile]);
 
   const city1 = useMemo(() => cities.find((c) => c.slug === currentCity), [currentCity]);
   const city2 = useMemo(() => cities.find((c) => c.slug === newCity), [newCity]);
@@ -119,26 +114,15 @@ export default function OfferCalculator() {
       </div>
 
       {/* Lifestyle Profile */}
-      <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-5 shadow-sm">
+      <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="text-sm font-bold text-gray-900">Your Lifestyle</h2>
             <p className="text-xs text-gray-500">Affects rent estimation in both cities</p>
           </div>
-          <span className="text-xs text-gray-400">{LIFESTYLE_PROFILES.find((p) => p.key === profile)?.acc}</span>
+          <span className="text-xs text-gray-400">{acc}</span>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {LIFESTYLE_PROFILES.map((p) => (
-            <button key={p.key} onClick={() => setProfile(p.key)}
-              className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
-                profile === p.key
-                  ? "bg-orange-50 text-orange-700 border-orange-300"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-orange-300 hover:text-orange-600"
-              }`}>
-              <span>{p.icon}</span> {p.label}
-            </button>
-          ))}
-        </div>
+        <ProfilePills active={profile} onChange={(key) => setProfile(key)} />
       </div>
 
       {/* Verdict */}

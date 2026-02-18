@@ -1,50 +1,22 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { CityData } from "@/lib/types";
 import { formatPrice } from "@/lib/data";
 import { affordabilityTier, TIER_CONFIG, getEstimatedMonthlyCost, type AffordabilityTier } from "@/lib/decisions";
+import { getProfileAccommodation, type ProfileKey } from "@/lib/budgetConfig";
 import { trackEvent } from "@/lib/analytics";
-
-const LIFESTYLE_PROFILES = [
-  { key: "student", label: "Student", icon: "🎓", accCentre: "PG - Double Sharing (with meals)", accOutskirts: "PG - Double Sharing (with meals)" },
-  { key: "professional", label: "Professional", icon: "💼", accCentre: "1 BHK in City Centre", accOutskirts: "1 BHK Outside City Centre" },
-  { key: "couple", label: "Couple", icon: "💑", accCentre: "1 BHK in City Centre", accOutskirts: "1 BHK Outside City Centre" },
-  { key: "family", label: "Family", icon: "👨‍👩‍👧", accCentre: "2 BHK in City Centre", accOutskirts: "2 BHK Outside City Centre" },
-];
-
-const ESTIMATE_ITEMS: Record<string, string[]> = {
-  "Food & Dining": ["Veg Thali ×15", "Chai ×30", "Coffee ×10", "Street Food ×8", "Dosa ×4", "Fast Food ×2", "Water ×15"],
-  "Groceries": ["Rice 5kg", "Atta 3kg", "Dal 2kg", "Milk 15L", "Eggs ×3dz", "Paneer 1kg", "Onions 3kg", "Tomatoes 3kg", "Potatoes 3kg", "Oil 2L", "Sugar 1kg", "Apples 2kg", "Bananas ×2dz", "Bread ×4"],
-  "Transport": ["Metro/Train pass", "Ola/Uber ×8", "Auto ×15", "Petrol 20L"],
-  "Utilities": ["Electricity", "Water", "LPG", "Broadband", "Mobile"],
-  "Household": ["Maid", "Laundry", "Miscellaneous"],
-  "Lifestyle": ["Gym", "Movies ×2", "Netflix", "Spotify", "Haircut", "Beer ×4"],
-  "Shopping": ["Skincare", "Amazon Prime"],
-};
-const TOTAL_ITEMS = Object.values(ESTIMATE_ITEMS).flat().length;
+import ProfilePills from "@/components/ui/ProfilePills";
+import CentreToggle from "@/components/ui/CentreToggle";
+import ItemsPopover from "@/components/ui/ItemsPopover";
 
 export default function SalaryCheck({ cities }: { cities: CityData[] }) {
   const [salary, setSalary] = useState(0);
   const [selectedCity, setSelectedCity] = useState("");
-  const [profile, setProfile] = useState("professional");
+  const [profile, setProfile] = useState<ProfileKey>("professional");
   const [cityCentre, setCityCentre] = useState(true);
-  const [showItems, setShowItems] = useState(false);
-  const popoverRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!showItems) return;
-    const handleClick = (e: MouseEvent) => {
-      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
-        setShowItems(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [showItems]);
-
-  const profileData = useMemo(() => LIFESTYLE_PROFILES.find((p) => p.key === profile), [profile]);
-  const acc = useMemo(() => cityCentre ? profileData?.accCentre : profileData?.accOutskirts, [cityCentre, profileData]);
+  const acc = useMemo(() => getProfileAccommodation(profile, cityCentre), [profile, cityCentre]);
   const hasCentreOption = profile !== "student";
 
   const city = useMemo(() => cities.find((c) => c.slug === selectedCity), [cities, selectedCity]);
@@ -59,6 +31,20 @@ export default function SalaryCheck({ cities }: { cities: CityData[] }) {
     }
   }, [tier, city, salary, profile]);
 
+  const suggestions = useMemo(() => {
+    if (!city || salary <= 0) return null;
+    const otherCities = cities.filter((c) => c.slug !== city.slug);
+    const cityTiers = otherCities.map((c) => ({
+      city: c,
+      tier: affordabilityTier(salary, c, acc) as AffordabilityTier,
+    }));
+    const tierOrder: AffordabilityTier[] = ["luxury", "saving_well", "comfortable", "survival", "cannot_afford"];
+    cityTiers.sort((a, b) => tierOrder.indexOf(a.tier) - tierOrder.indexOf(b.tier));
+    const savingWellCount = cityTiers.filter((c) => c.tier === "saving_well" || c.tier === "luxury").length;
+    const comfortableCount = cityTiers.filter((c) => c.tier === "comfortable").length;
+    return { top: cityTiers.slice(0, 6), savingWellCount, comfortableCount };
+  }, [city, salary, acc, cities]);
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6 shadow-sm">
       <h2 className="text-lg font-bold text-gray-900 mb-1">Can You Afford This City?</h2>
@@ -67,63 +53,25 @@ export default function SalaryCheck({ cities }: { cities: CityData[] }) {
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="relative flex-1">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">₹</span>
-          <input
-            type="text"
-            inputMode="numeric"
-            value={salary || ""}
+          <input type="text" inputMode="numeric" value={salary || ""}
             onChange={(e) => setSalary(Number(e.target.value.replace(/[^0-9]/g, "")))}
             placeholder="Monthly salary"
-            className="w-full pl-7 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white"
-          />
+            className="w-full pl-7 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white" />
         </div>
-        <select
-          value={selectedCity}
-          onChange={(e) => setSelectedCity(e.target.value)}
-          className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white sm:w-56"
-        >
+        <select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)}
+          className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white sm:w-56">
           <option value="">Select city</option>
-          {cities.map((c) => (
-            <option key={c.slug} value={c.slug}>{c.name}</option>
-          ))}
+          {cities.map((c) => <option key={c.slug} value={c.slug}>{c.name}</option>)}
         </select>
       </div>
 
-      <div className="flex flex-wrap items-center gap-1.5 mb-3">
-        {LIFESTYLE_PROFILES.map((p) => (
-          <button key={p.key} onClick={() => setProfile(p.key)}
-            className={`text-[11px] px-2.5 py-1 rounded-full border transition-all ${
-              profile === p.key
-                ? "bg-orange-50 text-orange-700 border-orange-300 font-medium"
-                : "bg-white text-gray-500 border-gray-200 hover:border-orange-200"
-            }`}>
-            {p.icon} {p.label}
-          </button>
-        ))}
+      <div className="mb-3">
+        <ProfilePills active={profile} onChange={(key) => setProfile(key)} size="sm" />
       </div>
 
       {hasCentreOption && (
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-[11px] text-gray-500">📍</span>
-          <button
-            onClick={() => setCityCentre(true)}
-            className={`text-[11px] px-2.5 py-1 rounded-l-full border transition-all ${
-              cityCentre
-                ? "bg-orange-50 text-orange-700 border-orange-300 font-medium"
-                : "bg-white text-gray-500 border-gray-200 hover:border-orange-200"
-            }`}
-          >
-            City Centre
-          </button>
-          <button
-            onClick={() => setCityCentre(false)}
-            className={`text-[11px] px-2.5 py-1 rounded-r-full border -ml-2 transition-all ${
-              !cityCentre
-                ? "bg-orange-50 text-orange-700 border-orange-300 font-medium"
-                : "bg-white text-gray-500 border-gray-200 hover:border-orange-200"
-            }`}
-          >
-            Away from Centre
-          </button>
+        <div className="mb-4">
+          <CentreToggle value={cityCentre} onChange={setCityCentre} />
         </div>
       )}
 
@@ -150,70 +98,34 @@ export default function SalaryCheck({ cities }: { cities: CityData[] }) {
               </div>
             </div>
           </div>
+
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-gray-500">
             <span className="font-medium text-gray-600">Assumptions:</span>
             <span>🏠 {acc}</span>
             <span>·</span>
-            <span className="relative" ref={popoverRef}>
-              <button
-                onClick={() => setShowItems(!showItems)}
-                className="underline decoration-dashed underline-offset-2 cursor-pointer hover:text-orange-600 transition-colors"
-              >
-                {TOTAL_ITEMS} items included
-              </button>
-              {showItems && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-white border border-gray-200 rounded-lg shadow-xl p-3 z-50 text-left">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-[11px] font-semibold text-gray-700">Items in estimate:</div>
-                    <button onClick={() => setShowItems(false)} className="text-gray-400 hover:text-gray-600">
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
-                  </div>
-                  <div className="text-[10px] text-gray-600 space-y-1.5 max-h-52 overflow-y-auto">
-                    {Object.entries(ESTIMATE_ITEMS).map(([cat, items]) => (
-                      <div key={cat}>
-                        <div className="font-semibold text-gray-500">{cat}</div>
-                        <div>{items.join(", ")}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </span>
+            <ItemsPopover accommodation={acc} />
             <span>·</span>
-            <a href={`/calculator?city=${city.slug}&profile=${profile}&centre=${cityCentre ? "1" : "0"}`} className="text-orange-500 font-medium hover:underline">See full breakdown of expenses →</a>
+            <a href={`/calculator?city=${city.slug}&profile=${profile}&centre=${cityCentre ? "1" : "0"}`} className="text-orange-500 font-medium hover:underline">
+              See full breakdown of expenses →
+            </a>
           </div>
 
-          {/* Try these cities */}
-          {(() => {
-            const otherCities = cities.filter((c) => c.slug !== city.slug);
-            const cityTiers = otherCities.map((c) => ({
-              city: c,
-              tier: affordabilityTier(salary, c, acc) as AffordabilityTier,
-            }));
-            const tierOrder: AffordabilityTier[] = ["luxury", "saving_well", "comfortable", "survival", "cannot_afford"];
-            cityTiers.sort((a, b) => tierOrder.indexOf(a.tier) - tierOrder.indexOf(b.tier));
-            const suggestions = cityTiers.slice(0, 6);
-            const savingWellCount = cityTiers.filter((c) => c.tier === "saving_well" || c.tier === "luxury").length;
-            const comfortableCount = cityTiers.filter((c) => c.tier === "comfortable").length;
-
-            return (
-              <div className="mt-3 pt-3 border-t border-gray-200/50">
-                <div className="text-xs text-gray-600 mb-2">
-                  At {formatPrice(salary)}/mo, you&apos;d be <strong className="text-emerald-600">Saving Well</strong> in {savingWellCount} cities
-                  {comfortableCount > 0 && <> and <strong className="text-green-600">Comfortable</strong> in {comfortableCount}</>}
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {suggestions.map(({ city: c, tier: t }) => (
-                    <a key={c.slug} href={`/cost-of-living/${c.slug}/prices`}
-                      className={`text-[10px] px-2 py-0.5 rounded-full border ${TIER_CONFIG[t].bgColor} ${TIER_CONFIG[t].color} font-medium hover:opacity-80 transition-opacity`}>
-                      {c.name}: {TIER_CONFIG[t].label}
-                    </a>
-                  ))}
-                </div>
+          {suggestions && (
+            <div className="mt-3 pt-3 border-t border-gray-200/50">
+              <div className="text-xs text-gray-600 mb-2">
+                At {formatPrice(salary)}/mo, you&apos;d be <strong className="text-emerald-600">Saving Well</strong> in {suggestions.savingWellCount} cities
+                {suggestions.comfortableCount > 0 && <> and <strong className="text-green-600">Comfortable</strong> in {suggestions.comfortableCount}</>}
               </div>
-            );
-          })()}
+              <div className="flex flex-wrap gap-1.5">
+                {suggestions.top.map(({ city: c, tier: t }) => (
+                  <a key={c.slug} href={`/cost-of-living/${c.slug}/prices`}
+                    className={`text-[10px] px-2 py-0.5 rounded-full border ${TIER_CONFIG[t].bgColor} ${TIER_CONFIG[t].color} font-medium hover:opacity-80 transition-opacity`}>
+                    {c.name}: {TIER_CONFIG[t].label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
