@@ -187,6 +187,12 @@ table tr { transition: background-color 0.15s ease; }
 .dark .focus\:ring-orange-500:focus { --tw-ring-color: #0d9488 !important; }
 .dark .focus\:border-orange-500:focus { border-color: #0d9488 !important; }
 
+/* Dark mode: orange gradient backgrounds (CTAs, banners) */
+.dark .bg-gradient-to-r.from-orange-600\/20 {
+  background-image: linear-gradient(to right, rgba(13, 148, 136, 0.12), rgba(13, 148, 136, 0.06)) !important;
+}
+.dark .border-orange-500\/30 { border-color: rgba(13, 148, 136, 0.2) !important; }
+
 /* Dark mode: orange gradients on index bars → teal */
 .dark .bg-gradient-to-r.from-orange-400 {
   background-image: linear-gradient(to right, #0d9488, #14b8a6) !important;
