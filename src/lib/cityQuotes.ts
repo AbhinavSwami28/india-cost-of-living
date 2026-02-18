@@ -376,9 +376,3 @@ export function getCityQuotes(slug: string): CityQuote[] {
   return [...citySpecific, ...fillers];
 }
 
-export function getRandomQuote(slug: string, seed: number): CityQuote | null {
-  const quotes = getCityQuotes(slug);
-  if (quotes.length === 0) return null;
-  const index = Math.abs(seed) % quotes.length;
-  return quotes[index];
-}

@@ -7,6 +7,11 @@ import { formatPrice, getPercentageDifference, getPricesByCategory, cities } fro
 import { decisionSummary, salaryEquivalent, affordabilityTier, TIER_CONFIG, calculateEMI, type AffordabilityTier as TierType } from "@/lib/decisions";
 import { DEFAULT_QUANTITIES, BUDGET_GROUPS, BUDGET_GROUP_ORDER, PROFILE_CONFIGS, getProfileExclusions, getProfileAccommodation, DEFAULT_BUDGET_ITEM_SET, type ProfileKey } from "@/lib/budgetConfig";
 import { trackEvent } from "@/lib/analytics";
+import EditablePrice from "@/components/ui/EditablePrice";
+import DiffBadge from "@/components/ui/DiffBadge";
+import ProfilePills from "@/components/ui/ProfilePills";
+
+const NON_VEG_ITEMS = ["Non-Veg Thali (local restaurant)", "Biryani (chicken)", "Chicken", "Eggs"];
 
 const MAX_CITIES = 5;
 
@@ -49,57 +54,6 @@ const ACCOMMODATION_OPTIONS = [
 
 
 
-const EditablePrice = React.memo(function EditablePrice({ value, onChange, isEdited }: {
-  value: number; onChange: (val: number) => void; isEdited: boolean;
-}) {
-  const [editing, setEditing] = useState(false);
-  const [inputVal, setInputVal] = useState("");
-
-  const handleClick = () => { setInputVal(String(value)); setEditing(true); };
-  const handleBlur = () => {
-    setEditing(false);
-    if (inputVal === "" || inputVal === "0") { if (value !== 0) onChange(0); return; }
-    const parsed = parseFloat(inputVal);
-    if (!isNaN(parsed) && parsed >= 0 && parsed !== value) onChange(parsed);
-  };
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-    if (e.key === "Escape") setEditing(false);
-  };
-
-  if (editing) {
-    return (
-      <input type="text" inputMode="decimal" value={inputVal}
-        onChange={(e) => setInputVal(e.target.value)} onBlur={handleBlur} onKeyDown={handleKeyDown} autoFocus
-        className="w-24 text-right text-sm font-semibold border border-orange-400 rounded-md px-2 py-1 focus:ring-2 focus:ring-orange-500 focus:outline-none bg-orange-50" />
-    );
-  }
-  return (
-    <button onClick={handleClick}
-      className={`text-sm font-semibold cursor-pointer group relative transition-colors ${isEdited ? "text-orange-600" : "text-gray-900"} hover:text-orange-500`}
-      title="Click to edit price">
-      {formatPrice(value)}
-      {isEdited ? (
-        <span className="ml-1 text-[10px] text-orange-500 font-normal">(edited)</span>
-      ) : (
-        <svg className="inline-block w-3 h-3 ml-1 text-gray-300 group-hover:text-orange-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-        </svg>
-      )}
-    </button>
-  );
-});
-
-const DiffBadge = React.memo(function DiffBadge({ diff }: { diff: number }) {
-  if (diff === 0) return <span className="text-xs text-gray-400">same</span>;
-  const isPositive = diff > 0;
-  return (
-    <span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${isPositive ? "bg-red-50 text-red-600" : "bg-green-50 text-green-600"}`}>
-      {isPositive ? "+" : ""}{diff}%
-    </span>
-  );
-});
-
 export default function InteractiveComparison({ initialCity1, initialCity2 }: InteractiveComparisonProps) {
   const router = useRouter();
 
@@ -117,18 +71,14 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
   const [customPrices, setCustomPrices] = useState<Record<string, number>>({});
   const [excludedItems, setExcludedItems] = useState<Set<string>>(new Set());
   const [vegMode, setVegMode] = useState(false);
-
-  const NON_VEG_ITEMS = [
-    "Non-Veg Thali (local restaurant)", "Biryani (chicken)", "Chicken", "Eggs",
-  ];
   const [quantities, setQuantities] = useState<Record<string, number>>(() => ({ ...DEFAULT_QUANTITIES }));
   const [cityAccommodations, setCityAccommodations] = useState<Record<string, string>>(() => {
     const acc: Record<string, string> = {};
     [initialCity1.slug, initialCity2.slug].forEach((s) => { acc[s] = "1 BHK Outside City Centre"; });
     return acc;
   });
-  const getAccommodation = (slug: string) => cityAccommodations[slug] ?? "1 BHK Outside City Centre";
-  const setAccommodation = (slug: string, acc: string) => setCityAccommodations((prev) => ({ ...prev, [slug]: acc }));
+  const getAccommodation = useCallback((slug: string) => cityAccommodations[slug] ?? "1 BHK Outside City Centre", [cityAccommodations]);
+  const setAccommodation = useCallback((slug: string, acc: string) => setCityAccommodations((prev) => ({ ...prev, [slug]: acc })), []);
   const [budgetItems, setBudgetItems] = useState<Set<string>>(() => {
     const initial = new Set(DEFAULT_BUDGET_ITEM_SET);
     initial.add("1 BHK Outside City Centre");
@@ -161,6 +111,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
   const toggleExcluded = useCallback((item: string) => {
     setExcludedItems((prev) => { const next = new Set(prev); next.has(item) ? next.delete(item) : next.add(item); return next; });
   }, []);
+  // NON_VEG_ITEMS is a component-level constant, stable across renders
   const toggleVegMode = useCallback(() => {
     setVegMode((prev) => {
       const next = !prev;
@@ -171,7 +122,6 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
       });
       return next;
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const toggleBudgetItem = useCallback((item: string) => {
     setBudgetItems((prev) => { const next = new Set(prev); next.has(item) ? next.delete(item) : next.add(item); return next; });
@@ -186,11 +136,11 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
     (slug: string, item: string, original: number) => customPrices[`${slug}:${item}`] ?? original,
     [customPrices]
   );
-  const setPrice = (slug: string, item: string, price: number) => {
+  const setPrice = useCallback((slug: string, item: string, price: number) => {
     setCustomPrices((prev) => ({ ...prev, [`${slug}:${item}`]: price }));
-  };
-  const isEdited = (slug: string, item: string) => `${slug}:${item}` in customPrices;
-  const resetAllPrices = () => setCustomPrices({});
+  }, []);
+  const isEdited = useCallback((slug: string, item: string) => `${slug}:${item}` in customPrices, [customPrices]);
+  const resetAllPrices = useCallback(() => setCustomPrices({}), []);
   const editCount = Object.keys(customPrices).length;
 
   const handleCityChange = (index: number, slug: string) => {
@@ -241,8 +191,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
       });
       return total;
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [cityAccommodations, budgetItems, getPrice, excludedItems, quantities]
+    [cityAccommodations, budgetItems, getPrice, excludedItems, quantities, getAccommodation]
   );
 
   const applyProfile = (profileKey: ProfileKey, accOverride?: string) => {
@@ -334,39 +283,12 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
       </div>
 
       {/* Profile Selector */}
-      <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-4 shadow-sm">
+      <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
         <div className="flex items-center justify-between mb-3">
-          <div className="text-sm font-bold text-gray-900 dark:text-white">Who are you?</div>
+          <div className="text-sm font-bold text-gray-900">Who are you?</div>
           <div className="text-[11px] text-gray-400">Affects accommodation &amp; budget defaults</div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {PROFILE_CONFIGS.map((p) => (
-            p.key === "couple" ? (
-              <div key={p.key} className={`inline-flex items-center gap-1.5 text-xs border rounded-full transition-all ${
-                activeProfile === "couple" ? "bg-orange-50 dark:bg-orange-950/30 border-orange-300 dark:border-orange-700" : "border-gray-200 dark:border-gray-700"
-              }`}>
-                <button onClick={() => applyProfile("couple", p.accCentre)}
-                  className={`pl-3 pr-1.5 py-1.5 font-medium transition-colors ${activeProfile === "couple" ? "text-orange-700 dark:text-orange-400" : "text-gray-600 dark:text-gray-400 hover:text-orange-600"}`}>
-                  {p.icon} {p.label}
-                </button>
-                <span className="text-gray-300 dark:text-gray-600">|</span>
-                <button onClick={() => applyProfile("couple", p.accOutskirts)}
-                  className="pr-3 pl-1.5 py-1.5 text-[10px] text-gray-500 hover:text-orange-600 transition-colors">
-                  outskirts
-                </button>
-              </div>
-            ) : (
-              <button key={p.key} onClick={() => applyProfile(p.key)}
-                className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
-                  activeProfile === p.key
-                    ? "bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-700"
-                    : "bg-white dark:bg-transparent text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-orange-300 hover:text-orange-600"
-                }`}>
-                <span>{p.icon}</span> {p.label}
-              </button>
-            )
-          ))}
-        </div>
+        <ProfilePills active={activeProfile} onChange={applyProfile} showCoupleVariants />
       </div>
 
       {/* Tabs */}

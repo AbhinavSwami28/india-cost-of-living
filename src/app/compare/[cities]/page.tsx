@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
 import { getCityBySlug, cities } from "@/lib/data";
-import InteractiveComparison from "@/components/InteractiveComparison";
-import AdBanner from "@/components/AdBanner";
+import InteractiveComparison from "@/components/comparison/InteractiveComparison";
+import AdBanner from "@/components/shared/AdBanner";
 
 interface PageProps {
   params: Promise<{ cities: string }>;

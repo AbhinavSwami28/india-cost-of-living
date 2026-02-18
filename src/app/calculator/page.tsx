@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import AdBanner from "@/components/AdBanner";
+import AdBanner from "@/components/shared/AdBanner";
 
-const BudgetCalculator = dynamic(() => import("@/components/BudgetCalculator"), {
+const BudgetCalculator = dynamic(() => import("@/components/calculator/BudgetCalculator"), {
   loading: () => <div className="text-center py-16 text-gray-400"><div className="text-4xl mb-3">🧮</div><p>Loading calculator...</p></div>,
 });
 

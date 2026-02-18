@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { CityData } from "@/lib/types";
 import { formatPrice } from "@/lib/data";
 import { affordabilityTier, TIER_CONFIG, getEstimatedMonthlyCost, type AffordabilityTier } from "@/lib/decisions";
@@ -43,14 +43,14 @@ export default function SalaryCheck({ cities }: { cities: CityData[] }) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [showItems]);
 
-  const profileData = LIFESTYLE_PROFILES.find((p) => p.key === profile);
-  const acc = cityCentre ? profileData?.accCentre : profileData?.accOutskirts;
+  const profileData = useMemo(() => LIFESTYLE_PROFILES.find((p) => p.key === profile), [profile]);
+  const acc = useMemo(() => cityCentre ? profileData?.accCentre : profileData?.accOutskirts, [cityCentre, profileData]);
   const hasCentreOption = profile !== "student";
 
-  const city = cities.find((c) => c.slug === selectedCity);
-  const tier = city && salary > 0 ? affordabilityTier(salary, city, acc) : null;
+  const city = useMemo(() => cities.find((c) => c.slug === selectedCity), [cities, selectedCity]);
+  const tier = useMemo(() => city && salary > 0 ? affordabilityTier(salary, city, acc) : null, [city, salary, acc]);
   const tierInfo = tier ? TIER_CONFIG[tier] : null;
-  const monthlyCost = city ? getEstimatedMonthlyCost(city, acc) : 0;
+  const monthlyCost = useMemo(() => city ? getEstimatedMonthlyCost(city, acc) : 0, [city, acc]);
   const savings = salary - monthlyCost;
 
   useEffect(() => {

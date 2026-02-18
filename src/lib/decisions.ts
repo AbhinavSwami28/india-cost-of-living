@@ -53,26 +53,6 @@ export const TIER_CONFIG: Record<AffordabilityTier, { label: string; color: stri
 };
 
 /**
- * Monthly savings comparison between two cities
- */
-export function savingsComparison(
-  salary1: number, salary2: number,
-  city1: CityData, city2: CityData
-): { savings1: number; savings2: number; betterCity: string; differencePerMonth: number } {
-  const cost1 = fullMonthlyCost(city1);
-  const cost2 = fullMonthlyCost(city2);
-  const savings1 = salary1 - cost1;
-  const savings2 = salary2 - cost2;
-
-  return {
-    savings1,
-    savings2,
-    betterCity: savings1 > savings2 ? city1.name : savings2 > savings1 ? city2.name : "Equal",
-    differencePerMonth: Math.abs(savings1 - savings2),
-  };
-}
-
-/**
  * Human-readable decision summary comparing two cities
  */
 export function decisionSummary(city1: CityData, city2: CityData): string {

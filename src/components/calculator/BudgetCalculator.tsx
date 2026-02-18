@@ -4,8 +4,9 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { CATEGORIES, CATEGORY_ICONS, CATEGORY_DESCRIPTIONS, Category } from "@/lib/types";
 import { formatPrice, cities } from "@/lib/data";
-import { DEFAULT_QUANTITIES, PROFILE_CONFIGS, getProfileExclusions, getProfileAccommodation, type ProfileKey } from "@/lib/budgetConfig";
+import { DEFAULT_QUANTITIES, getProfileExclusions, getProfileAccommodation, type ProfileKey } from "@/lib/budgetConfig";
 import { trackEvent } from "@/lib/analytics";
+import ProfilePills from "@/components/ui/ProfilePills";
 
 interface BudgetItem {
   item: string;
@@ -60,21 +61,22 @@ export default function BudgetCalculator() {
     setInitialized(true);
     setLocationName(city.name);
     setActiveProfile(profile);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Deps are empty because imported functions (getProfileAccommodation, getProfileExclusions,
+  // DEFAULT_QUANTITIES) are module-level constants — they never change between renders.
   }, []);
 
-  const handleBaseCityChange = (slug: string) => {
+  const handleBaseCityChange = useCallback((slug: string) => {
     setSelectedBaseCity(slug);
     initializeFromCity(slug, activeProfile);
     trackEvent("budget_calculate", { city: slug, profile: activeProfile });
-  };
+  }, [activeProfile, initializeFromCity]);
 
-  const handleProfileChange = (profileKey: ProfileKey) => {
+  const handleProfileChange = useCallback((profileKey: ProfileKey) => {
     setActiveProfile(profileKey);
     if (selectedBaseCity) {
       initializeFromCity(selectedBaseCity, profileKey);
     }
-  };
+  }, [selectedBaseCity, initializeFromCity]);
 
   useEffect(() => {
     const cityParam = searchParams.get("city");
@@ -85,8 +87,7 @@ export default function BudgetCalculator() {
       if (profileParam) setActiveProfile(profileParam);
       initializeFromCity(cityParam, profileParam ?? "professional", centreParam !== "0");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, initialized, initializeFromCity]);
 
   const toggleItem = (itemName: string) => {
     setBudgetItems((prev) =>
@@ -192,18 +193,7 @@ export default function BudgetCalculator() {
         {/* Profile Selector */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Your lifestyle</label>
-          <div className="flex flex-wrap gap-2">
-            {PROFILE_CONFIGS.map((p) => (
-              <button key={p.key} onClick={() => handleProfileChange(p.key)}
-                className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
-                  activeProfile === p.key
-                    ? "bg-orange-50 text-orange-700 border-orange-300"
-                    : "bg-white text-gray-600 border-gray-200 hover:border-orange-300 hover:text-orange-600"
-                }`}>
-                <span>{p.icon}</span> {p.label}
-              </button>
-            ))}
-          </div>
+          <ProfilePills active={activeProfile} onChange={handleProfileChange} />
         </div>
 
       </div>

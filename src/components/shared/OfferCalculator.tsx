@@ -21,21 +21,27 @@ export default function OfferCalculator() {
   const [newSalary, setNewSalary] = useState(0);
   const [profile, setProfile] = useState("professional");
 
-  const acc = LIFESTYLE_PROFILES.find((p) => p.key === profile)?.acc;
+  const acc = useMemo(() => LIFESTYLE_PROFILES.find((p) => p.key === profile)?.acc, [profile]);
 
   const city1 = useMemo(() => cities.find((c) => c.slug === currentCity), [currentCity]);
   const city2 = useMemo(() => cities.find((c) => c.slug === newCity), [newCity]);
 
   const hasInput = city1 && city2 && currentSalary > 0 && newSalary > 0;
 
-  const cost1 = city1 ? getEstimatedMonthlyCost(city1, acc) + currentEMI : 0;
-  const cost2 = city2 ? getEstimatedMonthlyCost(city2, acc) + currentEMI : 0;
-  const savings1 = currentSalary - cost1;
-  const savings2 = newSalary - cost2;
-  const diff = savings2 - savings1;
-  const equivSalary = city1 && city2 ? salaryEquivalent(currentSalary, city1, city2, acc) : 0;
-  const tier1 = city1 && currentSalary > 0 ? affordabilityTier(currentSalary - currentEMI, city1, acc) : null;
-  const tier2 = city2 && newSalary > 0 ? affordabilityTier(newSalary - currentEMI, city2, acc) : null;
+  const { cost1, cost2, savings1, savings2, diff, equivSalary, tier1, tier2 } = useMemo(() => {
+    const c1 = city1 ? getEstimatedMonthlyCost(city1, acc) + currentEMI : 0;
+    const c2 = city2 ? getEstimatedMonthlyCost(city2, acc) + currentEMI : 0;
+    return {
+      cost1: c1,
+      cost2: c2,
+      savings1: currentSalary - c1,
+      savings2: newSalary - c2,
+      diff: (newSalary - c2) - (currentSalary - c1),
+      equivSalary: city1 && city2 ? salaryEquivalent(currentSalary, city1, city2, acc) : 0,
+      tier1: city1 && currentSalary > 0 ? affordabilityTier(currentSalary - currentEMI, city1, acc) : null,
+      tier2: city2 && newSalary > 0 ? affordabilityTier(newSalary - currentEMI, city2, acc) : null,
+    };
+  }, [city1, city2, currentSalary, newSalary, currentEMI, acc]);
 
   const verdict = !hasInput ? null
     : diff > 5000 ? "yes" as const

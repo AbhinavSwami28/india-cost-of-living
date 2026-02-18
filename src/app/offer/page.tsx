@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
-const OfferCalculator = dynamic(() => import("@/components/OfferCalculator"), {
+const OfferCalculator = dynamic(() => import("@/components/shared/OfferCalculator"), {
   loading: () => (
     <div className="space-y-6">
       {[1, 2].map((i) => (

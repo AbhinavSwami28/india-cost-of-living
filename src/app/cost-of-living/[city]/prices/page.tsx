@@ -2,11 +2,11 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
 import { getCityBySlug, getAllCitySlugs, calculateCostIndex, formatPrice, cities } from "@/lib/data";
-import HeroImage from "@/components/HeroImage";
+import HeroImage from "@/components/shared/HeroImage";
 import { CATEGORIES, Category, CATEGORY_ICONS } from "@/lib/types";
-import PriceTable from "@/components/PriceTable";
-import AdBanner from "@/components/AdBanner";
-import CityCompareDropdown from "@/components/CityCompareDropdown";
+import PriceTable from "@/components/ui/PriceTable";
+import AdBanner from "@/components/shared/AdBanner";
+import CityCompareDropdown from "@/components/city/CityCompareDropdown";
 import { getCityQuotes } from "@/lib/cityQuotes";
 
 interface PageProps {

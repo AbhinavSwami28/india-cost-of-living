@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 import { cities } from "@/lib/data";
 import Link from "next/link";
-import InteractiveComparison from "@/components/InteractiveComparison";
-import AdBanner from "@/components/AdBanner";
+import InteractiveComparison from "@/components/comparison/InteractiveComparison";
+import AdBanner from "@/components/shared/AdBanner";
 
 export const metadata: Metadata = {
   title: "Compare Cost of Living Between Indian Cities",

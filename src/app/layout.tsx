@@ -3,11 +3,11 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import ThemeProvider from "@/components/ThemeProvider";
-import BackToTop from "@/components/BackToTop";
-import ErrorBoundary from "@/components/ErrorBoundary";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import ThemeProvider from "@/components/layout/ThemeProvider";
+import BackToTop from "@/components/layout/BackToTop";
+import ErrorBoundary from "@/components/layout/ErrorBoundary";
 import "./globals.css";
 
 const geistSans = Geist({
