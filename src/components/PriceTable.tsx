@@ -12,7 +12,7 @@ export default function PriceTable({ prices, cityName }: PriceTableProps) {
   return (
     <div className="space-y-8">
       {CATEGORIES.map((category) => {
-        const items = grouped[category];
+        const items = grouped[category]?.filter((item) => item.price > 0);
         if (!items || items.length === 0) return null;
 
         return (

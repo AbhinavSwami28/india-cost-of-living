@@ -5,26 +5,36 @@ import Link from "next/link";
 import { cities, formatPrice } from "@/lib/data";
 import { salaryEquivalent, affordabilityTier, TIER_CONFIG, getEstimatedMonthlyCost } from "@/lib/decisions";
 
+const LIFESTYLE_PROFILES = [
+  { key: "student", label: "Student", icon: "🎓", acc: "PG - Double Sharing (with meals)" },
+  { key: "professional", label: "Professional", icon: "💼", acc: "1 BHK in City Centre" },
+  { key: "couple", label: "Newly Married", icon: "💑", acc: "1 BHK in City Centre" },
+  { key: "family", label: "Family", icon: "👨‍👩‍👧", acc: "2 BHK in City Centre" },
+];
+
 export default function OfferCalculator() {
   const [currentCity, setCurrentCity] = useState("");
   const [currentSalary, setCurrentSalary] = useState(0);
   const [currentEMI, setCurrentEMI] = useState(0);
   const [newCity, setNewCity] = useState("");
   const [newSalary, setNewSalary] = useState(0);
+  const [profile, setProfile] = useState("professional");
+
+  const acc = LIFESTYLE_PROFILES.find((p) => p.key === profile)?.acc;
 
   const city1 = useMemo(() => cities.find((c) => c.slug === currentCity), [currentCity]);
   const city2 = useMemo(() => cities.find((c) => c.slug === newCity), [newCity]);
 
   const hasInput = city1 && city2 && currentSalary > 0 && newSalary > 0;
 
-  const cost1 = city1 ? getEstimatedMonthlyCost(city1) + currentEMI : 0;
-  const cost2 = city2 ? getEstimatedMonthlyCost(city2) + currentEMI : 0;
+  const cost1 = city1 ? getEstimatedMonthlyCost(city1, acc) + currentEMI : 0;
+  const cost2 = city2 ? getEstimatedMonthlyCost(city2, acc) + currentEMI : 0;
   const savings1 = currentSalary - cost1;
   const savings2 = newSalary - cost2;
   const diff = savings2 - savings1;
-  const equivSalary = city1 && city2 ? salaryEquivalent(currentSalary, city1, city2) : 0;
-  const tier1 = city1 && currentSalary > 0 ? affordabilityTier(currentSalary - currentEMI, city1) : null;
-  const tier2 = city2 && newSalary > 0 ? affordabilityTier(newSalary - currentEMI, city2) : null;
+  const equivSalary = city1 && city2 ? salaryEquivalent(currentSalary, city1, city2, acc) : 0;
+  const tier1 = city1 && currentSalary > 0 ? affordabilityTier(currentSalary - currentEMI, city1, acc) : null;
+  const tier2 = city2 && newSalary > 0 ? affordabilityTier(newSalary - currentEMI, city2, acc) : null;
 
   const verdict = !hasInput ? null
     : diff > 5000 ? "yes" as const
@@ -93,6 +103,29 @@ export default function OfferCalculator() {
             To match your {city1.name} lifestyle, you need at least <strong className="text-gray-900">{formatPrice(equivSalary)}</strong> in {city2.name}
           </p>
         )}
+      </div>
+
+      {/* Lifestyle Profile */}
+      <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="text-sm font-bold text-gray-900">Your Lifestyle</h2>
+            <p className="text-xs text-gray-500">Affects rent estimation in both cities</p>
+          </div>
+          <span className="text-xs text-gray-400">{LIFESTYLE_PROFILES.find((p) => p.key === profile)?.acc}</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {LIFESTYLE_PROFILES.map((p) => (
+            <button key={p.key} onClick={() => setProfile(p.key)}
+              className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
+                profile === p.key
+                  ? "bg-orange-50 text-orange-700 border-orange-300"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-orange-300 hover:text-orange-600"
+              }`}>
+              <span>{p.icon}</span> {p.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Verdict */}

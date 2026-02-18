@@ -47,7 +47,6 @@ const ACCOMMODATION_OPTIONS = [
 const MONTHLY_BUDGET_ITEMS: Record<string, { items: string[]; multiplier?: number; pickOne?: boolean }> = {
   "Restaurants & Dining": {
     items: ["Veg Thali (local restaurant)", "Chai (regular cup)", "Coffee (Cappuccino)"],
-    multiplier: 30,
   },
   "Groceries": {
     items: [
@@ -62,18 +61,35 @@ const MONTHLY_BUDGET_ITEMS: Record<string, { items: string[]; multiplier?: numbe
       "Broadband Internet", "Mobile Plan (Jio/Airtel)",
     ],
   },
-  "Household Help & Misc": {
-    items: ["Cook (part-time, 2 meals/day)", "Maid / Cleaning Help", "Miscellaneous Monthly Spend"],
+  "Household Help": {
+    items: ["Cook (part-time, 2 meals/day)", "Maid / Cleaning Help", "Laundry / Ironing (dhobi)"],
+  },
+  "Miscellaneous": {
+    items: ["Miscellaneous Monthly Spend"],
+  },
+  "Shopping & Personal Care": {
+    items: [
+      "Men's Casual Shirt (Zara/H&M)", "Women's Dress (Myntra/Zara)",
+      "Running Shoes (Nike/Adidas)", "Skincare Basics (Nykaa avg)", "Amazon Prime Membership",
+    ],
   },
   "Lifestyle & Entertainment": { items: ["Gym Membership", "Netflix (Standard Plan)", "Spotify Premium"] },
 };
 
+const MENS_ITEMS = new Set(["Men's Casual Shirt (Zara/H&M)", "Haircut (Men, basic salon)"]);
+const WOMENS_ITEMS = new Set(["Women's Dress (Myntra/Zara)"]);
+const SINGLE_PROFILE_EXCLUDE_WOMENS = new Set(["student", "professional"]);
+const COUPLE_PROFILES = new Set(["couple", "family"]);
+
 const DEFAULT_QUANTITIES: Record<string, number> = {
+  "Veg Thali (local restaurant)": 2, "Chai (regular cup)": 30, "Coffee (Cappuccino)": 10,
   "Rice (Basmati)": 5, "Wheat Flour (Atta)": 3, "Toor Dal": 2,
   "Milk (Full Cream)": 15, "Eggs": 3, "Chicken": 2, "Paneer": 1,
   "Onions": 3, "Tomatoes": 3, "Potatoes": 3,
   "Cooking Oil (Sunflower)": 2, "Sugar": 1, "Apples (Shimla)": 2,
-  "Bananas": 2, "Bread (White, Sliced)": 4,
+  "Men's Casual Shirt (Zara/H&M)": 1, "Women's Dress (Myntra/Zara)": 1,
+  "Running Shoes (Nike/Adidas)": 1, "Skincare Basics (Nykaa avg)": 1,
+  "Bananas": 2, "Bread (White, Sliced)": 2,
   "Auto Rickshaw (minimum fare)": 15, "Ola/Uber (avg ride)": 8,
   "Petrol": 20, "Diesel": 15,
   "Movie Ticket (Multiplex)": 2, "Haircut (Men, basic salon)": 1,
@@ -168,6 +184,19 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
   });
   const [salaries, setSalaries] = useState<Record<string, number>>({});
   const [shareCopied, setShareCopied] = useState(false);
+  const [showBudgetItems, setShowBudgetItems] = useState(false);
+  const budgetPopoverRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!showBudgetItems) return;
+    const handleClick = (e: MouseEvent) => {
+      if (budgetPopoverRef.current && !budgetPopoverRef.current.contains(e.target as Node)) {
+        setShowBudgetItems(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showBudgetItems]);
 
   const [loanDownPct, setLoanDownPct] = useState(20);
   const [loanTenure, setLoanTenure] = useState(20);
@@ -264,11 +293,18 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
     [cityAccommodations, budgetItems, getPrice, excludedItems, quantities]
   );
 
-  const applyProfile = (profile: "student" | "professional" | "family") => {
+  const PG_ITEMS = ["PG - Private Room (with meals)", "PG - Private Room (without meals)", "PG - Double Sharing (with meals)", "PG - Double Sharing (without meals)", "PG - Triple Sharing (with meals)", "PG - Triple Sharing (without meals)"];
+
+  const applyProfile = (profile: "student" | "professional" | "couple" | "family", accOverride?: string) => {
+    const genderExclusions = SINGLE_PROFILE_EXCLUDE_WOMENS.has(profile)
+      ? [...WOMENS_ITEMS]
+      : [];
+
     const profiles = {
-      student: { acc: "PG - Double Sharing (with meals)", ex: ["Meal for Two (high-end restaurant)", "Two Wheeler EMI (avg)", "Car EMI (avg)", "Diesel"] },
-      professional: { acc: "1 BHK in City Centre", ex: ["Two Wheeler EMI (avg)", "Car EMI (avg)", "Diesel"] },
-      family: { acc: "2 BHK in City Centre", ex: ["Two Wheeler EMI (avg)", "Car EMI (avg)", "PG - Private Room (with meals)", "PG - Private Room (without meals)", "PG - Double Sharing (with meals)", "PG - Double Sharing (without meals)", "PG - Triple Sharing (with meals)", "PG - Triple Sharing (without meals)"] },
+      student: { acc: "PG - Double Sharing (with meals)", ex: ["Meal for Two (high-end restaurant)", "Two Wheeler EMI (avg)", "Car EMI (avg)", "Diesel", ...genderExclusions] },
+      professional: { acc: "1 BHK in City Centre", ex: ["Two Wheeler EMI (avg)", "Car EMI (avg)", "Diesel", ...genderExclusions] },
+      couple: { acc: accOverride ?? "1 BHK in City Centre", ex: [...PG_ITEMS] },
+      family: { acc: "2 BHK in City Centre", ex: ["Two Wheeler EMI (avg)", "Car EMI (avg)", ...PG_ITEMS] },
     };
     const p = profiles[profile];
     const accMap: Record<string, string> = {};
@@ -348,7 +384,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
         </div>
         {citySlugs.length === 2 && (
           <div className="flex justify-center mt-3">
-            <button onClick={() => { const t = citySlugs[0]; handleCityChange(0, citySlugs[1]); setTimeout(() => handleCityChange(1, t), 0); }}
+            <button onClick={() => { const [a, b] = citySlugs; setCitySlugs([b, a]); router.push(`/compare/${b}-vs-${a}`, { scroll: false }); }}
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="Swap cities" aria-label="Swap cities">
               <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
             </button>
@@ -424,7 +460,36 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
           <span className="font-medium text-gray-600 dark:text-gray-300">Assumptions:</span>
           <span>Food {budgetItems.has("Veg Thali (local restaurant)") ? "×30 days" : "excluded"}</span>
           <span>·</span>
-          <span>{budgetItems.size} items included</span>
+          <span className="relative" ref={budgetPopoverRef}>
+            <button onClick={() => setShowBudgetItems(!showBudgetItems)} className="underline decoration-dashed underline-offset-2 cursor-pointer hover:text-emerald-600 transition-colors">{budgetItems.size} items included</button>
+            {showBudgetItems && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 bg-white dark:bg-[#171717] border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl p-3 z-50 text-left">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-[11px] font-semibold text-gray-700 dark:text-gray-300">Items in budget calculation:</div>
+                  <button onClick={() => setShowBudgetItems(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </div>
+                <div className="text-[10px] text-gray-600 dark:text-gray-400 space-y-0.5 max-h-52 overflow-y-auto">
+                  {Object.entries(MONTHLY_BUDGET_ITEMS).map(([cat, { items }]) => {
+                    const active = items.filter((item) => budgetItems.has(item));
+                    if (active.length === 0) return null;
+                    return (
+                      <div key={cat} className="mb-1.5">
+                        <div className="font-semibold text-gray-500 dark:text-gray-400 mb-0.5">{cat}</div>
+                        {active.map((item) => (
+                          <div key={item} className={excludedItems.has(item) ? "line-through text-gray-400 dark:text-gray-600" : ""}>
+                            {item}{quantities[item] && quantities[item] !== 1 ? ` ×${quantities[item]}` : ""}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="text-[9px] text-gray-400 mt-2 pt-1.5 border-t border-gray-100 dark:border-gray-800">+ accommodation (shown above)</div>
+              </div>
+            )}
+          </span>
           <span>·</span>
           <span>{excludedItems.size > 0 ? `${excludedItems.size} excluded` : "nothing excluded"}</span>
           <span>·</span>
@@ -500,7 +565,10 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
               const allGrouped = groupedByCity.map((g) => g.grouped[category]);
               if (allGrouped.some((g) => !g)) return null;
 
-              const baseItems = allGrouped[0];
+              const baseItems = allGrouped[0].filter((item) =>
+                allGrouped.some((g) => (g.find((p) => p.item === item.item)?.price ?? 0) > 0)
+              );
+              if (baseItems.length === 0) return null;
 
               return (
                 <section key={category} id={category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}>
@@ -594,10 +662,10 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
         <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Quick Profiles</h2>
           <p className="text-sm text-gray-500 mb-4">Auto-set accommodation, quantities, and exclusions</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {([
               { key: "student" as const, icon: "🎓", label: "Student", desc: "PG double sharing, basic groceries, public transport" },
-              { key: "professional" as const, icon: "💼", label: "Young Professional", desc: "1BHK centre, full groceries, car + gym" },
+              { key: "professional" as const, icon: "💼", label: "Young Professional", desc: "1BHK centre, full groceries, metro + gym" },
               { key: "family" as const, icon: "👨‍👩‍👧", label: "Family of 3-4", desc: "2BHK centre, higher quantities, no PG" },
             ]).map((p) => (
               <button key={p.key} onClick={() => applyProfile(p.key)}
@@ -609,6 +677,23 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
                 </div>
               </button>
             ))}
+            <div className="flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 text-left">
+              <span className="text-2xl">💑</span>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-bold text-gray-900 dark:text-white">Newly Married</div>
+                <div className="text-xs text-gray-500 mt-0.5">1BHK, 2 people, full groceries, no PG</div>
+                <div className="flex gap-2 mt-2">
+                  <button onClick={() => applyProfile("couple", "1 BHK in City Centre")}
+                    className="text-[10px] px-2.5 py-1 rounded-full bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 font-medium hover:bg-orange-100 dark:hover:bg-orange-950/50 transition-colors border border-orange-200 dark:border-orange-800">
+                    City Centre
+                  </button>
+                  <button onClick={() => applyProfile("couple", "1 BHK Outside City Centre")}
+                    className="text-[10px] px-2.5 py-1 rounded-full bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700">
+                    Outskirts
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

@@ -28,14 +28,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: `Cost of Living in ${city.name}, ${city.state} - Prices & Rent 2026`,
     description: `Cost of living in ${city.name}: 1BHK rent from ${rent1bhk ? formatPrice(rent1bhk.price) : "N/A"}, PG double sharing from ${pgDouble ? formatPrice(pgDouble.price) : "N/A"}. Compare groceries, transport, dining, and utilities prices.`,
     keywords: [
+      `cost of living in ${city.name}`,
       `cost of living ${city.name}`,
       `${city.name} rent prices`,
       `PG in ${city.name}`,
       `${city.name} grocery prices`,
       `double sharing PG ${city.name}`,
-      `triple sharing PG ${city.name}`,
-      `${city.name} expenses`,
+      `${city.name} expenses 2026`,
     ],
+    alternates: {
+      canonical: `/cost-of-living/${slug}`,
+    },
     openGraph: {
       title: `Cost of Living in ${city.name} — Prices & Rent 2026`,
       description: `1BHK: ${rent1bhk ? formatPrice(rent1bhk.price) : "N/A"}/mo, PG: ${pgDouble ? formatPrice(pgDouble.price) : "N/A"}/mo. Full breakdown of ${city.name} expenses.`,
@@ -60,8 +63,32 @@ export default async function CityPage({ params }: PageProps) {
   const pgDouble = city.prices.find((p) => p.item === "PG - Double Sharing (with meals)");
   const petrol = city.prices.find((p) => p.item === "Petrol");
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://costoflivingindia.com",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: `Cost of Living in ${city.name}`,
+        item: `https://costoflivingindia.com/cost-of-living/${city.slug}`,
+      },
+    ],
+  };
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+
       {/* Hero */}
       <section className="relative text-white overflow-hidden">
         {/* Background: image with fallback gradient */}

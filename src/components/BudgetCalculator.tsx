@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { CATEGORIES, CATEGORY_ICONS, CATEGORY_DESCRIPTIONS, Category } from "@/lib/types";
 import { formatPrice, cities } from "@/lib/data";
 
@@ -70,15 +71,30 @@ interface BudgetItem {
 }
 
 export default function BudgetCalculator() {
+  const searchParams = useSearchParams();
   const [selectedBaseCity, setSelectedBaseCity] = useState("");
   const [locationName, setLocationName] = useState("");
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
   const [initialized, setInitialized] = useState(false);
 
-  // Initialize budget items from a base city
-  const initializeFromCity = useCallback((citySlug: string) => {
+  const PROFILE_ACCOMMODATION: Record<string, { centre: string; outskirts: string }> = {
+    student: { centre: "PG - Double Sharing (with meals)", outskirts: "PG - Double Sharing (with meals)" },
+    professional: { centre: "1 BHK in City Centre", outskirts: "1 BHK Outside City Centre" },
+    couple: { centre: "1 BHK in City Centre", outskirts: "1 BHK Outside City Centre" },
+    family: { centre: "2 BHK in City Centre", outskirts: "2 BHK Outside City Centre" },
+  };
+
+  const initializeFromCity = useCallback((citySlug: string, profileKey?: string, isCentre?: boolean) => {
     const city = cities.find((c) => c.slug === citySlug);
     if (!city) return;
+
+    const profAccConfig = profileKey ? PROFILE_ACCOMMODATION[profileKey] : undefined;
+    const defaultAcc = profAccConfig
+      ? (isCentre ? profAccConfig.centre : profAccConfig.outskirts)
+      : "1 BHK Outside City Centre";
+
+    const isCoupleOrFamily = profileKey === "couple" || profileKey === "family";
+    const womensItems = new Set(["Women's Dress (Myntra/Zara)"]);
 
     const items: BudgetItem[] = city.prices.map((p) => {
       let qty = 1;
@@ -86,15 +102,15 @@ export default function BudgetCalculator() {
       else if (QUANTITY_ITEMS.has(p.item)) qty = 2;
       else if (MONTHLY_ITEMS.has(p.item)) qty = 1;
 
-      // EMI items are optional — user decides
       const isVehicle = p.item.includes("EMI");
-      // Skip per-km items (auto per-km)
       const isPerKm = p.item.includes("per km after min");
-      // Only select ONE accommodation (1 BHK Outside City Centre), deselect all others
       const isAccommodation =
         p.category === "Accommodation - Rent (Monthly)" ||
         p.category === "PG / Shared Accommodation (Monthly)";
-      const isDefaultAccommodation = p.item === "1 BHK Outside City Centre";
+      const isDefaultAccommodation = p.item === defaultAcc;
+
+      let selected = isAccommodation ? isDefaultAccommodation : (!isVehicle && !isPerKm);
+      if (!isCoupleOrFamily && womensItems.has(p.item)) selected = false;
 
       return {
         item: p.item,
@@ -102,7 +118,7 @@ export default function BudgetCalculator() {
         unit: p.unit,
         basePrice: p.price,
         customPrice: p.price,
-        selected: isAccommodation ? isDefaultAccommodation : (!isVehicle && !isPerKm),
+        selected,
         quantity: qty,
       };
     });
@@ -110,12 +126,24 @@ export default function BudgetCalculator() {
     setBudgetItems(items);
     setInitialized(true);
     setLocationName(city.name);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleBaseCityChange = (slug: string) => {
     setSelectedBaseCity(slug);
     initializeFromCity(slug);
   };
+
+  useEffect(() => {
+    const cityParam = searchParams.get("city");
+    const profileParam = searchParams.get("profile");
+    const centreParam = searchParams.get("centre");
+    if (cityParam && !initialized && cities.some((c) => c.slug === cityParam)) {
+      setSelectedBaseCity(cityParam);
+      initializeFromCity(cityParam, profileParam ?? undefined, centreParam !== "0");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const toggleItem = (itemName: string) => {
     setBudgetItems((prev) =>
@@ -263,9 +291,12 @@ export default function BudgetCalculator() {
                 const total = categoryTotals[cat] || 0;
                 if (total === 0) return null;
                 return (
-                  <div key={cat} className="text-xs text-orange-100">
+                  <div key={cat} className="text-xs text-orange-100 group/cat relative cursor-help">
                     <span>{CATEGORY_ICONS[cat as Category]}</span>{" "}
                     <span className="font-medium text-white">{formatPrice(total)}</span>
+                    <div className="hidden group-hover/cat:block absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1 bg-gray-900 text-white text-[10px] font-medium rounded-md whitespace-nowrap shadow-lg z-50">
+                      {cat}
+                    </div>
                   </div>
                 );
               })}
@@ -287,7 +318,7 @@ export default function BudgetCalculator() {
 
             <div className="space-y-6">
               {CATEGORIES.map((category) => {
-                const items = grouped[category];
+                const items = grouped[category]?.filter((i) => i.basePrice > 0);
                 if (!items || items.length === 0) return null;
 
                 const allSelected = items.every((i) => i.selected);

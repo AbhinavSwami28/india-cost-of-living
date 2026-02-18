@@ -80,9 +80,9 @@ function fullMonthlyCost(city: CityData, accommodation = "1 BHK Outside City Cen
 /**
  * Salary equivalence: what salary in City B gives the same lifestyle as salaryInA in City A
  */
-export function salaryEquivalent(salaryInA: number, cityA: CityData, cityB: CityData): number {
-  const costA = fullMonthlyCost(cityA);
-  const costB = fullMonthlyCost(cityB);
+export function salaryEquivalent(salaryInA: number, cityA: CityData, cityB: CityData, accommodation?: string): number {
+  const costA = fullMonthlyCost(cityA, accommodation);
+  const costB = fullMonthlyCost(cityB, accommodation);
   if (costA === 0) return salaryInA;
   return Math.round(salaryInA * (costB / costA));
 }
@@ -92,8 +92,8 @@ export function salaryEquivalent(salaryInA: number, cityA: CityData, cityB: City
  */
 export type AffordabilityTier = "cannot_afford" | "survival" | "comfortable" | "saving_well" | "luxury";
 
-export function affordabilityTier(salary: number, city: CityData): AffordabilityTier {
-  const cost = fullMonthlyCost(city);
+export function affordabilityTier(salary: number, city: CityData, accommodation?: string): AffordabilityTier {
+  const cost = fullMonthlyCost(city, accommodation);
   if (cost === 0) return "comfortable";
   const ratio = salary / cost;
 
@@ -174,6 +174,6 @@ export function calculateEMI(
 /**
  * Get estimated full monthly cost for a city (for external use)
  */
-export function getEstimatedMonthlyCost(city: CityData): number {
-  return fullMonthlyCost(city);
+export function getEstimatedMonthlyCost(city: CityData, accommodation?: string): number {
+  return fullMonthlyCost(city, accommodation);
 }

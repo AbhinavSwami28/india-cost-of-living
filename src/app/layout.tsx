@@ -21,34 +21,38 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "India Cost of Living - Compare Prices Across 50+ Indian Cities",
-    template: "%s | India Cost of Living",
+    default: "Cost of Living in India (2026) – Compare 54 Cities",
+    template: "%s | Cost of Living India",
   },
   description:
-    "Compare the cost of living across 50+ Indian cities. Prices for rent, PG accommodation, groceries, transport, and more in Mumbai, Delhi, Bangalore, Chennai, Hyderabad, Pune, Kolkata, and other cities.",
+    "Compare the cost of living across 54 Indian cities in 2026. Updated prices for rent, PG accommodation, groceries, transport & utilities. Interactive cost index, city comparison tools & salary calculator.",
   keywords: [
+    "cost of living in India",
     "cost of living India",
     "India city comparison",
     "rent prices India",
     "PG accommodation cost",
+    "cheapest cities in India",
     "Mumbai cost of living",
     "Bangalore cost of living",
     "Delhi cost of living",
-    "double sharing PG price",
-    "triple sharing PG price",
-    "India grocery prices",
+    "India living expenses 2026",
   ],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     type: "website",
     locale: "en_IN",
     siteName: "Cost of Living India",
+    title: "Cost of Living in India (2026) – Compare 54 Cities",
     url: "https://costoflivingindia.com",
-    description: "Compare cost of living across 54 Indian cities. Rent, PG, groceries, transport — find out what life really costs.",
+    description: "Compare cost of living across 54 Indian cities in 2026. Rent, PG, groceries, transport — find out what life really costs.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cost of Living India — Compare 54 Cities",
-    description: "Interactive comparison of rent, PG, groceries, transport across Indian cities.",
+    title: "Cost of Living in India (2026) – 54 Cities Compared",
+    description: "Compare rent, PG, groceries & transport prices across 54 Indian cities. Interactive cost index & city comparison tools.",
   },
   metadataBase: new URL("https://costoflivingindia.com"),
 };
