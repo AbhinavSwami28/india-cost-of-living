@@ -7,6 +7,15 @@ import { formatPrice, getPercentageDifference, getPricesByCategory, cities } fro
 import { decisionSummary, salaryEquivalent, affordabilityTier, TIER_CONFIG, calculateEMI, type AffordabilityTier as TierType } from "@/lib/decisions";
 
 const MAX_CITIES = 5;
+
+const GRID_COLS: Record<number, string> = {
+  2: "grid-cols-1 sm:grid-cols-2",
+  3: "grid-cols-1 sm:grid-cols-3",
+  4: "grid-cols-2 sm:grid-cols-2 lg:grid-cols-4",
+  5: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5",
+};
+const gridCols = (n: number) => GRID_COLS[n] ?? GRID_COLS[5];
+
 const CITY_COLORS = [
   { text: "text-orange-600", bg: "bg-orange-50", border: "border-orange-500", ring: "ring-orange-500" },
   { text: "text-blue-600", bg: "bg-blue-50", border: "border-blue-500", ring: "ring-blue-500" },
@@ -313,7 +322,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
             </button>
           )}
         </div>
-        <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${Math.min(citySlugs.length, 3)}, 1fr)` }}>
+        <div className={`grid gap-3 ${gridCols(citySlugs.length)}`}>
           {citySlugs.map((slug, index) => (
             <div key={index} className="relative">
               <label className={`block text-sm font-medium mb-1.5 ${CITY_COLORS[index].text}`}>
@@ -369,7 +378,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
         )}
 
         {/* Per-city budget breakdown with accommodation */}
-        <div className={`grid gap-3 mt-4 ${cityDataList.length <= 3 ? `grid-cols-1 sm:grid-cols-${cityDataList.length}` : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"}`}>
+        <div className={`grid gap-3 mt-4 ${gridCols(cityDataList.length)}`}>
           {cityDataList.map((cd, i) => {
             const acc = getAccommodation(cd.slug);
             const accLabel = ACCOMMODATION_OPTIONS.find((o) => o.key === acc)?.label ?? acc;
@@ -607,7 +616,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
         <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Accommodation per City</h2>
           <p className="text-sm text-gray-500 mb-4">Pick different accommodation types for each city</p>
-          <div className={`grid gap-4 ${cityDataList.length <= 3 ? `grid-cols-1 sm:grid-cols-${cityDataList.length}` : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"}`}>
+          <div className={`grid gap-4 ${gridCols(cityDataList.length)}`}>
             {cityDataList.map((cd, i) => {
               const currentAcc = getAccommodation(cd.slug);
               return (
@@ -655,7 +664,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
               </div>
             </div>
           </div>
-          <div className={`grid gap-4 mb-6 ${budgets.length <= 3 ? `grid-cols-1 sm:grid-cols-${budgets.length}` : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"}`}>
+          <div className={`grid gap-4 mb-6 ${gridCols(budgets.length)}`}>
             {budgets.map(({ city, budget }, i) => {
               const acc = getAccommodation(city.slug);
               const accLabel = ACCOMMODATION_OPTIONS.find((o) => o.key === acc)?.label ?? acc;
@@ -699,7 +708,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
         <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Savings Calculator</h2>
           <p className="text-sm text-gray-500 mb-5">Enter salary in each city to see disposable income</p>
-          <div className={`grid gap-4 mb-6 ${cityDataList.length <= 3 ? `grid-cols-1 sm:grid-cols-${cityDataList.length}` : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"}`}>
+          <div className={`grid gap-4 mb-6 ${gridCols(cityDataList.length)}`}>
             {cityDataList.map((cd) => (
               <div key={cd.slug}>
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5">Salary in {cd.name}</label>
@@ -713,7 +722,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
             ))}
           </div>
           {cityDataList.some((cd) => (salaries[cd.slug] ?? 0) > 0) && (
-            <div className={`grid gap-4 ${cityDataList.length <= 3 ? `grid-cols-1 sm:grid-cols-${cityDataList.length}` : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"}`}>
+            <div className={`grid gap-4 ${gridCols(cityDataList.length)}`}>
               {cityDataList.map((cd, i) => {
                 const salary = salaries[cd.slug] ?? 0;
                 const budget = budgets[i].budget;
@@ -800,7 +809,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 bg-white dark:bg-[#0a0a0a] dark:text-white" />
             </div>
           </div>
-          <div className={`grid gap-4 ${cityDataList.length <= 3 ? `grid-cols-1 sm:grid-cols-${cityDataList.length}` : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"}`}>
+          <div className={`grid gap-4 ${gridCols(cityDataList.length)}`}>
             {cityDataList.map((cd) => {
               const avgProp = cd.prices.find((p) => p.item === "Home Loan EMI (2BHK avg)")?.price ?? 0;
               const propPrice = Math.round(avgProp * 240 / 1.8);
