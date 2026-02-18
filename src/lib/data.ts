@@ -313,7 +313,7 @@ const bangalorePrices: Record<string, number> = {
   "2 BHK Outside City Centre": 30000,
   "3 BHK in City Centre": 80000,
   "3 BHK Outside City Centre": 45000,
-  "Home Loan EMI (2BHK avg)": 76000,
+  "Home Loan EMI (2BHK avg)": 95000,
   "PG - Private Room (with meals)": 16000,
   "PG - Private Room (without meals)": 12000,
   "PG - Double Sharing (with meals)": 11000,
