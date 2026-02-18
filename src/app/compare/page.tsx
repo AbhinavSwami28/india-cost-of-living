@@ -16,7 +16,7 @@ export default function ComparePage() {
 
   return (
     <div>
-      <section className="bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 text-white">
+      <section className="bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 dark:from-orange-950 dark:via-orange-900 dark:to-amber-950 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">
             Compare Cost of Living

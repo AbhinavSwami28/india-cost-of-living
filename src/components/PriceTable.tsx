@@ -20,19 +20,19 @@ export default function PriceTable({ prices, cityName }: PriceTableProps) {
             <div className="flex items-center gap-3 mb-4">
               <span className="text-2xl">{CATEGORY_ICONS[category as Category]}</span>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{category}</h2>
-                <p className="text-sm text-gray-500">{CATEGORY_DESCRIPTIONS[category as Category]}</p>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">{category}</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{CATEGORY_DESCRIPTIONS[category as Category]}</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+            <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] overflow-hidden shadow-sm">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="text-left px-4 sm:px-6 py-3 text-sm font-semibold text-gray-600">
+                  <tr className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
+                    <th className="text-left px-4 sm:px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">
                       Item
                     </th>
-                    <th className="text-right px-4 sm:px-6 py-3 text-sm font-semibold text-gray-600">
+                    <th className="text-right px-4 sm:px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">
                       {cityName}
                     </th>
                   </tr>
@@ -41,14 +41,14 @@ export default function PriceTable({ prices, cityName }: PriceTableProps) {
                   {items.map((item, idx) => (
                     <tr
                       key={item.item}
-                      className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"} hover:bg-orange-50/50 transition-colors`}
+                      className={`${idx % 2 === 0 ? "bg-white dark:bg-[#171717]" : "bg-gray-50/50 dark:bg-gray-800/30"} hover:bg-orange-50/50 dark:hover:bg-orange-950/20 transition-colors`}
                     >
                       <td className="px-4 sm:px-6 py-3">
-                        <div className="text-sm font-medium text-gray-900">{item.item}</div>
-                        <div className="text-xs text-gray-400">{item.unit}</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">{item.item}</div>
+                        <div className="text-xs text-gray-400 dark:text-gray-500">{item.unit}</div>
                       </td>
                       <td className="px-4 sm:px-6 py-3 text-right">
-                        <span className="text-sm font-semibold text-gray-900">
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">
                           {formatPrice(item.price)}
                         </span>
                       </td>

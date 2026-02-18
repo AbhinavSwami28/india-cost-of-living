@@ -160,7 +160,7 @@ export default async function CityPage({ params }: PageProps) {
           {/* Main Content */}
           <div className="flex-1 min-w-0">
             {/* Category Quick Nav */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 mb-8 shadow-sm">
+            <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-4 mb-8 shadow-sm">
               <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
                 Jump to Category
               </h2>
@@ -185,7 +185,7 @@ export default async function CityPage({ params }: PageProps) {
             <PriceTable prices={city.prices} cityName={city.name} />
 
             {/* Data info */}
-            <div className="mt-8 bg-gray-50 rounded-xl border border-gray-200 p-5">
+            <div className="mt-8 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-5">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                   <p className="text-sm text-gray-600">
@@ -205,8 +205,8 @@ export default async function CityPage({ params }: PageProps) {
           {/* Sidebar */}
           <aside className="lg:w-80 space-y-6 lg:sticky lg:top-20 lg:self-start">
             {/* Quick Compare */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-              <h3 className="font-bold text-gray-900 mb-3">Compare {city.name} with</h3>
+            <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-5 shadow-sm">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-3">Compare {city.name} with</h3>
               <div className="mb-3">
                 <CityCompareDropdown currentSlug={city.slug} cities={otherCities} />
               </div>
@@ -222,12 +222,12 @@ export default async function CityPage({ params }: PageProps) {
             </div>
 
             {/* Other Cities */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-              <h3 className="font-bold text-gray-900 mb-3">Other Cities</h3>
+            <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-5 shadow-sm">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-3">Other Cities</h3>
               <div className="space-y-1.5">
                 {otherCities.slice(0, 10).map((other) => (
                   <Link key={other.slug} href={`/cost-of-living/${other.slug}/prices`}
-                    className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-600 hover:text-gray-900">
+                    className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
                     <span>{other.name}</span>
                     <span className="text-xs text-gray-400">{other.state}</span>
                   </Link>
@@ -239,8 +239,8 @@ export default async function CityPage({ params }: PageProps) {
             </div>
 
             {/* Popular Moves */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-              <h3 className="font-bold text-gray-900 mb-3">People from {city.name} also compare</h3>
+            <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-5 shadow-sm">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-3">People from {city.name} also compare</h3>
               <div className="space-y-1.5">
                 {otherCities.slice(0, 4).map((other) => (
                   <Link key={other.slug} href={`/compare/${city.slug}-vs-${other.slug}`}
@@ -255,10 +255,10 @@ export default async function CityPage({ params }: PageProps) {
             {/* City Quotes */}
             {getCityQuotes(city.slug).length > 0 && (
               <div className="space-y-4">
-                <h3 className="font-bold text-gray-900">Voices of {city.name}</h3>
+                <h3 className="font-bold text-gray-900 dark:text-white">Voices of {city.name}</h3>
                 {getCityQuotes(city.slug).map((quote, i) => (
-                  <div key={i} className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200/60 p-4">
-                    <p className="text-sm text-gray-700 italic leading-relaxed">
+                  <div key={i} className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 rounded-xl border border-orange-200/60 dark:border-orange-800/30 p-4">
+                    <p className="text-sm text-gray-700 dark:text-gray-300 italic leading-relaxed">
                       &ldquo;{quote.text}&rdquo;
                     </p>
                     <div className="mt-2 text-xs text-orange-500 font-medium">

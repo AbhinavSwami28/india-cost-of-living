@@ -16,7 +16,7 @@ export default function CityCard({ city }: CityCardProps) {
   return (
     <Link
       href={`/cost-of-living/${city.slug}/prices`}
-      className="group block bg-white rounded-xl border border-gray-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 overflow-hidden"
+      className="group block bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-lg transition-all duration-200 overflow-hidden"
     >
       {/* City Image + Overlay */}
       <div className="relative h-36 bg-gradient-to-r from-orange-500 to-amber-500">
@@ -46,27 +46,27 @@ export default function CityCard({ city }: CityCardProps) {
         <div className="space-y-2">
           {thali > 0 && (
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">🍽️ Veg Thali</span>
-              <span className="text-sm font-semibold text-gray-900">{formatPrice(thali)}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">🍽️ Veg Thali</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatPrice(thali)}</span>
             </div>
           )}
           {rent1bhk > 0 && (
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">🏠 1BHK Rent</span>
-              <span className="text-sm font-semibold text-gray-900">{formatPrice(rent1bhk)}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">🏠 1BHK Rent</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatPrice(rent1bhk)}</span>
             </div>
           )}
           {pgDouble > 0 && (
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">🏘️ PG Double</span>
-              <span className="text-sm font-semibold text-gray-900">{formatPrice(pgDouble)}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">🏘️ PG Double</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatPrice(pgDouble)}</span>
             </div>
           )}
         </div>
 
-        <div className="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between">
+        <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
           <span className="text-xs text-gray-400">{city.population}</span>
-          <span className="text-xs text-orange-500 group-hover:text-orange-600 font-medium">
+          <span className="text-xs text-orange-500 group-hover:text-orange-600 dark:group-hover:text-orange-400 font-medium">
             View prices →
           </span>
         </div>

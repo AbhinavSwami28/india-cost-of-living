@@ -52,56 +52,56 @@ export default function OfferCalculator() {
   return (
     <div className="space-y-6">
       {/* Current Situation */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-lg font-bold text-gray-900 mb-1">Your Current Situation</h2>
-        <p className="text-sm text-gray-500 mb-4">Where you are now</p>
+      <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Your Current Situation</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Where you are now</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">City</label>
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">City</label>
             <select value={currentCity} onChange={(e) => setCurrentCity(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 bg-white">
+              className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 bg-white dark:bg-[#0a0a0a] dark:text-white">
               <option value="">Select city</option>
               {cities.map((c) => <option key={c.slug} value={c.slug}>{c.name}, {c.state}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Monthly In-Hand Salary</label>
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Monthly In-Hand Salary</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">₹</span>
               <input type="text" inputMode="numeric" value={currentSalary || ""} onChange={(e) => setCurrentSalary(Number(e.target.value.replace(/[^0-9]/g, "")))}
-                placeholder="e.g. 50000" className="w-full pl-7 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500" />
+                placeholder="e.g. 50000" className="w-full pl-7 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 bg-white dark:bg-[#0a0a0a] dark:text-white" />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Existing EMIs (total)</label>
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Existing EMIs (total)</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">₹</span>
               <input type="text" inputMode="numeric" value={currentEMI || ""} onChange={(e) => setCurrentEMI(Number(e.target.value.replace(/[^0-9]/g, "")))}
-                placeholder="e.g. 15000" className="w-full pl-7 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500" />
+                placeholder="e.g. 15000" className="w-full pl-7 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 bg-white dark:bg-[#0a0a0a] dark:text-white" />
             </div>
           </div>
         </div>
       </div>
 
       {/* New Offer */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-lg font-bold text-gray-900 mb-1">The New Offer</h2>
-        <p className="text-sm text-gray-500 mb-4">What they&apos;re offering you</p>
+      <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">The New Offer</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">What they&apos;re offering you</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">New City</label>
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">New City</label>
             <select value={newCity} onChange={(e) => setNewCity(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 bg-white">
+              className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 bg-white dark:bg-[#0a0a0a] dark:text-white">
               <option value="">Select city</option>
               {cities.map((c) => <option key={c.slug} value={c.slug}>{c.name}, {c.state}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Offered Monthly In-Hand</label>
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Offered Monthly In-Hand</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">₹</span>
               <input type="text" inputMode="numeric" value={newSalary || ""} onChange={(e) => setNewSalary(Number(e.target.value.replace(/[^0-9]/g, "")))}
-                placeholder="e.g. 70000" className="w-full pl-7 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500" />
+                placeholder="e.g. 70000" className="w-full pl-7 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 bg-white dark:bg-[#0a0a0a] dark:text-white" />
             </div>
           </div>
         </div>
@@ -113,7 +113,7 @@ export default function OfferCalculator() {
       </div>
 
       {/* Lifestyle Profile */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+      <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-5 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="text-sm font-bold text-gray-900">Your Lifestyle</h2>

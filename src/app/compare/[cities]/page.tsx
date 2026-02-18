@@ -66,7 +66,7 @@ export default async function ComparisonPage({ params }: PageProps) {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 text-white">
+      <section className="bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 dark:from-orange-950 dark:via-orange-900 dark:to-amber-950 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
           {/* Breadcrumb */}
           <nav className="text-sm text-orange-200 mb-5">
@@ -110,9 +110,9 @@ export default async function ComparisonPage({ params }: PageProps) {
                 <Link
                   key={`${from.slug}-${to.slug}`}
                   href={`/compare/${from.slug}-vs-${to.slug}`}
-                  className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-3 hover:border-orange-300 hover:shadow-md transition-all group"
+                  className="flex items-center justify-between bg-white dark:bg-[#171717] border border-gray-200 dark:border-[#2a2a2a] rounded-lg px-4 py-3 hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-md transition-all group"
                 >
-                  <span className="text-sm font-medium text-gray-800 group-hover:text-orange-700">
+                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200 group-hover:text-orange-700 dark:group-hover:text-orange-400">
                     {from.name} vs {to.name}
                   </span>
                   <span className="text-orange-400 group-hover:text-orange-600 text-sm">→</span>

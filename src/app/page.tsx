@@ -86,7 +86,7 @@ export default function HomePage() {
       />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 text-white">
+      <section className="bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 dark:from-orange-950 dark:via-orange-900 dark:to-amber-950 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-20">
           <div className="max-w-3xl">
             <h1 className="text-3xl sm:text-5xl font-bold mb-3 sm:mb-4 leading-tight">
@@ -99,13 +99,13 @@ export default function HomePage() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/offer"
-                className="bg-white text-orange-600 px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-orange-50 transition-colors text-sm sm:text-base"
+                className="bg-white dark:bg-white/10 text-orange-600 dark:text-orange-300 px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-orange-50 dark:hover:bg-white/20 transition-colors text-sm sm:text-base"
               >
                 Should I Take This Offer?
               </Link>
               <Link
                 href="/compare"
-                className="bg-orange-700/50 backdrop-blur-sm text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-orange-700/70 transition-colors border border-orange-400/30 text-sm sm:text-base"
+                className="bg-orange-700/50 dark:bg-orange-600/20 backdrop-blur-sm text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-orange-700/70 dark:hover:bg-orange-600/30 transition-colors border border-orange-400/30 dark:border-orange-500/20 text-sm sm:text-base"
               >
                 Compare Cities
               </Link>
@@ -121,23 +121,23 @@ export default function HomePage() {
       </section>
 
       {/* Quick Stats Bar */}
-      <section className="bg-white border-b border-gray-200">
+      <section className="bg-white dark:bg-[#0a0a0a] border-b border-gray-200 dark:border-[#2a2a2a]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="grid grid-cols-4 gap-3 sm:gap-6">
             <div className="text-center">
-              <div className="text-lg sm:text-2xl font-bold text-gray-900">{cities.length}</div>
+              <div className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{cities.length}</div>
               <div className="text-[11px] sm:text-sm text-gray-500">Cities</div>
             </div>
             <div className="text-center">
-              <div className="text-lg sm:text-2xl font-bold text-gray-900">56+</div>
+              <div className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">56+</div>
               <div className="text-[11px] sm:text-sm text-gray-500">Prices</div>
             </div>
             <div className="text-center">
-              <div className="text-lg sm:text-2xl font-bold text-gray-900">7</div>
+              <div className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">7</div>
               <div className="text-[11px] sm:text-sm text-gray-500">Categories</div>
             </div>
             <div className="text-center">
-              <div className="text-lg sm:text-2xl font-bold text-gray-900">2026</div>
+              <div className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">2026</div>
               <div className="text-[11px] sm:text-sm text-gray-500">Updated</div>
             </div>
           </div>
@@ -154,7 +154,7 @@ export default function HomePage() {
 
       {/* Interactive India Map */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6 shadow-sm">
+        <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-5 sm:p-6 shadow-sm">
           <h2 className="text-lg font-bold text-gray-900 mb-1">Interactive Map</h2>
           <p className="text-xs text-gray-500 mb-2">Hover over a city for quick stats. Click to explore.</p>
           <IndiaMap cities={cities} />
@@ -165,7 +165,7 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Cost of Living Index */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6 shadow-sm">
+          <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-5 sm:p-6 shadow-sm">
             <h2 className="text-lg font-bold text-gray-900 mb-1">Cost of Living Index</h2>
             <p className="text-xs text-gray-500 mb-4">Mumbai = 100. Score of 75 means ~25% cheaper than Mumbai.</p>
             <div className="space-y-2">
@@ -173,11 +173,11 @@ export default function HomePage() {
                 const index = calculateCostIndex(city);
                 return (
                   <Link key={city.slug} href={`/cost-of-living/${city.slug}/prices`} className="flex items-center gap-2 group">
-                    <span className="text-xs font-medium text-gray-700 w-20 shrink-0 group-hover:text-orange-600 transition-colors truncate">{city.name}</span>
-                    <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300 w-20 shrink-0 group-hover:text-orange-600 transition-colors truncate">{city.name}</span>
+                    <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-4 overflow-hidden">
                       <div className="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full" style={{ width: `${Math.max(index, 10)}%` }} />
                     </div>
-                    <span className="text-xs font-bold text-gray-700 w-8 text-right shrink-0">{index}</span>
+                    <span className="text-xs font-bold text-gray-700 dark:text-gray-300 w-8 text-right shrink-0">{index}</span>
                   </Link>
                 );
               })}
@@ -191,11 +191,11 @@ export default function HomePage() {
                   const index = calculateCostIndex(city);
                   return (
                     <Link key={city.slug} href={`/cost-of-living/${city.slug}/prices`} className="flex items-center gap-2 group">
-                      <span className="text-xs font-medium text-gray-700 w-20 shrink-0 group-hover:text-orange-600 transition-colors truncate">{city.name}</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 w-20 shrink-0 group-hover:text-orange-600 transition-colors truncate">{city.name}</span>
+                      <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-4 overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full" style={{ width: `${Math.max(index, 10)}%` }} />
                       </div>
-                      <span className="text-xs font-bold text-gray-700 w-8 text-right shrink-0">{index}</span>
+                      <span className="text-xs font-bold text-gray-700 dark:text-gray-300 w-8 text-right shrink-0">{index}</span>
                     </Link>
                   );
                 })}
@@ -204,7 +204,7 @@ export default function HomePage() {
           </div>
 
           {/* Rent Index */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6 shadow-sm">
+          <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-5 sm:p-6 shadow-sm">
             <h2 className="text-lg font-bold text-gray-900 mb-1">Rent Index</h2>
             <p className="text-xs text-gray-500 mb-4">Rent & PG prices relative to Mumbai = 100</p>
             <div className="space-y-2">
@@ -212,11 +212,11 @@ export default function HomePage() {
                 const index = calculateRentIndex(city);
                 return (
                   <Link key={city.slug} href={`/cost-of-living/${city.slug}/prices`} className="flex items-center gap-2 group">
-                    <span className="text-xs font-medium text-gray-700 w-20 shrink-0 group-hover:text-blue-600 transition-colors truncate">{city.name}</span>
-                    <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300 w-20 shrink-0 group-hover:text-blue-600 transition-colors truncate">{city.name}</span>
+                    <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-4 overflow-hidden">
                       <div className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full" style={{ width: `${Math.max(index, 10)}%` }} />
                     </div>
-                    <span className="text-xs font-bold text-gray-700 w-8 text-right shrink-0">{index}</span>
+                    <span className="text-xs font-bold text-gray-700 dark:text-gray-300 w-8 text-right shrink-0">{index}</span>
                   </Link>
                 );
               })}
@@ -230,11 +230,11 @@ export default function HomePage() {
                   const index = calculateRentIndex(city);
                   return (
                     <Link key={city.slug} href={`/cost-of-living/${city.slug}/prices`} className="flex items-center gap-2 group">
-                      <span className="text-xs font-medium text-gray-700 w-20 shrink-0 group-hover:text-blue-600 transition-colors truncate">{city.name}</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 w-20 shrink-0 group-hover:text-blue-600 transition-colors truncate">{city.name}</span>
+                      <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-4 overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full" style={{ width: `${Math.max(index, 10)}%` }} />
                       </div>
-                      <span className="text-xs font-bold text-gray-700 w-8 text-right shrink-0">{index}</span>
+                      <span className="text-xs font-bold text-gray-700 dark:text-gray-300 w-8 text-right shrink-0">{index}</span>
                     </Link>
                   );
                 })}
@@ -252,7 +252,7 @@ export default function HomePage() {
       {/* City Cards */}
       <section id="cities" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
             Explore Cities
           </h2>
           <p className="text-gray-500 mt-1 text-sm">
@@ -265,11 +265,11 @@ export default function HomePage() {
 
       {/* SEO Content */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="bg-white rounded-xl border border-gray-200 p-6 sm:p-8 shadow-sm">
+        <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 sm:p-8 shadow-sm">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Understanding Cost of Living in India
           </h2>
-          <div className="prose prose-gray max-w-none text-sm leading-relaxed space-y-4">
+          <div className="prose prose-gray dark:prose-invert max-w-none text-sm leading-relaxed space-y-4">
             <p>
               The cost of living in India varies dramatically from city to city. Mumbai, the
               financial capital, consistently tops every index as the most expensive city — a
@@ -368,20 +368,20 @@ export default function HomePage() {
 
       {/* FAQ Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
-        <div className="bg-white rounded-xl border border-gray-200 p-6 sm:p-8 shadow-sm">
+        <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 sm:p-8 shadow-sm">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             Frequently Asked Questions
           </h2>
           <div className="divide-y divide-gray-100">
             {FAQ_DATA.map((faq, i) => (
               <details key={i} className="py-4 first:pt-0 last:pb-0 group" open={i === 0}>
-                <summary className="flex items-center justify-between cursor-pointer list-none text-base font-semibold text-gray-900 hover:text-orange-700 transition-colors [&::-webkit-details-marker]:hidden">
+                <summary className="flex items-center justify-between cursor-pointer list-none text-base font-semibold text-gray-900 dark:text-white hover:text-orange-700 dark:hover:text-orange-400 transition-colors [&::-webkit-details-marker]:hidden">
                   <span>{faq.question}</span>
                   <svg className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
-                <p className="text-sm text-gray-600 leading-relaxed mt-3">{faq.answer}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mt-3">{faq.answer}</p>
               </details>
             ))}
           </div>
@@ -427,9 +427,9 @@ export default function HomePage() {
               <Link
                 key={`${c1}-${c2}`}
                 href={`/compare/${c1}-vs-${c2}`}
-                className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-3 hover:border-orange-300 hover:shadow-md transition-all"
+                className="flex items-center justify-between bg-white dark:bg-[#171717] border border-gray-200 dark:border-[#2a2a2a] rounded-lg px-4 py-3 hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-md transition-all"
               >
-                <span className="text-sm font-medium text-gray-800">
+                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
                   {city1.name} vs {city2.name}
                 </span>
                 <span className="text-orange-500 text-sm">→</span>

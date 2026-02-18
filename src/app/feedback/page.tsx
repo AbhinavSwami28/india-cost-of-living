@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function FeedbackPage() {
   return (
     <div>
-      <section className="bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 text-white">
+      <section className="bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 dark:from-orange-950 dark:via-orange-900 dark:to-amber-950 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
           <nav className="text-sm text-orange-200 mb-5">
             <Link href="/" className="hover:text-white transition-colors">
