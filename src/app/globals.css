@@ -191,3 +191,52 @@ table tr { transition: background-color 0.15s ease; }
 .dark .bg-gradient-to-r.from-orange-400 {
   background-image: linear-gradient(to right, #0d9488, #14b8a6) !important;
 }
+
+/* Dark mode: orange background variants */
+.dark .bg-orange-50 { background-color: rgba(13, 148, 136, 0.1) !important; }
+.dark .bg-orange-100 { background-color: rgba(13, 148, 136, 0.15) !important; }
+.dark .bg-orange-700\/50 { background-color: rgba(13, 148, 136, 0.3) !important; }
+.dark .hover\:bg-orange-700\/70:hover { background-color: rgba(13, 148, 136, 0.45) !important; }
+.dark .hover\:bg-orange-50:hover { background-color: rgba(13, 148, 136, 0.12) !important; }
+.dark .hover\:bg-orange-100:hover { background-color: rgba(13, 148, 136, 0.18) !important; }
+.dark .hover\:bg-orange-50\/50:hover { background-color: rgba(13, 148, 136, 0.08) !important; }
+.dark .hover\:bg-orange-50\/30:hover { background-color: rgba(13, 148, 136, 0.05) !important; }
+.dark .border-orange-200 { border-color: #134e4a !important; }
+.dark .border-orange-200\/60 { border-color: rgba(19, 78, 74, 0.6) !important; }
+.dark .border-orange-400\/30 { border-color: rgba(17, 94, 89, 0.3) !important; }
+
+/* Dark mode: gradient-to-r from-orange-50 (feedback CTA, quote cards) */
+.dark .bg-gradient-to-r.from-orange-50,
+.dark .bg-gradient-to-br.from-orange-50 {
+  background-image: linear-gradient(to right, rgba(13, 148, 136, 0.08), rgba(13, 148, 136, 0.04)) !important;
+}
+
+/* Dark mode: green/emerald accent states */
+.dark .bg-green-50 { background-color: rgba(5, 46, 22, 0.5) !important; }
+.dark .border-green-400 { border-color: #166534 !important; }
+.dark .text-green-700 { color: #4ade80 !important; }
+
+/* Dark mode: teal/emerald for selection accents */
+.dark .focus\:ring-orange-500:focus { --tw-ring-color: #0d9488 !important; }
+.dark .focus\:border-orange-500:focus { border-color: #0d9488 !important; }
+
+/* Dark mode: orange text inside hero/budget gradient overrides */
+.dark .bg-gradient-to-br.from-orange-500 .bg-orange-700\/50 {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+.dark .bg-gradient-to-br.from-orange-500 .hover\:bg-orange-700\/70:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+.dark .bg-gradient-to-br.from-orange-500 .border-orange-400\/30 {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+.dark .bg-gradient-to-br.from-orange-500 .text-orange-600 {
+  color: #94a3b8 !important;
+}
+.dark .bg-gradient-to-br.from-orange-500 .bg-white.text-orange-600 {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #e2e8f0 !important;
+}
+.dark .bg-gradient-to-br.from-orange-500 .hover\:bg-orange-50:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+}

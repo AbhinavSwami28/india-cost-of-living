@@ -257,7 +257,7 @@ export default async function CityPage({ params }: PageProps) {
               <div className="space-y-4">
                 <h3 className="font-bold text-gray-900 dark:text-white">Voices of {city.name}</h3>
                 {getCityQuotes(city.slug).map((quote, i) => (
-                  <div key={i} className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 rounded-xl border border-orange-200/60 dark:border-orange-800/30 p-4">
+                  <div key={i} className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-200/60 p-4">
                     <p className="text-sm text-gray-700 dark:text-gray-300 italic leading-relaxed">
                       &ldquo;{quote.text}&rdquo;
                     </p>
