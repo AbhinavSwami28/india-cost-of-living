@@ -21,8 +21,8 @@ export const CITY_QUOTES: Record<string, CityQuote[]> = {
   ],
   bangalore: [
     { text: "Bangalore is like a box of crayons — every shade of India is here, living together, building the future.", author: "Popular saying" },
+    { text: "Bengaluru has become a symbol of the rise of New India — a city that has philosophy in its soul and technology in its actions.", author: "Narendra Modi" },
     { text: "The Garden City taught India to dream in code and brew great coffee while doing it.", author: "Tech community saying" },
-    { text: "Bangalore is a place where you come for a job and stay for the weather, the food, and the people.", author: "Popular saying" },
     { text: "India's Silicon Valley is not just about technology — it is about the collision of tradition and innovation.", author: "Nandan Nilekani" },
     { text: "In Bangalore, every auto driver has a startup idea and every chai stall has Wi-Fi.", author: "Tech humour" },
   ],
@@ -56,8 +56,8 @@ export const CITY_QUOTES: Record<string, CityQuote[]> = {
   ],
   ahmedabad: [
     { text: "Ahmedabad is the Manchester of the East — built on enterprise, sustained by resilience.", author: "Historical reference" },
+    { text: "Ahmedabad has gone from Gardabad to a city of dreams and resolutions.", author: "Narendra Modi" },
     { text: "In Ahmedabad, business is not what you do — it is who you are. Every family here has a trader's instinct.", author: "Popular saying" },
-    { text: "The Sabarmati holds the memory of a man who shook an empire with just a pinch of salt.", author: "Reference to Gandhi" },
     { text: "Ahmedabad is a vegetarian's paradise — the variety here puts non-veg menus of other cities to shame.", author: "Food writers" },
     { text: "This city runs on khakhra, chai, and sheer determination.", author: "Popular saying" },
   ],
@@ -197,10 +197,11 @@ export const CITY_QUOTES: Record<string, CityQuote[]> = {
   ],
   varanasi: [
     { text: "Banaras is older than history, older than tradition, older even than legend — and looks twice as old as all of them put together.", author: "Mark Twain" },
+    { text: "Kashi belongs to me, and I belong to Kashi.", author: "Narendra Modi" },
+    { text: "Kashi is not just an ancient city but also a progressive city.", author: "Narendra Modi" },
     { text: "In Varanasi, death is not feared — it is the ultimate liberation. The ghats have burned for 5,000 years.", author: "Spiritual reference" },
     { text: "Kashi teaches you one thing: life and death are not opposites. They are two ghats on the same river.", author: "Popular saying" },
     { text: "The Ganga Aarti at Dashashwamedh Ghat is not a ceremony — it is humanity's oldest conversation with the divine.", author: "Spiritual observation" },
-    { text: "Benares is the ultimate pilgrimage — not to find God, but to find yourself.", author: "Popular saying" },
   ],
   agra: [
     { text: "The Taj Mahal is not a building — it is a love letter written in marble that the whole world reads.", author: "Popular saying" },
