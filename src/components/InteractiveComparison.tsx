@@ -6,6 +6,15 @@ import { CityData, CATEGORIES, CATEGORY_ICONS, CATEGORY_DESCRIPTIONS, Category }
 import { formatPrice, getPercentageDifference, getPricesByCategory, cities } from "@/lib/data";
 import { decisionSummary, salaryEquivalent, affordabilityTier, TIER_CONFIG, calculateEMI, type AffordabilityTier as TierType } from "@/lib/decisions";
 
+const MAX_CITIES = 5;
+const CITY_COLORS = [
+  { text: "text-orange-600", bg: "bg-orange-50", border: "border-orange-500", ring: "ring-orange-500" },
+  { text: "text-blue-600", bg: "bg-blue-50", border: "border-blue-500", ring: "ring-blue-500" },
+  { text: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-500", ring: "ring-emerald-500" },
+  { text: "text-purple-600", bg: "bg-purple-50", border: "border-purple-500", ring: "ring-purple-500" },
+  { text: "text-rose-600", bg: "bg-rose-50", border: "border-rose-500", ring: "ring-rose-500" },
+];
+
 interface InteractiveComparisonProps {
   initialCity1: CityData;
   initialCity2: CityData;
@@ -116,10 +125,11 @@ const DiffBadge = React.memo(function DiffBadge({ diff }: { diff: number }) {
 export default function InteractiveComparison({ initialCity1, initialCity2 }: InteractiveComparisonProps) {
   const router = useRouter();
 
-  const [city1Slug, setCity1Slug] = useState(initialCity1.slug);
-  const [city2Slug, setCity2Slug] = useState(initialCity2.slug);
-  const city1Data = useMemo(() => cities.find((c) => c.slug === city1Slug) || initialCity1, [city1Slug, initialCity1]);
-  const city2Data = useMemo(() => cities.find((c) => c.slug === city2Slug) || initialCity2, [city2Slug, initialCity2]);
+  const [citySlugs, setCitySlugs] = useState<string[]>([initialCity1.slug, initialCity2.slug]);
+  const cityDataList = useMemo(
+    () => citySlugs.map((slug) => cities.find((c) => c.slug === slug)!).filter(Boolean),
+    [citySlugs]
+  );
 
   const [activeTab, setActiveTab] = useState<"compare" | "calculator">("compare");
   const [viewMode, setViewMode] = useState<"monthly" | "yearly">("monthly");
@@ -141,22 +151,12 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
     initial.add("1 BHK Outside City Centre");
     return initial;
   });
-  const [salary1, setSalary1] = useState(0);
-  const [salary2, setSalary2] = useState(0);
+  const [salaries, setSalaries] = useState<Record<string, number>>({});
   const [shareCopied, setShareCopied] = useState(false);
 
-  // Home Loan EMI
   const [loanDownPct, setLoanDownPct] = useState(20);
   const [loanTenure, setLoanTenure] = useState(20);
   const [loanRate, setLoanRate] = useState(8.75);
-  const avgProp1 = city1Data.prices.find((p) => p.item === "Home Loan EMI (2BHK avg)")?.price ?? 0;
-  const avgProp2 = city2Data.prices.find((p) => p.item === "Home Loan EMI (2BHK avg)")?.price ?? 0;
-  // Reverse EMI to get approx property price (EMI ≈ rent2c * 20, so property ≈ EMI * tenure * 12 / some factor)
-  // Actually just use EMI * 240 / (rate factor) — simpler to store and show
-  const propPrice1 = Math.round(avgProp1 * 240 / 1.8);
-  const propPrice2 = Math.round(avgProp2 * 240 / 1.8);
-  const emi1 = calculateEMI(propPrice1 * (1 - loanDownPct / 100), loanRate, loanTenure);
-  const emi2 = calculateEMI(propPrice2 * (1 - loanDownPct / 100), loanRate, loanTenure);
 
   const toggleCategory = useCallback((cat: string) => {
     setVisibleCategories((prev) => { const next = new Set(prev); next.has(cat) ? next.delete(cat) : next.add(cat); return next; });
@@ -174,6 +174,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
       });
       return next;
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const toggleBudgetItem = useCallback((item: string) => {
     setBudgetItems((prev) => { const next = new Set(prev); next.has(item) ? next.delete(item) : next.add(item); return next; });
@@ -195,11 +196,32 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
   const resetAllPrices = () => setCustomPrices({});
   const editCount = Object.keys(customPrices).length;
 
-  const handleCityChange = (which: "city1" | "city2", slug: string) => {
-    if (which === "city1") { setCity1Slug(slug); if (slug !== city2Slug) router.push(`/compare/${slug}-vs-${city2Slug}`, { scroll: false }); }
-    else { setCity2Slug(slug); if (city1Slug !== slug) router.push(`/compare/${city1Slug}-vs-${slug}`, { scroll: false }); }
-    // Preserve edited prices — only clear prices for the city that changed
-    // (items are keyed as "citySlug:itemName" so other city's edits are safe)
+  const handleCityChange = (index: number, slug: string) => {
+    setCitySlugs((prev) => {
+      const next = [...prev];
+      next[index] = slug;
+      return next;
+    });
+    if (citySlugs.length === 2) {
+      const other = index === 0 ? citySlugs[1] : citySlugs[0];
+      const newSlug = index === 0 ? slug : citySlugs[0];
+      const newOther = index === 0 ? other : slug;
+      if (newSlug !== newOther) {
+        router.push(`/compare/${newSlug}-vs-${newOther}`, { scroll: false });
+      }
+    }
+  };
+
+  const addCity = () => {
+    if (citySlugs.length >= MAX_CITIES) return;
+    const usedSlugs = new Set(citySlugs);
+    const next = cities.find((c) => !usedSlugs.has(c.slug));
+    if (next) setCitySlugs((prev) => [...prev, next.slug]);
+  };
+
+  const removeCity = (index: number) => {
+    if (citySlugs.length <= 2) return;
+    setCitySlugs((prev) => prev.filter((_, i) => i !== index));
   };
 
   const calculateMonthlyBudget = useCallback(
@@ -237,59 +259,85 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
 
   const generateShareUrl = () => {
     const params = new URLSearchParams();
-    params.set("c1", city1Slug); params.set("c2", city2Slug);
+    citySlugs.forEach((s, i) => params.set(`c${i + 1}`, s));
     params.set("acc", selectedAccommodation); params.set("v", viewMode);
-    if (salary1 > 0) params.set("s1", String(salary1));
-    if (salary2 > 0) params.set("s2", String(salary2));
+    citySlugs.forEach((s, i) => { if ((salaries[s] ?? 0) > 0) params.set(`s${i + 1}`, String(salaries[s])); });
     navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?${params.toString()}`).then(() => {
       setShareCopied(true); setTimeout(() => setShareCopied(false), 2000);
     });
   };
 
-  const grouped1 = useMemo(() => getPricesByCategory(city1Data.prices), [city1Data.prices]);
-  const grouped2 = useMemo(() => getPricesByCategory(city2Data.prices), [city2Data.prices]);
-  const budget1 = calculateMonthlyBudget(city1Data);
-  const budget2 = calculateMonthlyBudget(city2Data);
-  const budgetDiff = getPercentageDifference(budget1, budget2);
-  const savings1 = salary1 - budget1;
-  const savings2 = salary2 - budget2;
+  const groupedByCity = useMemo(
+    () => cityDataList.map((cd) => ({ city: cd, grouped: getPricesByCategory(cd.prices) })),
+    [cityDataList]
+  );
+
+  const budgets = useMemo(
+    () => cityDataList.map((cd) => ({ city: cd, budget: calculateMonthlyBudget(cd) })),
+    [cityDataList, calculateMonthlyBudget]
+  );
+
+  const cheapestBudget = Math.min(...budgets.map((b) => b.budget));
+  const costliestBudget = Math.max(...budgets.map((b) => b.budget));
+  const cheapestCity = budgets.find((b) => b.budget === cheapestBudget)?.city.name ?? "";
+  const costliestCity = budgets.find((b) => b.budget === costliestBudget)?.city.name ?? "";
+  const budgetSpread = cheapestBudget > 0 ? Math.round(((costliestBudget - cheapestBudget) / cheapestBudget) * 100) : 0;
 
   const qtyChanges = Object.entries(quantities).filter(([k, v]) => v !== (DEFAULT_QUANTITIES[k] ?? 1)).length;
 
   return (
     <div className="space-y-8">
       {/* City Selectors */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Select Cities to Compare</h2>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-4">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">City 1</label>
-            <select value={city1Slug} onChange={(e) => handleCityChange("city1", e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white">
-              {cities.map((city) => <option key={city.slug} value={city.slug} disabled={city.slug === city2Slug}>{city.name}, {city.state}</option>)}
-            </select>
-          </div>
-          <div className="flex items-center justify-center sm:pb-2">
-            <button onClick={() => { const t = city1Slug; handleCityChange("city1", city2Slug); setTimeout(() => handleCityChange("city2", t), 0); }}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Swap cities" aria-label="Swap cities">
+      <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Select Cities to Compare</h2>
+          {citySlugs.length < MAX_CITIES && (
+            <button onClick={addCity}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-orange-600 hover:text-orange-700 bg-orange-50 dark:bg-orange-950/30 hover:bg-orange-100 px-3 py-1.5 rounded-lg transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+              Add City ({citySlugs.length}/{MAX_CITIES})
+            </button>
+          )}
+        </div>
+        <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${Math.min(citySlugs.length, 3)}, 1fr)` }}>
+          {citySlugs.map((slug, index) => (
+            <div key={index} className="relative">
+              <label className={`block text-sm font-medium mb-1.5 ${CITY_COLORS[index].text}`}>
+                City {index + 1}
+              </label>
+              <div className="flex gap-1">
+                <select value={slug} onChange={(e) => handleCityChange(index, e.target.value)}
+                  className="flex-1 px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white dark:bg-[#0a0a0a] dark:text-white">
+                  {cities.map((city) => (
+                    <option key={city.slug} value={city.slug} disabled={citySlugs.includes(city.slug) && city.slug !== slug}>
+                      {city.name}, {city.state}
+                    </option>
+                  ))}
+                </select>
+                {citySlugs.length > 2 && (
+                  <button onClick={() => removeCity(index)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Remove city">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        {citySlugs.length === 2 && (
+          <div className="flex justify-center mt-3">
+            <button onClick={() => { const t = citySlugs[0]; handleCityChange(0, citySlugs[1]); setTimeout(() => handleCityChange(1, t), 0); }}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="Swap cities" aria-label="Swap cities">
               <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
             </button>
           </div>
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-600 mb-1.5">City 2</label>
-            <select value={city2Slug} onChange={(e) => handleCityChange("city2", e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white">
-              {cities.map((city) => <option key={city.slug} value={city.slug} disabled={city.slug === city1Slug}>{city.name}, {city.state}</option>)}
-            </select>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-gray-200 dark:border-gray-700">
         {(["compare", "calculator"] as const).map((tab) => (
           <button key={tab} onClick={() => setActiveTab(tab)}
-            className={`px-6 py-3 text-sm font-semibold transition-colors relative ${activeTab === tab ? "text-orange-600" : "text-gray-500 hover:text-gray-700"}`}>
+            className={`px-6 py-3 text-sm font-semibold transition-colors relative ${activeTab === tab ? "text-orange-600" : "text-gray-500 hover:text-gray-700 dark:text-gray-400"}`}>
             {tab === "compare" ? "Compare Prices" : "Budget Calculator"}
             {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full" />}
           </button>
@@ -297,24 +345,32 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
       </div>
 
       {/* Decision Banner */}
-      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-5">
-        <p className="text-lg font-bold text-gray-900">{decisionSummary(city1Data, city2Data)}</p>
-        {salary1 > 0 && salary2 > 0 && (
-          <p className="text-sm text-gray-600 mt-1">
-            Salary equivalence: {formatPrice(salary1)} in {city1Data.name} ≈ <strong className="text-emerald-700">{formatPrice(salaryEquivalent(salary1, city1Data, city2Data))}</strong> in {city2Data.name}
-          </p>
-        )}
-        <div className="flex flex-wrap gap-2 mt-3">
-          <button onClick={() => setActiveTab("calculator")} className="text-xs text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-lg font-medium transition-colors">
-            Calculate your budget →
-          </button>
-          {salary1 === 0 && (
-            <button onClick={() => setActiveTab("calculator")} className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-lg font-medium transition-colors">
-              Enter salary for personalized comparison
-            </button>
+      {citySlugs.length === 2 && (
+        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-5">
+          <p className="text-lg font-bold text-gray-900 dark:text-white">{decisionSummary(cityDataList[0], cityDataList[1])}</p>
+          {(salaries[citySlugs[0]] ?? 0) > 0 && (salaries[citySlugs[1]] ?? 0) > 0 && (
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Salary equivalence: {formatPrice(salaries[citySlugs[0]])} in {cityDataList[0].name} ≈ <strong className="text-emerald-700 dark:text-emerald-400">{formatPrice(salaryEquivalent(salaries[citySlugs[0]], cityDataList[0], cityDataList[1]))}</strong> in {cityDataList[1].name}
+            </p>
           )}
+          <div className="flex flex-wrap gap-2 mt-3">
+            <button onClick={() => setActiveTab("calculator")} className="text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/50 hover:bg-emerald-200 px-3 py-1.5 rounded-lg font-medium transition-colors">
+              Calculate your budget →
+            </button>
+          </div>
         </div>
-      </div>
+      )}
+
+      {citySlugs.length > 2 && (
+        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-5">
+          <p className="text-lg font-bold text-gray-900 dark:text-white">
+            {cheapestCity} is the most affordable — {budgetSpread}% cheaper than {costliestCity}.
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            Comparing {citySlugs.length} cities. Monthly budgets range from {formatPrice(cheapestBudget)} to {formatPrice(costliestBudget)}.
+          </p>
+        </div>
+      )}
 
       {/* ====== COMPARE TAB ====== */}
       {activeTab === "compare" && <>
@@ -325,18 +381,18 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
               vegMode
                 ? "bg-green-50 border-green-400 text-green-700"
-                : "bg-white border-gray-200 text-gray-600 hover:border-green-300"
+                : "bg-white dark:bg-[#171717] border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-green-300"
             }`}
           >
             🌱 Veg Mode {vegMode ? "ON" : "OFF"}
           </button>
-          {vegMode && <span className="text-xs text-green-600">{NON_VEG_ITEMS.length} non-veg items excluded (chicken, eggs, biryani, non-veg thali)</span>}
+          {vegMode && <span className="text-xs text-green-600">{NON_VEG_ITEMS.length} non-veg items excluded</span>}
         </div>
 
         {/* Category Filters */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900">Filter Categories</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Filter Categories</h2>
             <div className="flex gap-2">
               <button onClick={() => setVisibleCategories(new Set(CATEGORIES))} className="text-xs text-orange-600 hover:text-orange-700 font-medium">Select All</button>
               <span className="text-gray-300">|</span>
@@ -345,10 +401,10 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {CATEGORIES.map((cat) => (
-              <label key={cat} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${visibleCategories.has(cat) ? "border-orange-300 bg-orange-50" : "border-gray-200 bg-gray-50 opacity-60"} hover:border-orange-400`}>
+              <label key={cat} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${visibleCategories.has(cat) ? "border-orange-300 bg-orange-50 dark:bg-orange-950/30" : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 opacity-60"} hover:border-orange-400`}>
                 <input type="checkbox" checked={visibleCategories.has(cat)} onChange={() => toggleCategory(cat)} className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500 accent-orange-500" />
                 <span className="text-lg">{CATEGORY_ICONS[cat as Category]}</span>
-                <span className="text-sm font-medium text-gray-700">{cat.split(" (")[0]}</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{cat.split(" (")[0]}</span>
               </label>
             ))}
           </div>
@@ -358,7 +414,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
         <div>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <h2 className="text-xl font-bold text-gray-900">Detailed Price Comparison</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Detailed Price Comparison</h2>
               {(excludedItems.size > 0 || qtyChanges > 0) && (
                 <button onClick={() => { setExcludedItems(new Set()); setQuantities({ ...DEFAULT_QUANTITIES }); }}
                   className="text-xs text-orange-600 hover:text-orange-700 bg-orange-50 px-2.5 py-1 rounded-full font-medium transition-colors">
@@ -366,74 +422,83 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
                 </button>
               )}
             </div>
-            <p className="text-xs text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full hidden sm:block">Uncheck to exclude from budget</p>
+            <p className="text-xs text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full hidden sm:block">Uncheck to exclude from budget</p>
           </div>
 
           <div className="space-y-8">
             {CATEGORIES.map((category) => {
               if (!visibleCategories.has(category)) return null;
-              const items1 = grouped1[category];
-              const items2 = grouped2[category];
-              if (!items1 || !items2) return null;
+              const allGrouped = groupedByCity.map((g) => g.grouped[category]);
+              if (allGrouped.some((g) => !g)) return null;
+
+              const baseItems = allGrouped[0];
 
               return (
                 <section key={category} id={category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}>
                   <div className="flex items-center gap-3 mb-4">
                     <span className="text-2xl">{CATEGORY_ICONS[category as Category]}</span>
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900">{category}</h3>
-                      <p className="text-sm text-gray-500">{CATEGORY_DESCRIPTIONS[category as Category]}</p>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">{category}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{CATEGORY_DESCRIPTIONS[category as Category]}</p>
                     </div>
                   </div>
-                  <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm scroll-hint">
+                  <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] overflow-hidden shadow-sm scroll-hint">
                     <div className="overflow-x-auto">
                       <table className="w-full min-w-[650px]">
                         <thead>
-                          <tr className="bg-gray-50 border-b border-gray-200">
+                          <tr className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
                             <th className="w-10 px-2 sm:px-3 py-3"><span className="sr-only">Include</span></th>
-                            <th className="text-left px-2 sm:px-4 py-3 text-sm font-semibold text-gray-600">Item</th>
-                            <th className="text-right px-4 sm:px-6 py-3 text-sm font-semibold text-orange-600">{city1Data.name}</th>
-                            <th className="text-right px-4 sm:px-6 py-3 text-sm font-semibold text-blue-600">{city2Data.name}</th>
-                            <th className="text-right px-4 sm:px-6 py-3 text-sm font-semibold text-gray-600">Diff</th>
+                            <th className="text-left px-2 sm:px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Item</th>
+                            {cityDataList.map((cd, i) => (
+                              <th key={cd.slug} className={`text-right px-3 sm:px-5 py-3 text-sm font-semibold ${CITY_COLORS[i].text}`}>{cd.name}</th>
+                            ))}
+                            {citySlugs.length === 2 && (
+                              <th className="text-right px-4 sm:px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400">Diff</th>
+                            )}
                           </tr>
                         </thead>
                         <tbody>
-                          {items1.map((item1, idx) => {
-                            const item2 = items2.find((i) => i.item === item1.item);
-                            if (!item2) return null;
+                          {baseItems.map((item1, idx) => {
+                            const matchedItems = cityDataList.map((cd) =>
+                              cd.prices.find((p) => p.item === item1.item && p.category === item1.category)
+                            );
+                            if (matchedItems.some((m) => !m)) return null;
                             const qty = getQty(item1.item);
-                            const p1 = getPrice(city1Data.slug, item1.item, item1.price) * qty;
-                            const p2 = getPrice(city2Data.slug, item2.item, item2.price) * qty;
-                            const diff = getPercentageDifference(p1, p2);
+                            const prices = matchedItems.map((m, ci) =>
+                              getPrice(cityDataList[ci].slug, m!.item, m!.price) * qty
+                            );
                             const excluded = excludedItems.has(item1.item);
+                            const diff = citySlugs.length === 2 ? getPercentageDifference(prices[0], prices[1]) : 0;
+
                             return (
-                              <tr key={item1.item} className={`${excluded ? "opacity-40" : idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"} hover:bg-orange-50/30 transition-all`}>
+                              <tr key={item1.item} className={`${excluded ? "opacity-40" : idx % 2 === 0 ? "bg-white dark:bg-[#171717]" : "bg-gray-50/50 dark:bg-gray-800/20"} hover:bg-orange-50/30 dark:hover:bg-orange-950/20 transition-all`}>
                                 <td className="px-2 sm:px-3 py-3 text-center">
                                   <input type="checkbox" checked={!excluded} onChange={() => toggleExcluded(item1.item)}
                                     className="w-3.5 h-3.5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 accent-orange-500 cursor-pointer" />
                                 </td>
                                 <td className="px-2 sm:px-4 py-3">
-                                  <div className={`text-sm font-medium ${excluded ? "line-through text-gray-400" : "text-gray-900"}`}>{item1.item}</div>
+                                  <div className={`text-sm font-medium ${excluded ? "line-through text-gray-400" : "text-gray-900 dark:text-white"}`}>{item1.item}</div>
                                   <div className="flex items-center gap-1.5 mt-0.5">
                                     <span className="text-xs text-gray-400">{item1.unit}</span>
                                     <div className="inline-flex items-center gap-0.5 ml-1">
                                       <button onClick={() => setQty(item1.item, qty - 1)} disabled={qty <= 1}
-                                        className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center rounded-md text-sm sm:text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors" aria-label={`Decrease ${item1.item} quantity`}>−</button>
+                                        className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center rounded-md text-sm sm:text-xs font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 active:bg-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors" aria-label={`Decrease ${item1.item} quantity`}>−</button>
                                       <span className={`text-xs font-semibold min-w-[22px] text-center ${qty !== (DEFAULT_QUANTITIES[item1.item] ?? 1) ? "text-orange-600" : "text-gray-500"}`}>×{qty}</span>
                                       <button onClick={() => setQty(item1.item, qty + 1)}
-                                        className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center rounded-md text-sm sm:text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300 transition-colors" aria-label={`Increase ${item1.item} quantity`}>+</button>
+                                        className="w-8 h-8 sm:w-6 sm:h-6 flex items-center justify-center rounded-md text-sm sm:text-xs font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 active:bg-gray-300 transition-colors" aria-label={`Increase ${item1.item} quantity`}>+</button>
                                     </div>
                                   </div>
                                 </td>
-                                <td className={`px-4 sm:px-6 py-3 text-right ${excluded ? "line-through" : ""}`}>
-                                  <EditablePrice value={p1} onChange={(val) => setPrice(city1Data.slug, item1.item, val / qty)} isEdited={isEdited(city1Data.slug, item1.item)} />
-                                </td>
-                                <td className={`px-4 sm:px-6 py-3 text-right ${excluded ? "line-through" : ""}`}>
-                                  <EditablePrice value={p2} onChange={(val) => setPrice(city2Data.slug, item2.item, val / qty)} isEdited={isEdited(city2Data.slug, item2.item)} />
-                                </td>
-                                <td className="px-4 sm:px-6 py-3 text-right">
-                                  {excluded ? <span className="text-xs text-gray-300">—</span> : <DiffBadge diff={diff} />}
-                                </td>
+                                {cityDataList.map((cd, ci) => (
+                                  <td key={cd.slug} className={`px-3 sm:px-5 py-3 text-right ${excluded ? "line-through" : ""}`}>
+                                    <EditablePrice value={prices[ci]} onChange={(val) => setPrice(cd.slug, item1.item, val / qty)} isEdited={isEdited(cd.slug, item1.item)} />
+                                  </td>
+                                ))}
+                                {citySlugs.length === 2 && (
+                                  <td className="px-4 sm:px-6 py-3 text-right">
+                                    {excluded ? <span className="text-xs text-gray-300">—</span> : <DiffBadge diff={diff} />}
+                                  </td>
+                                )}
                               </tr>
                             );
                           })}
@@ -457,8 +522,8 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
       {/* ====== CALCULATOR TAB ====== */}
       {activeTab === "calculator" && <>
         {/* Lifestyle Profiles */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-gray-900 mb-2">Quick Profiles</h2>
+        <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Quick Profiles</h2>
           <p className="text-sm text-gray-500 mb-4">Auto-set accommodation, quantities, and exclusions</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {([
@@ -467,10 +532,10 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
               { key: "family" as const, icon: "👨‍👩‍👧", label: "Family of 3-4", desc: "2BHK centre, higher quantities, no PG" },
             ]).map((p) => (
               <button key={p.key} onClick={() => applyProfile(p.key)}
-                className="flex items-start gap-3 p-4 rounded-xl border border-gray-200 hover:border-orange-400 hover:bg-orange-50/50 text-left transition-all group">
+                className="flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-orange-400 hover:bg-orange-50/50 dark:hover:bg-orange-950/20 text-left transition-all group">
                 <span className="text-2xl">{p.icon}</span>
                 <div>
-                  <div className="text-sm font-bold text-gray-900 group-hover:text-orange-700">{p.label}</div>
+                  <div className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-orange-700 dark:group-hover:text-orange-400">{p.label}</div>
                   <div className="text-xs text-gray-500 mt-0.5">{p.desc}</div>
                 </div>
               </button>
@@ -479,22 +544,26 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
         </div>
 
         {/* Accommodation */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-gray-900 mb-2">Your Accommodation Type</h2>
+        <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Your Accommodation Type</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {ACCOMMODATION_OPTIONS.map((opt) => {
               const sel = selectedAccommodation === opt.key;
-              const p1 = city1Data.prices.find((p) => p.item === opt.key);
-              const p2 = city2Data.prices.find((p) => p.item === opt.key);
               return (
-                <label key={opt.key} className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${sel ? "border-orange-500 bg-orange-50 ring-1 ring-orange-500" : "border-gray-200 hover:border-orange-300"}`}>
+                <label key={opt.key} className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${sel ? "border-orange-500 bg-orange-50 dark:bg-orange-950/30 ring-1 ring-orange-500" : "border-gray-200 dark:border-gray-700 hover:border-orange-300"}`}>
                   <div className="flex items-center gap-2">
                     <input type="radio" name="accommodation" checked={sel} onChange={() => setSelectedAccommodation(opt.key)} className="w-4 h-4 text-orange-500 accent-orange-500" />
-                    <span className={`text-sm font-medium ${sel ? "text-orange-700" : "text-gray-700"}`}>{opt.label}</span>
+                    <span className={`text-sm font-medium ${sel ? "text-orange-700 dark:text-orange-400" : "text-gray-700 dark:text-gray-300"}`}>{opt.label}</span>
                   </div>
                   <div className="text-right">
-                    {p1 && <span className="text-xs text-gray-500 block">{formatPrice(getPrice(city1Data.slug, opt.key, p1.price) * multiplier)}</span>}
-                    {p2 && <span className="text-xs text-gray-400 block">{formatPrice(getPrice(city2Data.slug, opt.key, p2.price) * multiplier)}</span>}
+                    {cityDataList.slice(0, 2).map((cd, i) => {
+                      const p = cd.prices.find((pr) => pr.item === opt.key);
+                      return p ? (
+                        <span key={cd.slug} className={`text-xs block ${i === 0 ? "text-gray-500" : "text-gray-400"}`}>
+                          {formatPrice(getPrice(cd.slug, opt.key, p.price) * multiplier)}
+                        </span>
+                      ) : null;
+                    })}
                     <span className="text-[10px] text-gray-400">/{viewMode === "yearly" ? "yr" : "mo"}</span>
                   </div>
                 </label>
@@ -522,22 +591,17 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-5 py-4 text-center">
-              <div className="text-sm text-orange-100">{city1Data.name}</div>
-              <div className="text-3xl font-bold">{formatPrice(budget1 * multiplier)}</div>
-              <div className="text-xs text-orange-200">per {viewMode === "yearly" ? "year" : "month"}</div>
-            </div>
-            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-5 py-4 text-center">
-              <div className="text-sm text-orange-100">{city2Data.name}</div>
-              <div className="text-3xl font-bold">{formatPrice(budget2 * multiplier)}</div>
-              <div className="text-xs text-orange-200">per {viewMode === "yearly" ? "year" : "month"}</div>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl px-5 py-4 text-center">
-              <div className="text-sm text-orange-100">Difference</div>
-              <div className="text-3xl font-bold">{Math.abs(budgetDiff)}%</div>
-              <div className="text-xs text-orange-200">{budgetDiff > 0 ? city2Data.name : city1Data.name} is costlier</div>
-            </div>
+          <div className={`grid gap-4 mb-6 ${budgets.length <= 3 ? `grid-cols-1 sm:grid-cols-${budgets.length}` : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"}`}>
+            {budgets.map(({ city, budget }, i) => (
+              <div key={city.slug} className={`bg-white/15 backdrop-blur-sm rounded-xl px-4 py-4 text-center ${budget === cheapestBudget && budgets.length > 2 ? "ring-2 ring-white/50" : ""}`}>
+                <div className="text-sm text-orange-100">{city.name}</div>
+                <div className="text-2xl sm:text-3xl font-bold">{formatPrice(budget * multiplier)}</div>
+                <div className="text-xs text-orange-200">per {viewMode === "yearly" ? "year" : "month"}</div>
+                {budget === cheapestBudget && budgets.length > 2 && (
+                  <div className="text-[10px] font-semibold text-green-200 mt-1">CHEAPEST</div>
+                )}
+              </div>
+            ))}
           </div>
           <details className="group">
             <summary className="text-sm font-medium text-orange-100 cursor-pointer hover:text-white flex items-center gap-2">
@@ -563,90 +627,75 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
         </div>
 
         {/* Savings Calculator */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-gray-900 mb-2">Savings Calculator</h2>
+        <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Savings Calculator</h2>
           <p className="text-sm text-gray-500 mb-5">Enter salary in each city to see disposable income</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Salary in {city1Data.name}</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">₹</span>
-                <input type="text" inputMode="numeric" value={salary1 || ""} onChange={(e) => setSalary1(Number(e.target.value.replace(/[^0-9]/g, "")))}
-                  placeholder="e.g. 50000" className="w-full pl-7 pr-16 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500" />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">/month</span>
+          <div className={`grid gap-4 mb-6 ${cityDataList.length <= 3 ? `grid-cols-1 sm:grid-cols-${cityDataList.length}` : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"}`}>
+            {cityDataList.map((cd) => (
+              <div key={cd.slug}>
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5">Salary in {cd.name}</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">₹</span>
+                  <input type="text" inputMode="numeric" value={salaries[cd.slug] || ""} onChange={(e) => setSalaries((prev) => ({ ...prev, [cd.slug]: Number(e.target.value.replace(/[^0-9]/g, "")) }))}
+                    placeholder="e.g. 50000" className="w-full pl-7 pr-12 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white dark:bg-[#0a0a0a] dark:text-white" />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">/mo</span>
+                </div>
               </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Salary in {city2Data.name}</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">₹</span>
-                <input type="text" inputMode="numeric" value={salary2 || ""} onChange={(e) => setSalary2(Number(e.target.value.replace(/[^0-9]/g, "")))}
-                  placeholder="e.g. 60000" className="w-full pl-7 pr-16 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500" />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">/month</span>
-              </div>
-            </div>
+            ))}
           </div>
-          {(salary1 > 0 || salary2 > 0) && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className={`rounded-xl px-5 py-4 text-center border ${savings1 >= 0 ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}`}>
-                <div className="text-sm text-gray-500">{city1Data.name}</div>
-                <div className="text-xs text-gray-400 mt-1">{formatPrice(salary1)} − {formatPrice(budget1)}</div>
-                <div className={`text-2xl font-bold mt-1 ${savings1 >= 0 ? "text-green-600" : "text-red-600"}`}>{savings1 >= 0 ? "" : "−"}{formatPrice(Math.abs(savings1))}</div>
-                <div className="text-xs text-gray-400">savings/month · {formatPrice(Math.abs(savings1) * 12)}/yr</div>
-              </div>
-              <div className={`rounded-xl px-5 py-4 text-center border ${savings2 >= 0 ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}`}>
-                <div className="text-sm text-gray-500">{city2Data.name}</div>
-                <div className="text-xs text-gray-400 mt-1">{formatPrice(salary2)} − {formatPrice(budget2)}</div>
-                <div className={`text-2xl font-bold mt-1 ${savings2 >= 0 ? "text-green-600" : "text-red-600"}`}>{savings2 >= 0 ? "" : "−"}{formatPrice(Math.abs(savings2))}</div>
-                <div className="text-xs text-gray-400">savings/month · {formatPrice(Math.abs(savings2) * 12)}/yr</div>
-              </div>
-              <div className="rounded-xl px-5 py-4 text-center bg-gray-50 border border-gray-200">
-                <div className="text-sm text-gray-500">Better Savings</div>
-                <div className="text-2xl font-bold mt-2 text-gray-900">{savings1 > savings2 ? city1Data.name : savings2 > savings1 ? city2Data.name : "Equal"}</div>
-                {savings1 !== savings2 && <div className="text-xs text-gray-400 mt-1">by {formatPrice(Math.abs(savings1 - savings2))}/mo</div>}
-              </div>
+          {cityDataList.some((cd) => (salaries[cd.slug] ?? 0) > 0) && (
+            <div className={`grid gap-4 ${cityDataList.length <= 3 ? `grid-cols-1 sm:grid-cols-${cityDataList.length}` : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"}`}>
+              {cityDataList.map((cd, i) => {
+                const salary = salaries[cd.slug] ?? 0;
+                const budget = budgets[i].budget;
+                const savings = salary - budget;
+                return (
+                  <div key={cd.slug} className={`rounded-xl px-4 py-4 text-center border ${savings >= 0 ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800" : "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800"}`}>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{cd.name}</div>
+                    <div className="text-xs text-gray-400 mt-1">{formatPrice(salary)} − {formatPrice(budget)}</div>
+                    <div className={`text-xl font-bold mt-1 ${savings >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>{savings >= 0 ? "" : "−"}{formatPrice(Math.abs(savings))}</div>
+                    <div className="text-xs text-gray-400">savings/mo · {formatPrice(Math.abs(savings) * 12)}/yr</div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
 
         {/* Salary Equivalence + Affordability Tiers */}
-        {(salary1 > 0 || salary2 > 0) && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-gray-900 mb-2">Salary Equivalence</h2>
+        {citySlugs.length === 2 && ((salaries[citySlugs[0]] ?? 0) > 0 || (salaries[citySlugs[1]] ?? 0) > 0) && (
+          <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Salary Equivalence</h2>
             <p className="text-sm text-gray-500 mb-4">What salary in one city equals the same lifestyle in another?</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-              {salary1 > 0 && (
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <div className="text-xs text-gray-500">{formatPrice(salary1)} in {city1Data.name} =</div>
-                  <div className="text-2xl font-bold text-emerald-600 mt-1">{formatPrice(salaryEquivalent(salary1, city1Data, city2Data))}</div>
-                  <div className="text-xs text-gray-500">in {city2Data.name}</div>
+              {(salaries[citySlugs[0]] ?? 0) > 0 && (
+                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 text-center">
+                  <div className="text-xs text-gray-500">{formatPrice(salaries[citySlugs[0]])} in {cityDataList[0].name} =</div>
+                  <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">{formatPrice(salaryEquivalent(salaries[citySlugs[0]], cityDataList[0], cityDataList[1]))}</div>
+                  <div className="text-xs text-gray-500">in {cityDataList[1].name}</div>
                 </div>
               )}
-              {salary2 > 0 && (
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <div className="text-xs text-gray-500">{formatPrice(salary2)} in {city2Data.name} =</div>
-                  <div className="text-2xl font-bold text-emerald-600 mt-1">{formatPrice(salaryEquivalent(salary2, city2Data, city1Data))}</div>
-                  <div className="text-xs text-gray-500">in {city1Data.name}</div>
+              {(salaries[citySlugs[1]] ?? 0) > 0 && (
+                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 text-center">
+                  <div className="text-xs text-gray-500">{formatPrice(salaries[citySlugs[1]])} in {cityDataList[1].name} =</div>
+                  <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">{formatPrice(salaryEquivalent(salaries[citySlugs[1]], cityDataList[1], cityDataList[0]))}</div>
+                  <div className="text-xs text-gray-500">in {cityDataList[0].name}</div>
                 </div>
               )}
             </div>
 
-            <h3 className="text-sm font-bold text-gray-900 mb-3">Affordability Tier</h3>
+            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3">Affordability Tier</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                { salary: salary1, city: city1Data },
-                { salary: salary2, city: city2Data },
-              ].filter(({ salary }) => salary > 0).map(({ salary, city }) => {
-                const tier = affordabilityTier(salary, city);
+              {cityDataList.filter((cd) => (salaries[cd.slug] ?? 0) > 0).map((cd) => {
+                const tier = affordabilityTier(salaries[cd.slug], cd);
                 const info = TIER_CONFIG[tier];
                 return (
-                  <div key={city.slug} className={`rounded-xl border p-4 ${info.bgColor}`}>
+                  <div key={cd.slug} className={`rounded-xl border p-4 ${info.bgColor}`}>
                     <div className="flex items-center justify-between mb-1">
                       <span className={`text-sm font-bold ${info.color}`}>{info.label}</span>
-                      <span className="text-xs text-gray-500">{city.name}</span>
+                      <span className="text-xs text-gray-500">{cd.name}</span>
                     </div>
                     <p className="text-xs text-gray-600">{info.description}</p>
-                    {/* Tier gauge */}
                     <div className="flex gap-1 mt-3">
                       {(["cannot_afford", "survival", "comfortable", "saving_well", "luxury"] as TierType[]).map((t) => (
                         <div key={t} className={`h-2 flex-1 rounded-full ${t === tier ? "opacity-100" : "opacity-20"} ${
@@ -662,49 +711,51 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
         )}
 
         {/* Home Loan EMI Calculator */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-gray-900 mb-2">Home Loan EMI (2BHK)</h2>
+        <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Home Loan EMI (2BHK)</h2>
           <p className="text-sm text-gray-500 mb-4">Based on average 2BHK apartment prices in each city</p>
           <div className="grid grid-cols-3 gap-3 mb-4">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Down Payment %</label>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Down Payment %</label>
               <input type="number" value={loanDownPct} onChange={(e) => setLoanDownPct(Number(e.target.value))} min={0} max={90}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500" />
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 bg-white dark:bg-[#0a0a0a] dark:text-white" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Tenure (years)</label>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Tenure (years)</label>
               <input type="number" value={loanTenure} onChange={(e) => setLoanTenure(Number(e.target.value))} min={1} max={30}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500" />
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 bg-white dark:bg-[#0a0a0a] dark:text-white" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Interest Rate %</label>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Interest Rate %</label>
               <input type="number" value={loanRate} onChange={(e) => setLoanRate(Number(e.target.value))} min={1} max={20} step={0.25}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500" />
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 bg-white dark:bg-[#0a0a0a] dark:text-white" />
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[
-              { city: city1Data, price: propPrice1, emi: emi1 },
-              { city: city2Data, price: propPrice2, emi: emi2 },
-            ].map(({ city, price, emi }) => (
-              <div key={city.slug} className="bg-gray-50 rounded-xl p-4">
-                <div className="text-sm font-bold text-gray-900 mb-2">{city.name}</div>
-                <div className="space-y-1.5 text-xs">
-                  <div className="flex justify-between"><span className="text-gray-500">Avg 2BHK Price</span><span className="font-semibold">{formatPrice(price)}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-500">Down Payment ({loanDownPct}%)</span><span className="font-semibold">{formatPrice(Math.round(price * loanDownPct / 100))}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-500">Loan Amount</span><span className="font-semibold">{formatPrice(Math.round(price * (1 - loanDownPct / 100)))}</span></div>
-                  <div className="flex justify-between border-t border-gray-200 pt-1.5"><span className="text-gray-700 font-medium">Monthly EMI</span><span className="font-bold text-orange-600 text-sm">{formatPrice(emi.emi)}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-500">Total Interest</span><span className="font-semibold text-red-500">{formatPrice(emi.totalInterest)}</span></div>
+          <div className={`grid gap-4 ${cityDataList.length <= 3 ? `grid-cols-1 sm:grid-cols-${cityDataList.length}` : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"}`}>
+            {cityDataList.map((cd) => {
+              const avgProp = cd.prices.find((p) => p.item === "Home Loan EMI (2BHK avg)")?.price ?? 0;
+              const propPrice = Math.round(avgProp * 240 / 1.8);
+              const emi = calculateEMI(propPrice * (1 - loanDownPct / 100), loanRate, loanTenure);
+              return (
+                <div key={cd.slug} className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4">
+                  <div className="text-sm font-bold text-gray-900 dark:text-white mb-2">{cd.name}</div>
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex justify-between"><span className="text-gray-500">Avg 2BHK Price</span><span className="font-semibold dark:text-gray-300">{formatPrice(propPrice)}</span></div>
+                    <div className="flex justify-between"><span className="text-gray-500">Down Payment ({loanDownPct}%)</span><span className="font-semibold dark:text-gray-300">{formatPrice(Math.round(propPrice * loanDownPct / 100))}</span></div>
+                    <div className="flex justify-between"><span className="text-gray-500">Loan Amount</span><span className="font-semibold dark:text-gray-300">{formatPrice(Math.round(propPrice * (1 - loanDownPct / 100)))}</span></div>
+                    <div className="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-1.5"><span className="text-gray-700 dark:text-gray-300 font-medium">Monthly EMI</span><span className="font-bold text-orange-600 text-sm">{formatPrice(emi.emi)}</span></div>
+                    <div className="flex justify-between"><span className="text-gray-500">Total Interest</span><span className="font-semibold text-red-500">{formatPrice(emi.totalInterest)}</span></div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         {/* Share */}
         <div className="flex justify-center">
           <button onClick={generateShareUrl}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm">
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-sm">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
             {shareCopied ? "Link Copied!" : "Share This Comparison"}
           </button>

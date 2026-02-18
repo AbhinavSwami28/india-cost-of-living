@@ -32,10 +32,14 @@ const CITY_MARKERS: Record<string, [number, number]> = {
 
 export default function IndiaMap({ cities }: { cities: CityData[] }) {
   const [hovered, setHovered] = useState<string | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const hoveredCity = hovered ? cities.find((c) => c.slug === hovered) : null;
 
   return (
-    <div className="relative">
+    <div className="relative" onMouseMove={(e) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    }}>
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{ rotate: [-83, 0, 0] as [number, number, number], scale: 850, center: [0, 23] as [number, number] }}
@@ -90,7 +94,8 @@ export default function IndiaMap({ cities }: { cities: CityData[] }) {
         const index = calculateCostIndex(hoveredCity);
         const rent = hoveredCity.prices.find((p) => p.item === "1 BHK in City Centre");
         return (
-          <div className="absolute top-4 right-4 z-20 bg-gray-900 text-white rounded-lg px-4 py-3 text-xs shadow-xl pointer-events-none">
+          <div className="absolute z-20 bg-gray-900 text-white rounded-lg px-3 py-2 text-xs shadow-xl pointer-events-none"
+            style={{ left: mousePos.x + 16, top: mousePos.y - 10 }}>
             <div className="font-bold text-sm">{hoveredCity.name}</div>
             <div className="text-gray-400">{hoveredCity.state}</div>
             <div className="mt-1.5 space-y-0.5">
