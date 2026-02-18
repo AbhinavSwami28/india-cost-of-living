@@ -24,7 +24,7 @@ export default function Footer() {
               {cities.slice(0, 10).map((city) => (
                 <li key={city.slug}>
                   <Link
-                    href={`/cost-of-living/${city.slug}`}
+                    href={`/cost-of-living/${city.slug}/prices`}
                     className="text-sm text-gray-400 hover:text-orange-400 transition-colors"
                   >
                     {city.name}
@@ -39,7 +39,7 @@ export default function Footer() {
               {cities.slice(10, 20).map((city) => (
                 <li key={city.slug}>
                   <Link
-                    href={`/cost-of-living/${city.slug}`}
+                    href={`/cost-of-living/${city.slug}/prices`}
                     className="text-sm text-gray-400 hover:text-orange-400 transition-colors"
                   >
                     {city.name}

@@ -15,7 +15,7 @@ export default function CityCard({ city }: CityCardProps) {
 
   return (
     <Link
-      href={`/cost-of-living/${city.slug}`}
+      href={`/cost-of-living/${city.slug}/prices`}
       className="group block bg-white rounded-xl border border-gray-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 overflow-hidden"
     >
       {/* City Image + Overlay */}

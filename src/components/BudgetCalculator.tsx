@@ -4,61 +4,8 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { CATEGORIES, CATEGORY_ICONS, CATEGORY_DESCRIPTIONS, Category } from "@/lib/types";
 import { formatPrice, cities } from "@/lib/data";
-
-// Which items make sense as "monthly" expenses
-const MONTHLY_ITEMS = new Set([
-  "Metro / Local Train (monthly pass)",
-  "Bus (monthly pass)",
-  "Electricity",
-  "Water Bill",
-  "Broadband Internet",
-  "Mobile Plan (Jio/Airtel)",
-  "Cook (part-time, 2 meals/day)",
-  "Maid / Cleaning Help",
-  "Miscellaneous Monthly Spend",
-  "Skincare Basics (Nykaa avg)",
-  "Amazon Prime Membership",
-  "1 BHK in City Centre",
-  "1 BHK Outside City Centre",
-  "2 BHK in City Centre",
-  "2 BHK Outside City Centre",
-  "3 BHK in City Centre",
-  "3 BHK Outside City Centre",
-  "PG - Private Room (with meals)",
-  "PG - Private Room (without meals)",
-  "PG - Double Sharing (with meals)",
-  "PG - Double Sharing (without meals)",
-  "PG - Triple Sharing (with meals)",
-  "PG - Triple Sharing (without meals)",
-  "Gym Membership",
-  "Netflix (Standard Plan)",
-  "Spotify Premium",
-]);
-
-// Items that are daily (multiply by 30 for monthly)
-const DAILY_ITEMS = new Set([
-  "Veg Thali (local restaurant)",
-  "Non-Veg Thali (local restaurant)",
-  "Chai (regular cup)",
-  "Coffee (Cappuccino)",
-  "Bottled Water (1 litre)",
-  "Milk (Full Cream)",
-]);
-
-// One-time / per-use items (user decides qty per month)
-const QUANTITY_ITEMS = new Set([
-  "Meal for Two (high-end restaurant)",
-  "Street Food (Vada Pav / Samosa)",
-  "Biryani (chicken)",
-  "Dosa (plain)",
-  "Fast Food Combo (McDonald's)",
-  "Soft Drink (Coca-Cola, 300ml)",
-  "Cooking Gas (LPG Cylinder)",
-  "Movie Ticket (Multiplex)",
-  "Haircut (Men, basic salon)",
-  "Domestic Beer (pint, restaurant)",
-  "Imported Beer (bottle, restaurant)",
-]);
+import { DEFAULT_QUANTITIES, PROFILE_CONFIGS, getProfileExclusions, getProfileAccommodation, type ProfileKey } from "@/lib/budgetConfig";
+import { trackEvent } from "@/lib/analytics";
 
 interface BudgetItem {
   item: string;
@@ -76,32 +23,18 @@ export default function BudgetCalculator() {
   const [locationName, setLocationName] = useState("");
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
   const [initialized, setInitialized] = useState(false);
+  const [activeProfile, setActiveProfile] = useState<ProfileKey>("professional");
 
-  const PROFILE_ACCOMMODATION: Record<string, { centre: string; outskirts: string }> = {
-    student: { centre: "PG - Double Sharing (with meals)", outskirts: "PG - Double Sharing (with meals)" },
-    professional: { centre: "1 BHK in City Centre", outskirts: "1 BHK Outside City Centre" },
-    couple: { centre: "1 BHK in City Centre", outskirts: "1 BHK Outside City Centre" },
-    family: { centre: "2 BHK in City Centre", outskirts: "2 BHK Outside City Centre" },
-  };
-
-  const initializeFromCity = useCallback((citySlug: string, profileKey?: string, isCentre?: boolean) => {
+  const initializeFromCity = useCallback((citySlug: string, profileKey?: ProfileKey, isCentre?: boolean) => {
     const city = cities.find((c) => c.slug === citySlug);
     if (!city) return;
 
-    const profAccConfig = profileKey ? PROFILE_ACCOMMODATION[profileKey] : undefined;
-    const defaultAcc = profAccConfig
-      ? (isCentre ? profAccConfig.centre : profAccConfig.outskirts)
-      : "1 BHK Outside City Centre";
-
-    const isCoupleOrFamily = profileKey === "couple" || profileKey === "family";
-    const womensItems = new Set(["Women's Dress (Myntra/Zara)"]);
+    const profile = profileKey ?? "professional";
+    const defaultAcc = getProfileAccommodation(profile, isCentre ?? true);
+    const exclusions = getProfileExclusions(profile);
 
     const items: BudgetItem[] = city.prices.map((p) => {
-      let qty = 1;
-      if (DAILY_ITEMS.has(p.item)) qty = 30;
-      else if (QUANTITY_ITEMS.has(p.item)) qty = 2;
-      else if (MONTHLY_ITEMS.has(p.item)) qty = 1;
-
+      const qty = DEFAULT_QUANTITIES[p.item] ?? 1;
       const isVehicle = p.item.includes("EMI");
       const isPerKm = p.item.includes("per km after min");
       const isAccommodation =
@@ -110,7 +43,7 @@ export default function BudgetCalculator() {
       const isDefaultAccommodation = p.item === defaultAcc;
 
       let selected = isAccommodation ? isDefaultAccommodation : (!isVehicle && !isPerKm);
-      if (!isCoupleOrFamily && womensItems.has(p.item)) selected = false;
+      if (exclusions.has(p.item)) selected = false;
 
       return {
         item: p.item,
@@ -126,21 +59,31 @@ export default function BudgetCalculator() {
     setBudgetItems(items);
     setInitialized(true);
     setLocationName(city.name);
+    setActiveProfile(profile);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleBaseCityChange = (slug: string) => {
     setSelectedBaseCity(slug);
-    initializeFromCity(slug);
+    initializeFromCity(slug, activeProfile);
+    trackEvent("budget_calculate", { city: slug, profile: activeProfile });
+  };
+
+  const handleProfileChange = (profileKey: ProfileKey) => {
+    setActiveProfile(profileKey);
+    if (selectedBaseCity) {
+      initializeFromCity(selectedBaseCity, profileKey);
+    }
   };
 
   useEffect(() => {
     const cityParam = searchParams.get("city");
-    const profileParam = searchParams.get("profile");
+    const profileParam = searchParams.get("profile") as ProfileKey | null;
     const centreParam = searchParams.get("centre");
     if (cityParam && !initialized && cities.some((c) => c.slug === cityParam)) {
       setSelectedBaseCity(cityParam);
-      initializeFromCity(cityParam, profileParam ?? undefined, centreParam !== "0");
+      if (profileParam) setActiveProfile(profileParam);
+      initializeFromCity(cityParam, profileParam ?? "professional", centreParam !== "0");
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
@@ -244,6 +187,23 @@ export default function BudgetCalculator() {
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Profile Selector */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Your lifestyle</label>
+          <div className="flex flex-wrap gap-2">
+            {PROFILE_CONFIGS.map((p) => (
+              <button key={p.key} onClick={() => handleProfileChange(p.key)}
+                className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
+                  activeProfile === p.key
+                    ? "bg-orange-50 text-orange-700 border-orange-300"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-orange-300 hover:text-orange-600"
+                }`}>
+                <span>{p.icon}</span> {p.label}
+              </button>
+            ))}
+          </div>
         </div>
 
       </div>

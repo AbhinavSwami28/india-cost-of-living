@@ -15,7 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   const cityPages: MetadataRoute.Sitemap = cities.map((city) => ({
-    url: `${base}/cost-of-living/${city.slug}`,
+    url: `${base}/cost-of-living/${city.slug}/prices`,
     lastModified: now,
     changeFrequency: "weekly" as const,
     priority: 0.8,

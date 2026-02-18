@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { cities, formatPrice } from "@/lib/data";
 import { salaryEquivalent, affordabilityTier, TIER_CONFIG, getEstimatedMonthlyCost } from "@/lib/decisions";
+import { trackEvent } from "@/lib/analytics";
 
 const LIFESTYLE_PROFILES = [
   { key: "student", label: "Student", icon: "🎓", acc: "PG - Double Sharing (with meals)" },
@@ -41,6 +42,12 @@ export default function OfferCalculator() {
     : diff > 0 ? "maybe" as const
     : diff > -3000 ? "neutral" as const
     : "no" as const;
+
+  useEffect(() => {
+    if (verdict && city1 && city2) {
+      trackEvent("offer_evaluate", { from_city: city1.slug, to_city: city2.slug, verdict });
+    }
+  }, [verdict, city1, city2]);
 
   return (
     <div className="space-y-6">

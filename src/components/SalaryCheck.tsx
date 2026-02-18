@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { CityData } from "@/lib/types";
 import { formatPrice } from "@/lib/data";
-import { affordabilityTier, TIER_CONFIG, getEstimatedMonthlyCost } from "@/lib/decisions";
+import { affordabilityTier, TIER_CONFIG, getEstimatedMonthlyCost, type AffordabilityTier } from "@/lib/decisions";
+import { trackEvent } from "@/lib/analytics";
 
 const LIFESTYLE_PROFILES = [
   { key: "student", label: "Student", icon: "🎓", accCentre: "PG - Double Sharing (with meals)", accOutskirts: "PG - Double Sharing (with meals)" },
@@ -51,6 +52,12 @@ export default function SalaryCheck({ cities }: { cities: CityData[] }) {
   const tierInfo = tier ? TIER_CONFIG[tier] : null;
   const monthlyCost = city ? getEstimatedMonthlyCost(city, acc) : 0;
   const savings = salary - monthlyCost;
+
+  useEffect(() => {
+    if (tier && city && salary > 0) {
+      trackEvent("salary_check", { city: city.slug, salary, profile, tier });
+    }
+  }, [tier, city, salary, profile]);
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6 shadow-sm">
@@ -176,6 +183,37 @@ export default function SalaryCheck({ cities }: { cities: CityData[] }) {
             <span>·</span>
             <a href={`/calculator?city=${city.slug}&profile=${profile}&centre=${cityCentre ? "1" : "0"}`} className="text-orange-500 font-medium hover:underline">See full breakdown of expenses →</a>
           </div>
+
+          {/* Try these cities */}
+          {(() => {
+            const otherCities = cities.filter((c) => c.slug !== city.slug);
+            const cityTiers = otherCities.map((c) => ({
+              city: c,
+              tier: affordabilityTier(salary, c, acc) as AffordabilityTier,
+            }));
+            const tierOrder: AffordabilityTier[] = ["luxury", "saving_well", "comfortable", "survival", "cannot_afford"];
+            cityTiers.sort((a, b) => tierOrder.indexOf(a.tier) - tierOrder.indexOf(b.tier));
+            const suggestions = cityTiers.slice(0, 6);
+            const savingWellCount = cityTiers.filter((c) => c.tier === "saving_well" || c.tier === "luxury").length;
+            const comfortableCount = cityTiers.filter((c) => c.tier === "comfortable").length;
+
+            return (
+              <div className="mt-3 pt-3 border-t border-gray-200/50">
+                <div className="text-xs text-gray-600 mb-2">
+                  At {formatPrice(salary)}/mo, you&apos;d be <strong className="text-emerald-600">Saving Well</strong> in {savingWellCount} cities
+                  {comfortableCount > 0 && <> and <strong className="text-green-600">Comfortable</strong> in {comfortableCount}</>}
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {suggestions.map(({ city: c, tier: t }) => (
+                    <a key={c.slug} href={`/cost-of-living/${c.slug}/prices`}
+                      className={`text-[10px] px-2 py-0.5 rounded-full border ${TIER_CONFIG[t].bgColor} ${TIER_CONFIG[t].color} font-medium hover:opacity-80 transition-opacity`}>
+                      {c.name}: {TIER_CONFIG[t].label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
     </div>

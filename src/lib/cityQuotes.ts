@@ -35,7 +35,7 @@ export const CITY_QUOTES: Record<string, CityQuote[]> = {
   ],
   hyderabad: [
     { text: "Hyderabad is a city where a 400-year-old monument and a glass tower office exist in the same line of sight.", author: "Popular saying" },
-    { text: "Hyderabad ki biryani mein woh baat hai, jo kisi aur biryani mein nahi — there's something in Hyderabad's biryani you won't find elsewhere.", author: "Food saying" },
+    { text: "Hyderabad ki biryani mein woh baat hai, jo kisi aur biryani mein nahi.", author: "Food saying" },
     { text: "Hyderabad doesn't choose between its Nizami past and its tech future — it lives both, effortlessly.", author: "Travel writers" },
     { text: "This city has the warmth of its people baked into its DNA — from the Irani chai to the way strangers say 'Aadab'.", author: "Popular saying" },
     { text: "Hyderabad is proof that you don't have to sacrifice heritage for progress.", author: "Urban planners" },
@@ -52,7 +52,7 @@ export const CITY_QUOTES: Record<string, CityQuote[]> = {
     { text: "Kolkata is the only city I know where people still argue about poetry over cups of chai at midnight.", author: "Popular saying" },
     { text: "If you want to know the soul of India, come to Calcutta.", author: "Dominique Lapierre", context: "City of Joy" },
     { text: "Kolkata doesn't rush. It thinks, it debates, it savours. And somehow, it gets there.", author: "Popular saying" },
-    { text: "The city of joy, where art, culture, and intellect matter more than money — and that is both its beauty and its curse.", author: "Common observation" },
+    { text: "The city of joy, where art, culture, and intellect matter more than money.", author: "Common observation" },
   ],
   ahmedabad: [
     { text: "Ahmedabad is the Manchester of the East — built on enterprise, sustained by resilience.", author: "Historical reference" },
@@ -79,164 +79,301 @@ export const CITY_QUOTES: Record<string, CityQuote[]> = {
     { text: "Gurgaon is India's corporate experiment — a city built by private enterprise in the shadow of the capital.", author: "Urban commentary" },
     { text: "Millennium City rose from farmland to Fortune 500 offices in two decades. That is the Gurgaon story.", author: "Popular saying" },
     { text: "In Gurgaon, the malls are the town squares and the offices are the neighbourhoods.", author: "Urban observation" },
+    { text: "Love it or hate it, Gurgaon rewrote the rules of Indian urbanisation — for better and for worse.", author: "Urban planners" },
   ],
   noida: [
     { text: "Noida is where Delhi's ambition meets Uttar Pradesh's energy — a city always under construction, always growing.", author: "Popular saying" },
     { text: "From a quiet industrial area to a media and tech hub — Noida's transformation is one of India's urban miracles.", author: "Urban commentary" },
+    { text: "Noida's sectors may confuse outsiders, but every resident knows their number is their identity.", author: "Local humour" },
+    { text: "Film City, IT parks, and expressways — Noida builds infrastructure like it's in a permanent hurry.", author: "Popular observation" },
+  ],
+  "navi-mumbai": [
+    { text: "Navi Mumbai was planned as Mumbai's twin — a city built to relieve the pressure of the Maximum City.", author: "Urban planning reference" },
+    { text: "Cleaner air, wider roads, and affordable rent — Navi Mumbai is everything Mumbai wishes it could be.", author: "Popular saying" },
+    { text: "CIDCO planned a city. The people built a community. That's the Navi Mumbai story.", author: "Urban observation" },
+    { text: "The new international airport will put Navi Mumbai on the world map — the city's best years are ahead.", author: "Popular saying" },
+  ],
+  thane: [
+    { text: "The City of Lakes — Thane has over 30 lakes, more than any other city its size in Maharashtra.", author: "Geographic fact" },
+    { text: "Thane offers what Mumbai can't — space to breathe, lakes to walk around, and rent that lets you save.", author: "Popular saying" },
+    { text: "Once Mumbai's quiet suburb, Thane is now a city in its own right — with its own identity and pride.", author: "Urban observation" },
+    { text: "The Yeoor Hills on one side, Ulhas Creek on the other — Thane's geography is an urban planner's dream.", author: "Geographic reference" },
   ],
   chandigarh: [
     { text: "Chandigarh is Le Corbusier's gift to India — a city designed for the human scale.", author: "Architectural reference" },
     { text: "The city beautiful lives up to its name — planned roads, open spaces, and a quality of life most cities envy.", author: "Popular saying" },
     { text: "In Chandigarh, the sector number is your identity, the Rock Garden is your pride, and the Lake is your evening.", author: "Local saying" },
-  ],
-  amritsar: [
-    { text: "Amritsar is faith made tangible — the Golden Temple feeds 100,000 people every day, free, without question.", author: "Popular saying" },
-    { text: "The city of the Golden Temple, where langar feeds more people daily than any restaurant chain in the world.", author: "Common tribute" },
-  ],
-  surat: [
-    { text: "Surat polishes 90% of the world's diamonds. The city literally makes the world sparkle.", author: "Industry fact" },
-    { text: "Surat has reinvented itself more times than any Indian city — from plague city in 1994 to India's cleanest city.", author: "Popular observation" },
-  ],
-  vadodara: [
-    { text: "Vadodara is the cultural capital of Gujarat — the Laxmi Vilas Palace is larger than Buckingham Palace.", author: "Historical reference" },
-    { text: "Baroda has a grace that comes from being a princely state — art, music, and education run deep here.", author: "Cultural saying" },
+    { text: "Two states share it, everyone claims it, and it belongs to no one — that's Chandigarh's unique charm.", author: "Popular saying" },
   ],
   indore: [
     { text: "Indore tops India's cleanliness rankings year after year — the city takes pride in every street corner.", author: "Swachh Bharat" },
     { text: "Sarafa Bazaar at midnight is Indore's real heart — a street food market that wakes up when others sleep.", author: "Food writers" },
+    { text: "Indore is proof that a mid-sized Indian city can be world-class — clean, well-fed, and full of energy.", author: "Urban commentary" },
+    { text: "Poha jalebi in the morning, garadu in the evening, sarafa at night — Indore lives to eat.", author: "Food saying" },
   ],
   bhopal: [
     { text: "Bhopal is the city of lakes, the city of poets, and the city that carries its scars with quiet dignity.", author: "Popular saying" },
     { text: "Two lakes, two cultures, Hindu and Muslim heritage side by side — Bhopal is India's composite culture in miniature.", author: "Cultural observation" },
+    { text: "The only Indian city where begums ruled for over a century — Bhopal's women have always led.", author: "Historical reference" },
+    { text: "Upper Lake, Lower Lake, and a skyline of minarets — Bhopal is more beautiful than it gets credit for.", author: "Travel writers" },
+  ],
+  surat: [
+    { text: "Surat polishes 90% of the world's diamonds. The city literally makes the world sparkle.", author: "Industry fact" },
+    { text: "Surat has reinvented itself more times than any Indian city — from plague city in 1994 to India's cleanest.", author: "Popular observation" },
+    { text: "The Diamond City's entrepreneurs don't just cut stones — they build empires from scratch.", author: "Business commentary" },
+    { text: "Surat's street food is Gujarat's best-kept secret — locho, ghari, and undhiyu that you won't find anywhere else.", author: "Food writers" },
+  ],
+  vadodara: [
+    { text: "Vadodara is the cultural capital of Gujarat — the Laxmi Vilas Palace is larger than Buckingham Palace.", author: "Historical reference" },
+    { text: "Baroda has a grace that comes from being a princely state — art, music, and education run deep here.", author: "Cultural saying" },
+    { text: "Sayajirao Gaekwad III built a modern city a century before 'smart cities' became a buzzword.", author: "Historical reference" },
+    { text: "MS University, Navratri, and Maharaja's legacy — Vadodara blends youth energy with royal heritage.", author: "Cultural observation" },
+  ],
+  nagpur: [
+    { text: "Nagpur sits at India's exact geographic centre — the zero mile marker of the nation.", author: "Geographic fact" },
+    { text: "The Orange City's Nagpur oranges are famous, but its real sweetness lies in its people.", author: "Popular saying" },
+    { text: "Nagpur is where North meets South, East meets West — geographically and culturally, it's India's crossroads.", author: "Geographic observation" },
+    { text: "Saoji food is not for the faint-hearted — Nagpur's spice levels are legendary even by Indian standards.", author: "Food writers" },
+  ],
+  nashik: [
+    { text: "Nashik is India's wine capital — from temple town to vineyard tours, the city keeps reinventing itself.", author: "Popular saying" },
+    { text: "Every 12 years, Nashik hosts the Kumbh Mela — millions arrive, and the city absorbs them all.", author: "Cultural reference" },
+    { text: "Sula Vineyards put Nashik on the global wine map — the Napa Valley of India sits on the Godavari.", author: "Travel writers" },
+    { text: "Trimbakeshwar, Panchavati, and Sula — Nashik offers both spiritual cleansing and grape crushing.", author: "Travel humour" },
   ],
   coimbatore: [
     { text: "Coimbatore is Tamil Nadu's industrial powerhouse — quiet, efficient, and understated, just like its people.", author: "Popular saying" },
     { text: "The Manchester of South India runs on engineering, textiles, and a no-nonsense work ethic.", author: "Industrial reference" },
+    { text: "Coimbatore sits at the foothills of the Nilgiris — industry on one side, mountains on the other.", author: "Geographic reference" },
+    { text: "The city that built India's pump industry — 50% of the country's motors come from Coimbatore.", author: "Industry fact" },
   ],
   kochi: [
-    { text: "Kochi is where Arabia, China, Portugal, Holland, and England left their fingerprints — a truly cosmopolitan port city.", author: "Historical reference" },
+    { text: "Kochi is where Arabia, China, Portugal, Holland, and England left their fingerprints — a truly cosmopolitan port.", author: "Historical reference" },
     { text: "In Kochi, the backwaters whisper stories that are older than most nations.", author: "Travel writers" },
+    { text: "Fort Kochi's Chinese fishing nets have been working since the 14th century — older than the printing press.", author: "Historical fact" },
+    { text: "The Kochi-Muziris Biennale proved that a small city can host world-class contemporary art.", author: "Cultural observation" },
   ],
   thiruvananthapuram: [
     { text: "Thiruvananthapuram moves at its own pace — unhurried, educated, and deeply rooted in tradition.", author: "Popular saying" },
     { text: "The land of temples, techies, and ISRO — where rocket science meets coconut groves.", author: "Popular saying" },
+    { text: "Kerala's capital has the highest literacy in any Indian state capital — here, education is a way of life.", author: "Social reference" },
+    { text: "Padmanabhaswamy Temple's vault holds treasures worth more than most countries' GDP. Trivandrum keeps secrets well.", author: "Historical reference" },
   ],
   visakhapatnam: [
     { text: "Vizag has the Bay of Bengal on one side and the Eastern Ghats on the other — nature's own amphitheatre.", author: "Travel writers" },
     { text: "The Jewel of the East Coast is Andhra Pradesh's best-kept secret — but not for much longer.", author: "Popular saying" },
+    { text: "India's naval pride — the Eastern Naval Command in Vizag guards the entire Bay of Bengal.", author: "Defence reference" },
+    { text: "Araku Valley coffee, Rushikonda Beach, and submarine museums — Vizag has surprises at every turn.", author: "Travel writers" },
+  ],
+  vijayawada: [
+    { text: "Vijayawada, the city of victory — where the Krishna river blesses the land and ambition drives the people.", author: "Popular saying" },
+    { text: "The Kanaka Durga temple on Indrakeeladri hill has watched over Vijayawada for over a thousand years.", author: "Cultural reference" },
+    { text: "Andhra's commercial capital never rests — trade, transport, and tenacity define Vijayawada.", author: "Business observation" },
+    { text: "Mango capital of the world — Vijayawada's Banginapalli mangoes are worth the entire summer's heat.", author: "Popular saying" },
   ],
   mysuru: [
     { text: "Mysuru is the city that proves heritage and cleanliness can go hand in hand — India's second cleanest city.", author: "Swachh Bharat" },
     { text: "Dasara in Mysuru is not a festival — it is a 10-day spectacle that kings started and democracy continued.", author: "Cultural reference" },
+    { text: "The Palace City glows at night with 97,000 bulbs — a sight that makes you believe in fairy tales.", author: "Travel writers" },
+    { text: "Mysore Pak was invented in the royal kitchen. Even the sweets here have a royal pedigree.", author: "Food history" },
   ],
-  jodhpur: [
-    { text: "The Blue City rises from the Thar Desert like a mirage — except it is real, and it is magnificent.", author: "Travel writers" },
-    { text: "Mehrangarh Fort towers over Jodhpur like a guardian — inside its walls, 500 years of Rajput pride.", author: "Historical reference" },
+  mangalore: [
+    { text: "Mangalore is where the Western Ghats meet the Arabian Sea — beaches, temples, and the best seafood in India.", author: "Travel writers" },
+    { text: "Mangalorean cuisine doesn't get the fame it deserves — Neer Dosa, Kori Rotti, and fish curry that haunts your memory.", author: "Food writers" },
+    { text: "The port city that gave India Yakshagana, banking families, and a work ethic that punches above its weight.", author: "Cultural observation" },
+    { text: "Mangalore's red-tiled roofs, coconut trees, and church bells — a slice of coastal Karnataka at its finest.", author: "Travel writers" },
   ],
-  udaipur: [
-    { text: "Udaipur is the most romantic city in India — the lakes, the palaces, the sunsets, all conspire to make you fall in love.", author: "Travel writers" },
-    { text: "The City of Lakes was born from a dream — a Maharana who wanted heaven on earth, and nearly built it.", author: "Historical reference" },
+  madurai: [
+    { text: "Madurai is Tamil Nadu's soul city — the Meenakshi Temple has drawn pilgrims for over 2,500 years.", author: "Historical reference" },
+    { text: "The city that never sleeps in Tamil Nadu — the Meenakshi temple rituals run from 5 AM to 10 PM daily.", author: "Cultural reference" },
+    { text: "Madurai is older than Rome — the Sangam literature places this city at the heart of Tamil civilisation.", author: "Historical reference" },
+    { text: "Jigarthanda on a hot Madurai afternoon is not a drink — it's a survival mechanism.", author: "Local saying" },
+  ],
+  trichy: [
+    { text: "Rock Fort Ucchi Pillayar Temple stands on a rock that is 3.8 billion years old — one of the oldest on Earth.", author: "Geological fact" },
+    { text: "Sri Ranganathaswamy Temple in Trichy is the largest functioning Hindu temple in the world — 156 acres.", author: "Religious reference" },
+    { text: "Trichy is the quiet achiever of Tamil Nadu — no hype, just steady growth and deep cultural roots.", author: "Popular saying" },
+    { text: "The Kaveri splits around Srirangam island, creating a temple town that feels frozen in sacred time.", author: "Travel writers" },
   ],
   varanasi: [
     { text: "Banaras is older than history, older than tradition, older even than legend — and looks twice as old as all of them put together.", author: "Mark Twain" },
     { text: "In Varanasi, death is not feared — it is the ultimate liberation. The ghats have burned for 5,000 years.", author: "Spiritual reference" },
     { text: "Kashi teaches you one thing: life and death are not opposites. They are two ghats on the same river.", author: "Popular saying" },
+    { text: "The Ganga Aarti at Dashashwamedh Ghat is not a ceremony — it is humanity's oldest conversation with the divine.", author: "Spiritual observation" },
+    { text: "Benares is the ultimate pilgrimage — not to find God, but to find yourself.", author: "Popular saying" },
   ],
   agra: [
     { text: "The Taj Mahal is not a building — it is a love letter written in marble that the whole world reads.", author: "Popular saying" },
     { text: "Behind the Taj, there is a city that has its own stories — of petha, leather, and everyday resilience.", author: "Local saying" },
+    { text: "Shah Jahan built the Taj in 22 years with 20,000 workers. Some things are worth the wait and the effort.", author: "Historical reference" },
+    { text: "Agra has three UNESCO World Heritage Sites within 50 km. No other Indian city comes close.", author: "Heritage fact" },
+  ],
+  kanpur: [
+    { text: "Kanpur built the leather and textile industries that dressed a nation — the Manchester of the East.", author: "Industrial reference" },
+    { text: "IIT Kanpur's campus on the Ganga is where some of India's finest engineers found their calling.", author: "Education reference" },
+    { text: "Kanpur's chaat is UP's most underrated — the flavours here rival Lucknow and Varanasi combined.", author: "Food writers" },
+    { text: "An industrial city with a poet's heart — Kanpur has contributed more to Hindi literature than people know.", author: "Cultural observation" },
   ],
   patna: [
     { text: "Patna was Pataliputra — the world's largest city in 300 BC, when London was a swamp.", author: "Historical reference" },
     { text: "Bihar's capital carries 2,500 years of unbroken urban history — few cities on Earth can say the same.", author: "Historical reference" },
+    { text: "Chanakya taught here, Ashoka ruled from here, and the Mauryan Empire changed the world from Pataliputra.", author: "Historical reference" },
+    { text: "Litti chokha by the Ganga, Sonepur Mela across the river — Patna's simple pleasures run deep.", author: "Cultural saying" },
+  ],
+  ranchi: [
+    { text: "The city of waterfalls — Ranchi's surrounding forests and cascades make it Jharkhand's green jewel.", author: "Travel writers" },
+    { text: "Hundru Falls, Jonha Falls, Dassam Falls — Ranchi is surrounded by nature's spectacle.", author: "Geographic reference" },
+    { text: "MS Dhoni's hometown — where a small-city boy became the world's coolest cricket captain.", author: "Sports reference" },
+    { text: "Ranchi's plateau climate means you never need an AC — nature provides what other cities buy.", author: "Popular saying" },
   ],
   bhubaneswar: [
     { text: "The Temple City of India — once home to 7,000 temples, each one a masterpiece of Kalinga architecture.", author: "Historical reference" },
     { text: "Bhubaneswar is Odisha's quiet revolution — smart city planning, growing IT, and a deep cultural soul.", author: "Urban commentary" },
+    { text: "Lingaraj Temple's 11th-century spire still dominates the skyline — a thousand years and counting.", author: "Historical reference" },
+    { text: "Odisha's capital is proof that tier-2 cities can leapfrog — KIIT, Infocity, and world-class hockey.", author: "Urban observation" },
   ],
   guwahati: [
     { text: "Guwahati is the gateway to the Northeast — where the Brahmaputra runs wide and the hills begin.", author: "Travel writers" },
     { text: "The city where Assam tea meets tribal heritage, where temples sit beside river islands.", author: "Cultural observation" },
+    { text: "Kamakhya Temple sits atop Nilachal Hill — one of India's most powerful shakti peethas.", author: "Spiritual reference" },
+    { text: "The Brahmaputra at Guwahati is so wide, you can't see the other bank. The river dwarfs the city.", author: "Geographic observation" },
+  ],
+  dehradun: [
+    { text: "Dehradun sits in the Doon Valley like a secret garden — the mountains on all sides, the pace of life unhurried.", author: "Travel writers" },
+    { text: "From the Forest Research Institute to ISRO — Dehradun quietly shapes India's science and defence.", author: "Institutional reference" },
+    { text: "The last town before the mountains — every hill station in Uttarakhand begins with Dehradun.", author: "Travel saying" },
+    { text: "Doon School, Wadia Institute, IMA — the institutions here have shaped leaders for a century.", author: "Education reference" },
+  ],
+  amritsar: [
+    { text: "Amritsar is faith made tangible — the Golden Temple feeds 100,000 people every day, free, without question.", author: "Popular saying" },
+    { text: "The city of the Golden Temple, where langar feeds more people daily than any restaurant chain in the world.", author: "Common tribute" },
+    { text: "Jallianwala Bagh still stands as a reminder — Amritsar knows the price of freedom.", author: "Historical reference" },
+    { text: "The Wagah Border ceremony every evening is not just a flag lowering — it's pure, unbridled patriotism.", author: "Cultural observation" },
+  ],
+  ludhiana: [
+    { text: "Ludhiana is Punjab's industrial engine — the city makes the hosiery and bicycles that India runs on.", author: "Industrial reference" },
+    { text: "More than half of India's bicycles are made in Ludhiana — the city puts the nation on wheels.", author: "Industry fact" },
+    { text: "Ludhiana's industrialists started from zero — many of the biggest names were Partition refugees who rebuilt from scratch.", author: "Historical reference" },
+    { text: "The woollen capital of India — when winter comes, the country wears Ludhiana.", author: "Industry saying" },
+  ],
+  jodhpur: [
+    { text: "The Blue City rises from the Thar Desert like a mirage — except it is real, and it is magnificent.", author: "Travel writers" },
+    { text: "Mehrangarh Fort towers over Jodhpur like a guardian — inside its walls, 500 years of Rajput pride.", author: "Historical reference" },
+    { text: "The blue houses of Jodhpur were once Brahmin homes — now the colour defines an entire city's identity.", author: "Cultural reference" },
+    { text: "Jodhpur's mirchi vada is so beloved, it has its own fan following — spice is a way of life here.", author: "Food saying" },
+  ],
+  udaipur: [
+    { text: "Udaipur is the most romantic city in India — the lakes, the palaces, the sunsets, all conspire to make you fall in love.", author: "Travel writers" },
+    { text: "The City of Lakes was born from a dream — a Maharana who wanted heaven on earth, and nearly built it.", author: "Historical reference" },
+    { text: "James Bond filmed Octopussy here. If it's good enough for 007, it's good enough for the world.", author: "Pop culture reference" },
+    { text: "Lake Pichola at sunset turns gold, pink, and orange — a show that no human artist could replicate.", author: "Travel writers" },
+  ],
+  kota: [
+    { text: "Kota sends more students to IIT than any other city in India — the coaching capital of the nation.", author: "Education reference" },
+    { text: "Every year, 200,000 students arrive in Kota with a dream — and the city reorganises itself around them.", author: "Education observation" },
+    { text: "Kota's coaching industry is worth thousands of crores — built not on infrastructure, but on the hopes of teenagers.", author: "Business commentary" },
+    { text: "The Chambal river flows quietly through Kota — perhaps the only quiet thing in this city of relentless study.", author: "Popular observation" },
   ],
   goa: [
     { text: "Goa is not a place — it is a state of mind. Susegad: the art of contentment.", author: "Goan philosophy" },
     { text: "Where else in India can you hear church bells and temple bells at the same time, with the ocean as background music?", author: "Popular saying" },
-  ],
-  nagpur: [
-    { text: "Nagpur sits at India's exact geographic centre — the zero mile marker of the nation.", author: "Geographic fact" },
-    { text: "The Orange City's Nagpur oranges are famous, but its real sweetness lies in its people.", author: "Popular saying" },
-  ],
-  madurai: [
-    { text: "Madurai is Tamil Nadu's soul city — the Meenakshi Temple has drawn pilgrims for over 2,500 years.", author: "Historical reference" },
-    { text: "The city that never sleeps in Tamil Nadu — the Meenakshi temple rituals run from 5 AM to 10 PM daily.", author: "Cultural reference" },
-  ],
-  vijayawada: [
-    { text: "Vijayawada, the city of victory — where the Krishna river blesses the land and ambition drives the people.", author: "Popular saying" },
-  ],
-  mangalore: [
-    { text: "Mangalore is where the Western Ghats meet the Arabian Sea — a city of beaches, temples, and the best seafood in India.", author: "Travel writers" },
-  ],
-  gwalior: [
-    { text: "Gwalior Fort is the 'Pearl amongst fortresses in India' — even the Mughals coveted it.", author: "Babur's memoirs" },
-  ],
-  raipur: [
-    { text: "Raipur is Chhattisgarh's beating heart — a city transforming from a small town into a smart city.", author: "Urban commentary" },
-  ],
-  kanpur: [
-    { text: "Kanpur built the leather and textile industries that dressed a nation — the Manchester of the East.", author: "Industrial reference" },
-  ],
-  dehradun: [
-    { text: "Dehradun sits in the Doon Valley like a secret garden — the mountains on all sides, the pace of life unhurried.", author: "Travel writers" },
-  ],
-  ranchi: [
-    { text: "The city of waterfalls — Ranchi's surrounding forests and cascades make it Jharkhand's green jewel.", author: "Travel writers" },
-  ],
-  prayagraj: [
-    { text: "At Triveni Sangam, three rivers meet — Ganga, Yamuna, and the invisible Saraswati. Prayagraj is where faith has an address.", author: "Spiritual reference" },
-  ],
-  nashik: [
-    { text: "Nashik is India's wine capital — from temple town to vineyard tours, the city keeps reinventing itself.", author: "Popular saying" },
-  ],
-  aurangabad: [
-    { text: "Ajanta and Ellora — two UNESCO sites within driving distance. Aurangabad is a living museum of ancient India.", author: "Heritage reference" },
-  ],
-  ludhiana: [
-    { text: "Ludhiana is Punjab's industrial engine — the city makes the hosiery and bicycles that India runs on.", author: "Industrial reference" },
-  ],
-  kolhapur: [
-    { text: "Kolhapur's Kolhapuri chappals and misal pav are famous — a city of wrestling, spice, and fierce pride.", author: "Cultural reference" },
-  ],
-  warangal: [
-    { text: "The Thousand Pillar Temple and Warangal Fort speak of a Kakatiya dynasty that once ruled all of Deccan.", author: "Historical reference" },
-  ],
-  trichy: [
-    { text: "Rock Fort Ucchi Pillayar Temple stands on a rock that is 3.8 billion years old — one of the oldest on Earth.", author: "Geological fact" },
-  ],
-  hubli: [
-    { text: "Hubli-Dharwad is the cultural twin city of Karnataka — Hindustani music in Dharwad, commerce in Hubli.", author: "Cultural reference" },
-  ],
-  meerut: [
-    { text: "The First War of Independence in 1857 began in Meerut — this city lit the spark of freedom.", author: "Historical reference" },
-  ],
-  jamshedpur: [
-    { text: "Jamshedpur is India's first planned industrial city — built by the Tatas, for the Tatas, and now for all of India.", author: "Industrial reference" },
+    { text: "Goa's secret is not the beaches or the parties — it's the way the locals have mastered the art of living well.", author: "Travel writers" },
+    { text: "Fish curry rice and feni — Goa's essentials haven't changed in centuries, and that is the whole point.", author: "Cultural observation" },
   ],
   siliguri: [
     { text: "Siliguri is the gateway to Darjeeling, Sikkim, and the entire Northeast — the narrow corridor that connects it all.", author: "Geographic reference" },
+    { text: "The Chicken's Neck — Siliguri sits on the slimmest stretch of India, connecting the Northeast to the mainland.", author: "Geographic fact" },
+    { text: "Tea gardens on one side, the Himalayas on the other — Siliguri's setting is more dramatic than cities ten times its size.", author: "Travel writers" },
+    { text: "Hong Kong Market in Siliguri is where the cultures of Nepal, Bhutan, and Bengal meet over trade.", author: "Cultural observation" },
   ],
-  kota: [
-    { text: "Kota sends more students to IIT than any other city in India — the coaching capital of the nation.", author: "Education reference" },
+  jamshedpur: [
+    { text: "Jamshedpur is India's first planned industrial city — built by the Tatas, for the Tatas, and now for all of India.", author: "Industrial reference" },
+    { text: "Tata Steel city is so well-planned that even the trees are mapped — Jamshedji's vision lives on.", author: "Urban observation" },
+    { text: "Jubilee Park, Dimna Lake, and Dalma Hills — Jamshedpur proves an industrial city can also be green.", author: "Travel writers" },
+    { text: "In Jamshedpur, the company is the city and the city is the company — a unique Indian experiment in corporate governance.", author: "Urban commentary" },
   ],
-  "navi-mumbai": [
-    { text: "Navi Mumbai was planned as Mumbai's twin — a city built to relieve the pressure of the Maximum City.", author: "Urban planning reference" },
+  aurangabad: [
+    { text: "Ajanta and Ellora — two UNESCO sites within driving distance. Aurangabad is a living museum of ancient India.", author: "Heritage reference" },
+    { text: "The Bibi Ka Maqbara was built as a replica of the Taj — they called it the Taj of the Deccan.", author: "Historical reference" },
+    { text: "Aurangabad is Maharashtra's gateway to history — every cave, every carving tells a story 2,000 years old.", author: "Heritage observation" },
+    { text: "From Ajanta's Buddhist paintings to Ellora's Hindu, Buddhist, and Jain caves — Aurangabad celebrates every faith.", author: "Cultural reference" },
   ],
-  thane: [
-    { text: "The City of Lakes — Thane has over 30 lakes, more than any other city its size in Maharashtra.", author: "Geographic fact" },
+  kolhapur: [
+    { text: "Kolhapur's Kolhapuri chappals and misal pav are famous — a city of wrestling, spice, and fierce pride.", author: "Cultural reference" },
+    { text: "Mahalakshmi Temple's shakti and the kushti akhadas — Kolhapur is where devotion and strength are the same thing.", author: "Cultural observation" },
+    { text: "Kolhapuri misal is not a breakfast — it's a challenge. The spice level here is not for tourists.", author: "Food writers" },
+    { text: "Shahu Maharaj made Kolhapur a centre of social reform — this city fought caste before it was fashionable.", author: "Historical reference" },
+  ],
+  "hubli-dharwad": [
+    { text: "Hubli-Dharwad is the cultural twin city of Karnataka — Hindustani music in Dharwad, commerce in Hubli.", author: "Cultural reference" },
+    { text: "Dharwad pedha is so famous, it has a GI tag — sweetness certified by geography.", author: "Food fact" },
+    { text: "Hubli's trading spirit and Dharwad's musical soul — twin cities that complete each other.", author: "Cultural observation" },
+    { text: "The cradle of Karnataka's Hindustani classical music — Dharwad has produced more maestros per square km than anywhere.", author: "Music reference" },
+  ],
+  warangal: [
+    { text: "The Thousand Pillar Temple and Warangal Fort speak of a Kakatiya dynasty that once ruled all of Deccan.", author: "Historical reference" },
+    { text: "Warangal was the Kakatiya capital — the Ramappa Temple is now a UNESCO World Heritage Site.", author: "Heritage reference" },
+    { text: "The iconic Kakatiya Kala Thoranam gateway is Telangana's state emblem — Warangal's legacy lives on every government document.", author: "Cultural fact" },
+    { text: "NIT Warangal and IIT Hyderabad nearby — the region is becoming Telangana's education corridor.", author: "Education reference" },
+  ],
+  raipur: [
+    { text: "Raipur is Chhattisgarh's beating heart — a city transforming from a small town into a smart city.", author: "Urban commentary" },
+    { text: "Naya Raipur is India's greenest planned city — solar-powered, wide roads, and 40% green cover by design.", author: "Urban planning reference" },
+    { text: "Chhattisgarh's capital sits on iron and steel — the mineral wealth beneath funds the dreams above.", author: "Economic observation" },
+    { text: "Marine Drive Raipur — yes, a lake-side promenade in landlocked Chhattisgarh. The city surprises you.", author: "Popular observation" },
+  ],
+  gwalior: [
+    { text: "Gwalior Fort is the 'Pearl amongst fortresses in India' — even the Mughals coveted it.", author: "Babur's memoirs" },
+    { text: "Tansen sang in Gwalior's court — the city where Indian classical music found its most celebrated voice.", author: "Music reference" },
+    { text: "The Scindia dynasty shaped modern Gwalior — palaces, railways, and a legacy of royal ambition.", author: "Historical reference" },
+    { text: "Gwalior Fort has stood for 1,500 years — every empire that ruled India wanted this rock.", author: "Historical reference" },
+  ],
+  prayagraj: [
+    { text: "At Triveni Sangam, three rivers meet — Ganga, Yamuna, and the invisible Saraswati. Prayagraj is where faith has an address.", author: "Spiritual reference" },
+    { text: "Every 12 years, the Kumbh Mela makes Prayagraj the largest gathering of humans on Earth — visible from space.", author: "Cultural fact" },
+    { text: "The city that gave India its freedom fighters — Nehru, the Gandhis, and countless revolutionaries walked these streets.", author: "Historical reference" },
+    { text: "From Anand Bhawan to the High Court — Prayagraj shaped India's political and legal foundations.", author: "Historical observation" },
+  ],
+  meerut: [
+    { text: "The First War of Independence in 1857 began in Meerut — this city lit the spark of freedom.", author: "Historical reference" },
+    { text: "India's sports goods capital — from cricket bats to hockey sticks, Meerut equips the nation's athletes.", author: "Industry reference" },
+    { text: "Meerut is Delhi NCR's quiet neighbour — close enough to commute, far enough to have its own identity.", author: "Popular saying" },
+    { text: "Nauchandi Fair, Hastinapur nearby, and the cantonment's colonial legacy — Meerut has layers most people never see.", author: "Cultural observation" },
   ],
 };
 
+const INDIA_QUOTES: CityQuote[] = [
+  { text: "A nation's culture resides in the hearts and in the soul of its people.", author: "Mahatma Gandhi" },
+  { text: "You dream. You aspire. You believe. I will clear the way for you.", author: "Narendra Modi" },
+  { text: "India is not just a geography or a nationality. It is an idea, an aspiration, a force.", author: "Narendra Modi" },
+  { text: "Arise, awake, and stop not till the goal is reached.", author: "Swami Vivekananda" },
+  { text: "You must be the change you wish to see in the world.", author: "Mahatma Gandhi" },
+  { text: "Dream, dream, dream. Dreams transform into thoughts, and thoughts result in action.", author: "APJ Abdul Kalam" },
+  { text: "We owe a lot to the Indians, who taught us how to count, without which no worthwhile scientific discovery could have been made.", author: "Albert Einstein" },
+  { text: "India has no dearth of brave young men and women and if they get the opportunity and help then we can compete with other nations in space exploration and in other fields.", author: "APJ Abdul Kalam" },
+  { text: "The mantra of unity, the mantra of India, the mantra of development — together we will build the India of our dreams.", author: "Narendra Modi" },
+  { text: "I measure the progress of a community by the degree of progress which women have achieved.", author: "B.R. Ambedkar" },
+  { text: "Every Indian should now forget that he is a Rajput, a Sikh, or a Jat. He must remember that he is an Indian.", author: "Sardar Vallabhbhai Patel" },
+  { text: "Where the mind is without fear and the head is held high — into that heaven of freedom, my Father, let my country awake.", author: "Rabindranath Tagore", context: "Gitanjali" },
+  { text: "Sare jahan se achha, Hindustan hamara — Better than all the world is our Hindustan.", author: "Muhammad Iqbal" },
+  { text: "India is the cradle of the human race, the birthplace of human speech, the mother of history.", author: "Mark Twain" },
+  { text: "If there is one place on the face of earth where all the dreams of living men have found a home, it is India.", author: "Romain Rolland" },
+  { text: "We are Indians, firstly and lastly.", author: "B.R. Ambedkar" },
+  { text: "Faith is the bird that feels the light when the dawn is still dark.", author: "Rabindranath Tagore" },
+  { text: "The best way to find yourself is to lose yourself in the service of others.", author: "Mahatma Gandhi" },
+  { text: "Great dreams of great dreamers are always transcended.", author: "APJ Abdul Kalam" },
+  { text: "Minimum Government, Maximum Governance — that is my mantra.", author: "Narendra Modi" },
+];
+
 export function getCityQuotes(slug: string): CityQuote[] {
-  return CITY_QUOTES[slug] || [];
+  const citySpecific = CITY_QUOTES[slug] || [];
+  const fillerCount = Math.max(0, 8 - citySpecific.length);
+  const slugHash = slug.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+  const fillers: CityQuote[] = [];
+  for (let i = 0; i < fillerCount; i++) {
+    fillers.push(INDIA_QUOTES[(slugHash + i) % INDIA_QUOTES.length]);
+  }
+  return [...citySpecific, ...fillers];
 }
 
 export function getRandomQuote(slug: string, seed: number): CityQuote | null {

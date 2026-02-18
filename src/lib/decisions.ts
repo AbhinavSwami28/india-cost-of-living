@@ -1,74 +1,14 @@
 import { CityData } from "./types";
 import { formatPrice } from "./data";
+import { BUDGET_ITEMS } from "./budgetConfig";
 
-// Comprehensive monthly expense for a single working professional
-// Includes: food, groceries, transport, utilities, lifestyle, household help, shopping, misc
 function comprehensiveMonthlyExpense(city: CityData): number {
-  const get = (item: string) => city.prices.find((p) => p.item === item)?.price ?? 0;
-
-  // Food: mix of cooking at home + eating out
-  const food =
-    get("Veg Thali (local restaurant)") * 15 +  // eat out ~15 days
-    get("Chai (regular cup)") * 30 +              // daily chai
-    get("Coffee (Cappuccino)") * 10 +             // coffee 10x/month
-    get("Street Food (Vada Pav / Samosa)") * 8 +  // snacks
-    get("Dosa (plain)") * 4 +                     // occasional
-    get("Fast Food Combo (McDonald's)") * 2 +     // occasional
-    get("Bottled Water (1 litre)") * 15;           // water
-
-  // Groceries: monthly staples
-  const groceries =
-    get("Rice (Basmati)") * 5 +
-    get("Wheat Flour (Atta)") * 3 +
-    get("Toor Dal") * 2 +
-    get("Milk (Full Cream)") * 15 +
-    get("Eggs") * 3 +                             // 3 dozen
-    get("Paneer") * 1 +
-    get("Onions") * 3 +
-    get("Tomatoes") * 3 +
-    get("Potatoes") * 3 +
-    get("Cooking Oil (Sunflower)") * 2 +
-    get("Sugar") * 1 +
-    get("Apples (Shimla)") * 2 +
-    get("Bananas") * 2 +
-    get("Bread (White, Sliced)") * 4;
-
-  // Transport: metro pass + Ola rides + auto rides + petrol
-  const transport =
-    (get("Metro / Local Train (monthly pass)") || get("Bus (monthly pass)")) +
-    get("Ola/Uber (avg ride)") * 8 +              // 8 rides/month
-    get("Auto Rickshaw (minimum fare)") * 15 +     // 15 auto rides
-    get("Petrol") * 20;                            // 20L petrol
-
-  // Utilities
-  const utilities =
-    get("Electricity") +
-    get("Water Bill") +
-    get("Cooking Gas (LPG Cylinder)") +
-    get("Broadband Internet") +
-    get("Mobile Plan (Jio/Airtel)");
-
-  // Household help
-  const household =
-    get("Maid / Cleaning Help") +
-    get("Laundry / Ironing (dhobi)") +
-    get("Miscellaneous Monthly Spend");
-
-  // Lifestyle
-  const lifestyle =
-    get("Gym Membership") +
-    get("Movie Ticket (Multiplex)") * 2 +
-    get("Netflix (Standard Plan)") +
-    get("Spotify Premium") +
-    get("Haircut (Men, basic salon)") +
-    get("Domestic Beer (pint, restaurant)") * 4;
-
-  // Shopping
-  const shopping =
-    get("Skincare Basics (Nykaa avg)") +
-    get("Amazon Prime Membership");
-
-  return food + groceries + transport + utilities + household + lifestyle + shopping;
+  return BUDGET_ITEMS
+    .filter((b) => !b.isOptional)
+    .reduce((sum, b) => {
+      const price = city.prices.find((p) => p.item === b.item)?.price ?? 0;
+      return sum + price * b.defaultQty;
+    }, 0);
 }
 
 // Full monthly cost including rent

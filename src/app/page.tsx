@@ -6,7 +6,12 @@ import SalaryCheck from "@/components/SalaryCheck";
 import Link from "next/link";
 
 const IndiaMap = dynamic(() => import("@/components/IndiaMap"), {
-  loading: () => <div className="h-64 flex items-center justify-center text-gray-400 text-sm">Loading map...</div>,
+  loading: () => (
+    <div className="h-64 space-y-3 p-4">
+      <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+      <div className="flex-1 bg-gray-100 rounded-xl animate-pulse h-48" />
+    </div>
+  ),
 });
 const AdBanner = dynamic(() => import("@/components/AdBanner"));
 
@@ -167,7 +172,7 @@ export default function HomePage() {
               {sortedCities.slice(0, 10).map((city) => {
                 const index = calculateCostIndex(city);
                 return (
-                  <Link key={city.slug} href={`/cost-of-living/${city.slug}`} className="flex items-center gap-2 group">
+                  <Link key={city.slug} href={`/cost-of-living/${city.slug}/prices`} className="flex items-center gap-2 group">
                     <span className="text-xs font-medium text-gray-700 w-20 shrink-0 group-hover:text-orange-600 transition-colors truncate">{city.name}</span>
                     <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
                       <div className="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full" style={{ width: `${Math.max(index, 10)}%` }} />
@@ -185,7 +190,7 @@ export default function HomePage() {
                 {sortedCities.slice(10).map((city) => {
                   const index = calculateCostIndex(city);
                   return (
-                    <Link key={city.slug} href={`/cost-of-living/${city.slug}`} className="flex items-center gap-2 group">
+                    <Link key={city.slug} href={`/cost-of-living/${city.slug}/prices`} className="flex items-center gap-2 group">
                       <span className="text-xs font-medium text-gray-700 w-20 shrink-0 group-hover:text-orange-600 transition-colors truncate">{city.name}</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full" style={{ width: `${Math.max(index, 10)}%` }} />
@@ -206,7 +211,7 @@ export default function HomePage() {
               {[...cities].sort((a, b) => calculateRentIndex(b) - calculateRentIndex(a)).slice(0, 10).map((city) => {
                 const index = calculateRentIndex(city);
                 return (
-                  <Link key={city.slug} href={`/cost-of-living/${city.slug}`} className="flex items-center gap-2 group">
+                  <Link key={city.slug} href={`/cost-of-living/${city.slug}/prices`} className="flex items-center gap-2 group">
                     <span className="text-xs font-medium text-gray-700 w-20 shrink-0 group-hover:text-blue-600 transition-colors truncate">{city.name}</span>
                     <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
                       <div className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full" style={{ width: `${Math.max(index, 10)}%` }} />
@@ -224,7 +229,7 @@ export default function HomePage() {
                 {[...cities].sort((a, b) => calculateRentIndex(b) - calculateRentIndex(a)).slice(10).map((city) => {
                   const index = calculateRentIndex(city);
                   return (
-                    <Link key={city.slug} href={`/cost-of-living/${city.slug}`} className="flex items-center gap-2 group">
+                    <Link key={city.slug} href={`/cost-of-living/${city.slug}/prices`} className="flex items-center gap-2 group">
                       <span className="text-xs font-medium text-gray-700 w-20 shrink-0 group-hover:text-blue-600 transition-colors truncate">{city.name}</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full" style={{ width: `${Math.max(index, 10)}%` }} />
@@ -283,10 +288,10 @@ export default function HomePage() {
             <h3 className="text-lg font-semibold text-gray-900 pt-2">Rent &amp; Accommodation</h3>
             <p>
               Rent is the single largest expense in most Indian cities, accounting for 30–50% of
-              monthly income. The <Link href="/cost-of-living/mumbai" className="text-orange-600 hover:text-orange-700 font-medium">cost of living in Mumbai</Link> is
+              monthly income. The <Link href="/cost-of-living/mumbai/prices" className="text-orange-600 hover:text-orange-700 font-medium">cost of living in Mumbai</Link> is
               driven primarily by sky-high rents — a 1BHK in the city centre can exceed ₹60,000/month.
-              In <Link href="/cost-of-living/bangalore" className="text-orange-600 hover:text-orange-700 font-medium">Bangalore</Link>, strong
-              IT-sector demand pushes 1BHK rents to around ₹28,000, while <Link href="/cost-of-living/delhi" className="text-orange-600 hover:text-orange-700 font-medium">Delhi</Link> and <Link href="/cost-of-living/gurgaon" className="text-orange-600 hover:text-orange-700 font-medium">Gurgaon</Link> hover
+              In <Link href="/cost-of-living/bangalore/prices" className="text-orange-600 hover:text-orange-700 font-medium">Bangalore</Link>, strong
+              IT-sector demand pushes 1BHK rents to around ₹28,000, while <Link href="/cost-of-living/delhi/prices" className="text-orange-600 hover:text-orange-700 font-medium">Delhi</Link> and <Link href="/cost-of-living/gurgaon/prices" className="text-orange-600 hover:text-orange-700 font-medium">Gurgaon</Link> hover
               around ₹22,000 each.
             </p>
             <p>
@@ -313,7 +318,7 @@ export default function HomePage() {
               {expensive5.map((city, i) => (
                 <span key={city.slug}>
                   {i > 0 && (i === expensive5.length - 1 ? ", and " : ", ")}
-                  <Link href={`/cost-of-living/${city.slug}`} className="text-orange-600 hover:text-orange-700 font-medium">
+                  <Link href={`/cost-of-living/${city.slug}/prices`} className="text-orange-600 hover:text-orange-700 font-medium">
                     {city.name} ({calculateCostIndex(city)})
                   </Link>
                 </span>
@@ -322,7 +327,7 @@ export default function HomePage() {
               {cheapest5.map((city, i) => (
                 <span key={city.slug}>
                   {i > 0 && (i === cheapest5.length - 1 ? ", and " : ", ")}
-                  <Link href={`/cost-of-living/${city.slug}`} className="text-orange-600 hover:text-orange-700 font-medium">
+                  <Link href={`/cost-of-living/${city.slug}/prices`} className="text-orange-600 hover:text-orange-700 font-medium">
                     {city.name} ({calculateCostIndex(city)})
                   </Link>
                 </span>

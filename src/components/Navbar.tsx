@@ -46,7 +46,7 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
             <Link href="/"
-              className={`text-sm font-medium transition-colors ${pathname === "/" ? "text-orange-600" : "text-gray-600 hover:text-gray-900"}`}>
+              className={`text-sm font-medium transition-colors ${pathname === "/" ? "text-orange-600" : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"}`}>
               Home
             </Link>
 
@@ -55,9 +55,9 @@ export default function Navbar() {
               <button
                 onClick={() => setCityDropdownOpen(!cityDropdownOpen)}
                 onBlur={() => setTimeout(() => setCityDropdownOpen(false), 300)}
-                className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors flex items-center gap-1"
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm font-medium transition-colors flex items-center gap-1"
               >
-                Cities
+                Prices By City
                 <svg
                   className={`w-4 h-4 transition-transform ${cityDropdownOpen ? "rotate-180" : ""}`}
                   fill="none"
@@ -71,13 +71,13 @@ export default function Navbar() {
               {cityDropdownOpen && (
                 <div className="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-[#171717] rounded-lg shadow-lg border border-gray-200 dark:border-[#2a2a2a] py-2 max-h-80 overflow-y-auto">
                   {cities.slice(0, 15).map((city) => (
-                    <Link key={city.slug} href={`/cost-of-living/${city.slug}`}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 transition-colors"
+                    <Link key={city.slug} href={`/cost-of-living/${city.slug}/prices`}
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-orange-950/30 hover:text-orange-700 dark:hover:text-orange-400 transition-colors"
                       onClick={() => setCityDropdownOpen(false)}>
                       {city.name}
                     </Link>
                   ))}
-                  <Link href="/#cities" className="block px-4 py-2 text-sm text-orange-500 font-medium hover:bg-orange-50"
+                  <Link href="/#cities" className="block px-4 py-2 text-sm text-orange-500 font-medium hover:bg-orange-50 dark:hover:bg-orange-950/30"
                     onClick={() => setCityDropdownOpen(false)}>
                     All {cities.length} cities →
                   </Link>
@@ -86,15 +86,15 @@ export default function Navbar() {
             </div>
 
             <Link href="/compare"
-              className={`text-sm font-medium transition-colors ${isActive("/compare") ? "text-orange-600" : "text-gray-600 hover:text-gray-900"}`}>
+              className={`text-sm font-medium transition-colors ${isActive("/compare") ? "text-orange-600" : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"}`}>
               Compare
             </Link>
             <Link href="/offer"
-              className={`text-sm font-medium transition-colors ${isActive("/offer") ? "text-orange-600" : "text-gray-600 hover:text-gray-900"}`}>
+              className={`text-sm font-medium transition-colors ${isActive("/offer") ? "text-orange-600" : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"}`}>
               Job Offer
             </Link>
             <Link href="/feedback"
-              className={`text-sm font-medium transition-colors ${isActive("/feedback") ? "text-orange-600" : "text-gray-600 hover:text-gray-900"}`}>
+              className={`text-sm font-medium transition-colors ${isActive("/feedback") ? "text-orange-600" : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"}`}>
               Feedback
             </Link>
             <Link href="/calculator"
@@ -124,31 +124,31 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {menuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
+          <div className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700">
             <Link
               href="/"
-              className="block py-2 text-gray-700 hover:text-orange-600"
+              className="block py-2 text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400"
               onClick={() => setMenuOpen(false)}
             >
               Home
             </Link>
-            <Link href="/compare" className="block py-2 text-gray-700 hover:text-orange-600" onClick={() => setMenuOpen(false)}>
+            <Link href="/compare" className="block py-2 text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400" onClick={() => setMenuOpen(false)}>
               Compare Cities
             </Link>
-            <Link href="/offer" className="block py-2 text-gray-700 hover:text-orange-600" onClick={() => setMenuOpen(false)}>
+            <Link href="/offer" className="block py-2 text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400" onClick={() => setMenuOpen(false)}>
               Should I Take This Offer?
             </Link>
-            <Link href="/calculator" className="block py-2 text-gray-700 hover:text-orange-600" onClick={() => setMenuOpen(false)}>
+            <Link href="/calculator" className="block py-2 text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400" onClick={() => setMenuOpen(false)}>
               My Budget Calculator
             </Link>
-            <Link href="/feedback" className="block py-2 text-gray-700 hover:text-orange-600" onClick={() => setMenuOpen(false)}>
+            <Link href="/feedback" className="block py-2 text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400" onClick={() => setMenuOpen(false)}>
               Feedback
             </Link>
-            <div className="mt-2 pt-2 border-t border-gray-100">
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">Top Cities</p>
+            <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">Prices By City</p>
               {cities.slice(0, 8).map((city) => (
-                <Link key={city.slug} href={`/cost-of-living/${city.slug}`}
-                  className="block py-1.5 text-sm text-gray-600 hover:text-orange-600"
+                <Link key={city.slug} href={`/cost-of-living/${city.slug}/prices`}
+                  className="block py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400"
                   onClick={() => setMenuOpen(false)}>
                   {city.name}
                 </Link>

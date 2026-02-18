@@ -56,7 +56,7 @@ export default function IndiaMap({ cities }: { cities: CityData[] }) {
                 fill="#e8ede8"
                 stroke="#bbb"
                 strokeWidth={0.4}
-                className="outline-none dark:fill-[#1a1a1a] dark:stroke-[#333]"
+                className="outline-none dark:fill-[#1a1a1a] dark:stroke-[#555] hover:dark:fill-[#2a2a2a]"
                 style={{
                   default: { outline: "none" },
                   hover: { fill: "#fde68a", outline: "none" },
@@ -74,7 +74,7 @@ export default function IndiaMap({ cities }: { cities: CityData[] }) {
 
           return (
             <Marker key={city.slug} coordinates={coords}>
-              <Link href={`/cost-of-living/${city.slug}`}>
+              <Link href={`/cost-of-living/${city.slug}/prices`}>
                 <circle
                   r={isHovered ? 5 : 2.5}
                   fill={isHovered ? "#f97316" : "#ea580c"}

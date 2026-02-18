@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { CityData, CATEGORIES, CATEGORY_ICONS, CATEGORY_DESCRIPTIONS, Category } from "@/lib/types";
 import { formatPrice, getPercentageDifference, getPricesByCategory, cities } from "@/lib/data";
 import { decisionSummary, salaryEquivalent, affordabilityTier, TIER_CONFIG, calculateEMI, type AffordabilityTier as TierType } from "@/lib/decisions";
+import { DEFAULT_QUANTITIES, BUDGET_GROUPS, BUDGET_GROUP_ORDER, PROFILE_CONFIGS, getProfileExclusions, getProfileAccommodation, DEFAULT_BUDGET_ITEM_SET, type ProfileKey } from "@/lib/budgetConfig";
+import { trackEvent } from "@/lib/analytics";
 
 const MAX_CITIES = 5;
 
@@ -44,57 +46,8 @@ const ACCOMMODATION_OPTIONS = [
   { key: "PG - Triple Sharing (without meals)", label: "PG Triple (no meals)" },
 ] as const;
 
-const MONTHLY_BUDGET_ITEMS: Record<string, { items: string[]; multiplier?: number; pickOne?: boolean }> = {
-  "Restaurants & Dining": {
-    items: ["Veg Thali (local restaurant)", "Chai (regular cup)", "Coffee (Cappuccino)"],
-  },
-  "Groceries": {
-    items: [
-      "Rice (Basmati)", "Wheat Flour (Atta)", "Toor Dal", "Milk (Full Cream)",
-      "Eggs", "Cooking Oil (Sunflower)", "Onions", "Tomatoes", "Potatoes",
-    ],
-  },
-  "Transportation": { items: ["Metro / Local Train (monthly pass)", "Petrol"], pickOne: true },
-  "Utilities (Monthly)": {
-    items: [
-      "Electricity", "Water Bill", "Cooking Gas (LPG Cylinder)",
-      "Broadband Internet", "Mobile Plan (Jio/Airtel)",
-    ],
-  },
-  "Household Help": {
-    items: ["Cook (part-time, 2 meals/day)", "Maid / Cleaning Help", "Laundry / Ironing (dhobi)"],
-  },
-  "Miscellaneous": {
-    items: ["Miscellaneous Monthly Spend"],
-  },
-  "Shopping & Personal Care": {
-    items: [
-      "Men's Casual Shirt (Zara/H&M)", "Women's Dress (Myntra/Zara)",
-      "Running Shoes (Nike/Adidas)", "Skincare Basics (Nykaa avg)", "Amazon Prime Membership",
-    ],
-  },
-  "Lifestyle & Entertainment": { items: ["Gym Membership", "Netflix (Standard Plan)", "Spotify Premium"] },
-};
 
-const MENS_ITEMS = new Set(["Men's Casual Shirt (Zara/H&M)", "Haircut (Men, basic salon)"]);
-const WOMENS_ITEMS = new Set(["Women's Dress (Myntra/Zara)"]);
-const SINGLE_PROFILE_EXCLUDE_WOMENS = new Set(["student", "professional"]);
-const COUPLE_PROFILES = new Set(["couple", "family"]);
 
-const DEFAULT_QUANTITIES: Record<string, number> = {
-  "Veg Thali (local restaurant)": 2, "Chai (regular cup)": 30, "Coffee (Cappuccino)": 10,
-  "Rice (Basmati)": 5, "Wheat Flour (Atta)": 3, "Toor Dal": 2,
-  "Milk (Full Cream)": 15, "Eggs": 3, "Chicken": 2, "Paneer": 1,
-  "Onions": 3, "Tomatoes": 3, "Potatoes": 3,
-  "Cooking Oil (Sunflower)": 2, "Sugar": 1, "Apples (Shimla)": 2,
-  "Men's Casual Shirt (Zara/H&M)": 1, "Women's Dress (Myntra/Zara)": 1,
-  "Running Shoes (Nike/Adidas)": 1, "Skincare Basics (Nykaa avg)": 1,
-  "Bananas": 2, "Bread (White, Sliced)": 2,
-  "Auto Rickshaw (minimum fare)": 15, "Ola/Uber (avg ride)": 8,
-  "Petrol": 20, "Diesel": 15,
-  "Movie Ticket (Multiplex)": 2, "Haircut (Men, basic salon)": 1,
-  "Domestic Beer (pint, restaurant)": 4, "Imported Beer (bottle, restaurant)": 2,
-};
 
 const EditablePrice = React.memo(function EditablePrice({ value, onChange, isEdited }: {
   value: number; onChange: (val: number) => void; isEdited: boolean;
@@ -177,12 +130,12 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
   const getAccommodation = (slug: string) => cityAccommodations[slug] ?? "1 BHK Outside City Centre";
   const setAccommodation = (slug: string, acc: string) => setCityAccommodations((prev) => ({ ...prev, [slug]: acc }));
   const [budgetItems, setBudgetItems] = useState<Set<string>>(() => {
-    const initial = new Set<string>();
-    Object.values(MONTHLY_BUDGET_ITEMS).forEach(({ items }) => items.forEach((item) => initial.add(item)));
+    const initial = new Set(DEFAULT_BUDGET_ITEM_SET);
     initial.add("1 BHK Outside City Centre");
     return initial;
   });
   const [salaries, setSalaries] = useState<Record<string, number>>({});
+  const [activeProfile, setActiveProfile] = useState<ProfileKey>("professional");
   const [shareCopied, setShareCopied] = useState(false);
   const [showBudgetItems, setShowBudgetItems] = useState(false);
   const budgetPopoverRef = React.useRef<HTMLDivElement>(null);
@@ -241,6 +194,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
   const editCount = Object.keys(customPrices).length;
 
   const handleCityChange = (index: number, slug: string) => {
+    trackEvent("city_compare", { city: slug, position: index });
     setCitySlugs((prev) => {
       const next = [...prev];
       next[index] = slug;
@@ -283,9 +237,7 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
         if (excludedItems.has(itemName)) return;
         const priceItem = cityData.prices.find((p) => p.item === itemName);
         if (!priceItem) return;
-        const price = getPrice(cityData.slug, priceItem.item, priceItem.price) * (quantities[itemName] ?? 1);
-        const budgetConfig = MONTHLY_BUDGET_ITEMS[priceItem.category];
-        total += budgetConfig?.multiplier && budgetConfig.items.includes(itemName) ? price * budgetConfig.multiplier : price;
+        total += getPrice(cityData.slug, priceItem.item, priceItem.price) * (quantities[itemName] ?? 1);
       });
       return total;
     },
@@ -293,26 +245,15 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
     [cityAccommodations, budgetItems, getPrice, excludedItems, quantities]
   );
 
-  const PG_ITEMS = ["PG - Private Room (with meals)", "PG - Private Room (without meals)", "PG - Double Sharing (with meals)", "PG - Double Sharing (without meals)", "PG - Triple Sharing (with meals)", "PG - Triple Sharing (without meals)"];
-
-  const applyProfile = (profile: "student" | "professional" | "couple" | "family", accOverride?: string) => {
-    const genderExclusions = SINGLE_PROFILE_EXCLUDE_WOMENS.has(profile)
-      ? [...WOMENS_ITEMS]
-      : [];
-
-    const profiles = {
-      student: { acc: "PG - Double Sharing (with meals)", ex: ["Meal for Two (high-end restaurant)", "Two Wheeler EMI (avg)", "Car EMI (avg)", "Diesel", ...genderExclusions] },
-      professional: { acc: "1 BHK in City Centre", ex: ["Two Wheeler EMI (avg)", "Car EMI (avg)", "Diesel", ...genderExclusions] },
-      couple: { acc: accOverride ?? "1 BHK in City Centre", ex: [...PG_ITEMS] },
-      family: { acc: "2 BHK in City Centre", ex: ["Two Wheeler EMI (avg)", "Car EMI (avg)", ...PG_ITEMS] },
-    };
-    const p = profiles[profile];
+  const applyProfile = (profileKey: ProfileKey, accOverride?: string) => {
+    const acc = accOverride ?? getProfileAccommodation(profileKey, true);
     const accMap: Record<string, string> = {};
-    citySlugs.forEach((s) => { accMap[s] = p.acc; });
+    citySlugs.forEach((s) => { accMap[s] = acc; });
     setCityAccommodations(accMap);
-    setExcludedItems(new Set(p.ex));
+    setExcludedItems(getProfileExclusions(profileKey));
     setQuantities({ ...DEFAULT_QUANTITIES });
     setCustomPrices({});
+    setActiveProfile(profileKey);
   };
 
   const generateShareUrl = () => {
@@ -390,6 +331,42 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
             </button>
           </div>
         )}
+      </div>
+
+      {/* Profile Selector */}
+      <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-4 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-sm font-bold text-gray-900 dark:text-white">Who are you?</div>
+          <div className="text-[11px] text-gray-400">Affects accommodation &amp; budget defaults</div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {PROFILE_CONFIGS.map((p) => (
+            p.key === "couple" ? (
+              <div key={p.key} className={`inline-flex items-center gap-1.5 text-xs border rounded-full transition-all ${
+                activeProfile === "couple" ? "bg-orange-50 dark:bg-orange-950/30 border-orange-300 dark:border-orange-700" : "border-gray-200 dark:border-gray-700"
+              }`}>
+                <button onClick={() => applyProfile("couple", p.accCentre)}
+                  className={`pl-3 pr-1.5 py-1.5 font-medium transition-colors ${activeProfile === "couple" ? "text-orange-700 dark:text-orange-400" : "text-gray-600 dark:text-gray-400 hover:text-orange-600"}`}>
+                  {p.icon} {p.label}
+                </button>
+                <span className="text-gray-300 dark:text-gray-600">|</span>
+                <button onClick={() => applyProfile("couple", p.accOutskirts)}
+                  className="pr-3 pl-1.5 py-1.5 text-[10px] text-gray-500 hover:text-orange-600 transition-colors">
+                  outskirts
+                </button>
+              </div>
+            ) : (
+              <button key={p.key} onClick={() => applyProfile(p.key)}
+                className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
+                  activeProfile === p.key
+                    ? "bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-700"
+                    : "bg-white dark:bg-transparent text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-orange-300 hover:text-orange-600"
+                }`}>
+                <span>{p.icon}</span> {p.label}
+              </button>
+            )
+          ))}
+        </div>
       </div>
 
       {/* Tabs */}
@@ -471,8 +448,8 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
                   </button>
                 </div>
                 <div className="text-[10px] text-gray-600 dark:text-gray-400 space-y-0.5 max-h-52 overflow-y-auto">
-                  {Object.entries(MONTHLY_BUDGET_ITEMS).map(([cat, { items }]) => {
-                    const active = items.filter((item) => budgetItems.has(item));
+                  {BUDGET_GROUP_ORDER.map((cat) => {
+                    const active = (BUDGET_GROUPS[cat]?.items ?? []).filter((item) => budgetItems.has(item));
                     if (active.length === 0) return null;
                     return (
                       <div key={cat} className="mb-1.5">
@@ -658,45 +635,6 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
 
       {/* ====== CALCULATOR TAB ====== */}
       {activeTab === "calculator" && <>
-        {/* Lifestyle Profiles */}
-        <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Quick Profiles</h2>
-          <p className="text-sm text-gray-500 mb-4">Auto-set accommodation, quantities, and exclusions</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {([
-              { key: "student" as const, icon: "🎓", label: "Student", desc: "PG double sharing, basic groceries, public transport" },
-              { key: "professional" as const, icon: "💼", label: "Young Professional", desc: "1BHK centre, full groceries, metro + gym" },
-              { key: "family" as const, icon: "👨‍👩‍👧", label: "Family of 3-4", desc: "2BHK centre, higher quantities, no PG" },
-            ]).map((p) => (
-              <button key={p.key} onClick={() => applyProfile(p.key)}
-                className="flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-orange-400 hover:bg-orange-50/50 dark:hover:bg-orange-950/20 text-left transition-all group">
-                <span className="text-2xl">{p.icon}</span>
-                <div>
-                  <div className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-orange-700 dark:group-hover:text-orange-400">{p.label}</div>
-                  <div className="text-xs text-gray-500 mt-0.5">{p.desc}</div>
-                </div>
-              </button>
-            ))}
-            <div className="flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 text-left">
-              <span className="text-2xl">💑</span>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold text-gray-900 dark:text-white">Newly Married</div>
-                <div className="text-xs text-gray-500 mt-0.5">1BHK, 2 people, full groceries, no PG</div>
-                <div className="flex gap-2 mt-2">
-                  <button onClick={() => applyProfile("couple", "1 BHK in City Centre")}
-                    className="text-[10px] px-2.5 py-1 rounded-full bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 font-medium hover:bg-orange-100 dark:hover:bg-orange-950/50 transition-colors border border-orange-200 dark:border-orange-800">
-                    City Centre
-                  </button>
-                  <button onClick={() => applyProfile("couple", "1 BHK Outside City Centre")}
-                    className="text-[10px] px-2.5 py-1 rounded-full bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700">
-                    Outskirts
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Per-City Accommodation */}
         <div className="bg-white dark:bg-[#171717] rounded-xl border border-gray-200 dark:border-[#2a2a2a] p-6 shadow-sm">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Accommodation per City</h2>
@@ -772,19 +710,23 @@ export default function InteractiveComparison({ initialCity1, initialCity2 }: In
               Customize budget items ({budgetItems.size} selected)
             </summary>
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {Object.entries(MONTHLY_BUDGET_ITEMS).map(([category, config]) => (
-                <div key={category} className="bg-white/10 rounded-lg p-3">
-                  <div className="text-xs font-semibold text-orange-200 mb-2 uppercase tracking-wide">
-                    {category.split(" (")[0]}{config.multiplier && <span className="font-normal normal-case ml-1">(×{config.multiplier} days)</span>}
+              {BUDGET_GROUP_ORDER.map((group) => {
+                const config = BUDGET_GROUPS[group];
+                if (!config) return null;
+                return (
+                  <div key={group} className="bg-white/10 rounded-lg p-3">
+                    <div className="text-xs font-semibold text-orange-200 mb-2 uppercase tracking-wide">
+                      {group}
+                    </div>
+                    {config.items.map((item) => (
+                      <label key={item} className="flex items-center gap-2 py-0.5 cursor-pointer">
+                        <input type="checkbox" checked={budgetItems.has(item)} onChange={() => toggleBudgetItem(item)} className="w-3.5 h-3.5 rounded border-white/30 text-orange-300 focus:ring-orange-300 accent-orange-300" />
+                        <span className="text-xs text-orange-100">{item}{DEFAULT_QUANTITIES[item] > 1 ? ` ×${DEFAULT_QUANTITIES[item]}` : ""}</span>
+                      </label>
+                    ))}
                   </div>
-                  {config.items.map((item) => (
-                    <label key={item} className="flex items-center gap-2 py-0.5 cursor-pointer">
-                      <input type="checkbox" checked={budgetItems.has(item)} onChange={() => toggleBudgetItem(item)} className="w-3.5 h-3.5 rounded border-white/30 text-orange-300 focus:ring-orange-300 accent-orange-300" />
-                      <span className="text-xs text-orange-100">{item}</span>
-                    </label>
-                  ))}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </details>
         </div>

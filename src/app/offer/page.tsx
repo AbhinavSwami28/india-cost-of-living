@@ -3,7 +3,19 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 
 const OfferCalculator = dynamic(() => import("@/components/OfferCalculator"), {
-  loading: () => <div className="text-center py-16 text-gray-400"><div className="text-4xl mb-3">🤔</div><p>Loading...</p></div>,
+  loading: () => (
+    <div className="space-y-6">
+      {[1, 2].map((i) => (
+        <div key={i} className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm space-y-4 animate-pulse">
+          <div className="h-5 w-48 bg-gray-200 rounded" />
+          <div className="h-3 w-32 bg-gray-100 rounded" />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[1, 2, 3].map((j) => <div key={j} className="h-10 bg-gray-100 rounded-lg" />)}
+          </div>
+        </div>
+      ))}
+    </div>
+  ),
 });
 
 export const metadata: Metadata = {
