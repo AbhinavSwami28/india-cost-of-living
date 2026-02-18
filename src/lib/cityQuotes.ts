@@ -342,37 +342,7 @@ export const CITY_QUOTES: Record<string, CityQuote[]> = {
   ],
 };
 
-const INDIA_QUOTES: CityQuote[] = [
-  { text: "A nation's culture resides in the hearts and in the soul of its people.", author: "Mahatma Gandhi" },
-  { text: "You dream. You aspire. You believe. I will clear the way for you.", author: "Narendra Modi" },
-  { text: "India is not just a geography or a nationality. It is an idea, an aspiration, a force.", author: "Narendra Modi" },
-  { text: "Arise, awake, and stop not till the goal is reached.", author: "Swami Vivekananda" },
-  { text: "You must be the change you wish to see in the world.", author: "Mahatma Gandhi" },
-  { text: "Dream, dream, dream. Dreams transform into thoughts, and thoughts result in action.", author: "APJ Abdul Kalam" },
-  { text: "We owe a lot to the Indians, who taught us how to count, without which no worthwhile scientific discovery could have been made.", author: "Albert Einstein" },
-  { text: "India has no dearth of brave young men and women and if they get the opportunity and help then we can compete with other nations in space exploration and in other fields.", author: "APJ Abdul Kalam" },
-  { text: "The mantra of unity, the mantra of India, the mantra of development — together we will build the India of our dreams.", author: "Narendra Modi" },
-  { text: "I measure the progress of a community by the degree of progress which women have achieved.", author: "B.R. Ambedkar" },
-  { text: "Every Indian should now forget that he is a Rajput, a Sikh, or a Jat. He must remember that he is an Indian.", author: "Sardar Vallabhbhai Patel" },
-  { text: "Where the mind is without fear and the head is held high — into that heaven of freedom, my Father, let my country awake.", author: "Rabindranath Tagore", context: "Gitanjali" },
-  { text: "Sare jahan se achha, Hindustan hamara — Better than all the world is our Hindustan.", author: "Muhammad Iqbal" },
-  { text: "India is the cradle of the human race, the birthplace of human speech, the mother of history.", author: "Mark Twain" },
-  { text: "If there is one place on the face of earth where all the dreams of living men have found a home, it is India.", author: "Romain Rolland" },
-  { text: "We are Indians, firstly and lastly.", author: "B.R. Ambedkar" },
-  { text: "Faith is the bird that feels the light when the dawn is still dark.", author: "Rabindranath Tagore" },
-  { text: "The best way to find yourself is to lose yourself in the service of others.", author: "Mahatma Gandhi" },
-  { text: "Great dreams of great dreamers are always transcended.", author: "APJ Abdul Kalam" },
-  { text: "Minimum Government, Maximum Governance — that is my mantra.", author: "Narendra Modi" },
-];
-
 export function getCityQuotes(slug: string): CityQuote[] {
-  const citySpecific = CITY_QUOTES[slug] || [];
-  const fillerCount = Math.max(0, 8 - citySpecific.length);
-  const slugHash = slug.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-  const fillers: CityQuote[] = [];
-  for (let i = 0; i < fillerCount; i++) {
-    fillers.push(INDIA_QUOTES[(slugHash + i) % INDIA_QUOTES.length]);
-  }
-  return [...citySpecific, ...fillers];
+  return CITY_QUOTES[slug] || [];
 }
 
