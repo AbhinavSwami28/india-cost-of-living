@@ -12,16 +12,16 @@ export default function HeroSection({ cityCount }: { cityCount: number }) {
             Compare prices across {cityCount} major Indian cities. From PG
             double sharing to 3BHK rent, chai to biryani — find out what life really costs.
           </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/offer"
-              className="bg-white text-orange-600 px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-orange-50 transition-colors text-sm sm:text-base"
+              className="text-white/80 hover:text-white px-3 py-2.5 text-sm sm:text-base font-medium transition-colors"
             >
               Should I Take This Offer?
             </Link>
             <Link
               href="/compare"
-              className="bg-orange-700/50 backdrop-blur-sm text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-orange-700/70 transition-colors border border-orange-400/30 text-sm sm:text-base"
+              className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base"
             >
               Compare Cities
             </Link>
