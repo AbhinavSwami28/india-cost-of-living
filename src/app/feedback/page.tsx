@@ -37,6 +37,9 @@ export default function FeedbackPage() {
             height="900"
             className="border-0 w-full"
             title="Feedback Form"
+            sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
+            referrerPolicy="no-referrer"
+            loading="lazy"
           >
             Loading feedback form...
           </iframe>
