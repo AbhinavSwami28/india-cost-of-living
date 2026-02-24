@@ -71,6 +71,24 @@ export default function RootLayout({
         <Script id="theme-init" strategy="beforeInteractive">
           {`try{var t=localStorage.getItem("theme");if(t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme:dark)").matches))document.documentElement.classList.add("dark")}catch(e){}`}
         </Script>
+        {adsenseClientId && (
+          <Script
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
+            crossOrigin="anonymous"
+            strategy="beforeInteractive"
+          />
+        )}
+        {adsenseClientId && (
+          <Script
+            src={`https://fundingchoicesmessages.google.com/i/${adsenseClientId}?ers=1`}
+            strategy="beforeInteractive"
+          />
+        )}
+        {adsenseClientId && (
+          <Script id="google-fc-init" strategy="beforeInteractive">
+            {`(function() {var a=window;var b="fc";function c(d){for(var e=0;e<d.length-1;e++){if(!a[d[e]]){return}}return a[d[e]]}a[b]=a[b]||{};a[b].callQueue=a[b].callQueue||[];a[b].callQueue.push(c)})();`}
+          </Script>
+        )}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
@@ -86,28 +104,6 @@ export default function RootLayout({
 
         <Analytics />
         <SpeedInsights />
-
-        {/* Google Funding Choices — GDPR/EEA consent management */}
-        {adsenseClientId && (
-          <Script
-            src={`https://fundingchoicesmessages.google.com/i/${adsenseClientId}?ers=1`}
-            strategy="beforeInteractive"
-          />
-        )}
-        {adsenseClientId && (
-          <Script id="google-fc-init" strategy="beforeInteractive">
-            {`(function() {var a=window;var b="fc";function c(d){for(var e=0;e<d.length-1;e++){if(!a[d[e]]){return}}return a[d[e]]}a[b]=a[b]||{};a[b].callQueue=a[b].callQueue||[];a[b].callQueue.push(c)})();`}
-          </Script>
-        )}
-
-        {/* Google AdSense */}
-        {adsenseClientId && (
-          <Script
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
-            crossOrigin="anonymous"
-            strategy="beforeInteractive"
-          />
-        )}
       </body>
     </html>
   );
