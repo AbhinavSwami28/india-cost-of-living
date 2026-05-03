@@ -4,9 +4,17 @@ export interface BudgetItemConfig {
   defaultQty: number;
   isOptional?: boolean;
   genderTag?: "m" | "f";
+  nonVeg?: boolean;
 }
 
-export type ProfileKey = "student" | "professional" | "couple" | "family";
+export type ProfileKey =
+  | "student"
+  | "professional"
+  | "couple"
+  | "dink"
+  | "family"
+  | "family-kids"
+  | "retired";
 
 export interface ProfileConfig {
   key: ProfileKey;
@@ -16,6 +24,7 @@ export interface ProfileConfig {
   accOutskirts: string;
   excludeItems: string[];
   excludeWomens: boolean;
+  qtyOverrides?: Record<string, number>;
 }
 
 const PG_ITEMS = [
@@ -87,10 +96,10 @@ export const BUDGET_ITEMS: BudgetItemConfig[] = [
   { item: "Domestic Beer (pint, restaurant)", budgetGroup: "Lifestyle & Entertainment", defaultQty: 4 },
 
   // Optional items — not in default budget, user can add
-  { item: "Non-Veg Thali (local restaurant)", budgetGroup: "Restaurants & Dining", defaultQty: 2, isOptional: true },
-  { item: "Chicken", budgetGroup: "Groceries", defaultQty: 2, isOptional: true },
+  { item: "Non-Veg Thali (local restaurant)", budgetGroup: "Restaurants & Dining", defaultQty: 2, isOptional: true, nonVeg: true },
+  { item: "Chicken", budgetGroup: "Groceries", defaultQty: 2, isOptional: true, nonVeg: true },
   { item: "Meal for Two (high-end restaurant)", budgetGroup: "Restaurants & Dining", defaultQty: 1, isOptional: true },
-  { item: "Biryani (chicken)", budgetGroup: "Restaurants & Dining", defaultQty: 2, isOptional: true },
+  { item: "Biryani (chicken)", budgetGroup: "Restaurants & Dining", defaultQty: 2, isOptional: true, nonVeg: true },
   { item: "Soft Drink (Coca-Cola, 300ml)", budgetGroup: "Restaurants & Dining", defaultQty: 4, isOptional: true },
   { item: "Two Wheeler EMI (avg)", budgetGroup: "Transportation", defaultQty: 1, isOptional: true },
   { item: "Car EMI (avg)", budgetGroup: "Transportation", defaultQty: 1, isOptional: true },
@@ -152,6 +161,23 @@ export const PROFILE_CONFIGS: ProfileConfig[] = [
     excludeWomens: false,
   },
   {
+    key: "dink",
+    label: "DINK",
+    icon: "👫",
+    accCentre: "1 BHK in City Centre",
+    accOutskirts: "1 BHK Outside City Centre",
+    excludeItems: [...PG_ITEMS],
+    excludeWomens: false,
+    qtyOverrides: {
+      "Meal for Two (high-end restaurant)": 2,
+      "Movie Ticket (Multiplex)": 4,
+      "Domestic Beer (pint, restaurant)": 8,
+      "Specialty Coffee (Third Wave)": 8,
+      "Fast Food Combo (McDonald's)": 4,
+      "Ola/Uber (avg ride)": 12,
+    },
+  },
+  {
     key: "family",
     label: "Family",
     icon: "👨‍👩‍👧",
@@ -159,6 +185,56 @@ export const PROFILE_CONFIGS: ProfileConfig[] = [
     accOutskirts: "2 BHK Outside City Centre",
     excludeItems: ["Two Wheeler EMI (avg)", "Car EMI (avg)", ...PG_ITEMS],
     excludeWomens: false,
+  },
+  {
+    key: "family-kids",
+    label: "Family + Kids",
+    icon: "👨‍👩‍👧‍👦",
+    accCentre: "2 BHK in City Centre",
+    accOutskirts: "2 BHK Outside City Centre",
+    excludeItems: ["Two Wheeler EMI (avg)", ...PG_ITEMS, "Domestic Beer (pint, restaurant)", "Imported Beer (bottle, restaurant)"],
+    excludeWomens: false,
+    qtyOverrides: {
+      "Milk (Full Cream)": 30,
+      "Eggs": 6,
+      "Wheat Flour (Atta)": 6,
+      "Rice (Basmati)": 8,
+      "Toor Dal": 3,
+      "Bananas": 4,
+      "Apples (Shimla)": 3,
+      "Bread (White, Sliced)": 4,
+      "Paneer": 2,
+      "Cooking Oil (Sunflower)": 3,
+      "Cooking Gas (LPG Cylinder)": 1,
+      "Movie Ticket (Multiplex)": 4,
+    },
+  },
+  {
+    key: "retired",
+    label: "Retired",
+    icon: "🧓",
+    accCentre: "2 BHK in City Centre",
+    accOutskirts: "2 BHK Outside City Centre",
+    excludeItems: [
+      ...PG_ITEMS,
+      "Two Wheeler EMI (avg)",
+      "Car EMI (avg)",
+      "Gym Membership",
+      "Domestic Beer (pint, restaurant)",
+      "Imported Beer (bottle, restaurant)",
+      "Whey Protein (1 kg)",
+      "Specialty Coffee (Third Wave)",
+      "Fast Food Combo (McDonald's)",
+      "Spotify Premium",
+      "Running Shoes (Nike/Adidas)",
+    ],
+    excludeWomens: false,
+    qtyOverrides: {
+      "Movie Ticket (Multiplex)": 1,
+      "Ola/Uber (avg ride)": 12,
+      "Auto Rickshaw (minimum fare)": 20,
+      "Petrol": 8,
+    },
   },
 ];
 
@@ -181,3 +257,12 @@ export function getProfileAccommodation(profileKey: string, cityCentre: boolean)
 export const DEFAULT_BUDGET_ITEM_SET: Set<string> = new Set(
   BUDGET_ITEMS.filter((b) => !b.isOptional).map((b) => b.item)
 );
+
+export const NON_VEG_ITEMS: Set<string> = new Set(
+  BUDGET_ITEMS.filter((b) => b.nonVeg).map((b) => b.item)
+);
+
+export function getProfileQty(profileKey: string, item: string): number {
+  const profile = PROFILE_CONFIGS.find((p) => p.key === profileKey);
+  return profile?.qtyOverrides?.[item] ?? DEFAULT_QUANTITIES[item] ?? 1;
+}

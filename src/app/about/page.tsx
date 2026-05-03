@@ -77,7 +77,7 @@ export default function AboutPage() {
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mt-4">
               <p className="text-xs text-orange-800">
                 <strong>Data accuracy note:</strong> All prices are in Indian Rupees (₹) and represent city-wide averages
-                as of February 2026. Prices in premium localities may be 20-50% higher than shown.
+                as of May 2026. Prices in premium localities may be 20-50% higher than shown.
                 We welcome corrections and updates from local residents.
               </p>
             </div>

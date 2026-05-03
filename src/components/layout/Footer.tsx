@@ -133,7 +133,7 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} India Cost of Living. All rights reserved.
           </p>
           <p className="text-xs text-gray-600">
-            Prices are community-sourced averages and may vary. Last updated February 2026.
+            Prices are community-sourced averages and may vary. Last updated May 2026.
           </p>
         </div>
       </div>

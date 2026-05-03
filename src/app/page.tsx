@@ -68,7 +68,7 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
         <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6 shadow-sm">
           <h2 className="text-lg font-bold text-gray-900 mb-1">Interactive Map</h2>
-          <p className="text-xs text-gray-500 mb-2">Hover over a city for quick stats. Click to explore.</p>
+          <p className="text-xs text-gray-500 mb-2">Click any city to open its full cost-of-living profile.</p>
           <IndiaMap cities={cities} />
         </div>
       </section>

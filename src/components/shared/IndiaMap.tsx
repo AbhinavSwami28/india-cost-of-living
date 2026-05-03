@@ -28,6 +28,15 @@ const CITY_MARKERS: Record<string, [number, number]> = {
   bhubaneswar: [85.825, 20.296], guwahati: [91.736, 26.145], dehradun: [78.032, 30.317],
   jodhpur: [73.024, 26.239], udaipur: [73.713, 24.585], goa: [73.828, 15.491],
   raipur: [81.630, 21.251], siliguri: [88.395, 26.727],
+  gurgaon: [77.026, 28.460], noida: [77.391, 28.535],
+  "navi-mumbai": [73.018, 19.033], thane: [72.972, 19.218],
+  vadodara: [73.181, 22.307], nashik: [73.789, 19.997],
+  trichy: [78.704, 10.790], jamshedpur: [86.181, 22.804],
+  aurangabad: [75.343, 19.876], kolhapur: [74.243, 16.704],
+  "hubli-dharwad": [75.124, 15.367], warangal: [79.582, 17.965],
+  gwalior: [78.179, 26.218], prayagraj: [81.846, 25.435],
+  meerut: [77.706, 28.984], kota: [75.834, 25.213],
+  ludhiana: [75.857, 30.901],
 };
 
 export default function IndiaMap({ cities }: { cities: CityData[] }) {
@@ -74,16 +83,25 @@ export default function IndiaMap({ cities }: { cities: CityData[] }) {
 
           return (
             <Marker key={city.slug} coordinates={coords}>
-              <Link href={`/cost-of-living/${city.slug}/prices`}>
-                <circle
-                  r={isHovered ? 5 : 2.5}
-                  fill={isHovered ? "#f97316" : "#ea580c"}
-                  stroke="#fff"
-                  strokeWidth={isHovered ? 1.5 : 0.8}
-                  className="cursor-pointer transition-all duration-150"
+              <Link
+                href={`/cost-of-living/${city.slug}/prices`}
+                aria-label={`View cost of living in ${city.name}`}
+              >
+                <g
+                  className="cursor-pointer"
                   onMouseEnter={() => setHovered(city.slug)}
                   onMouseLeave={() => setHovered(null)}
-                />
+                >
+                  {/* Invisible larger hit area for easier clicking */}
+                  <circle r={8} fill="transparent" />
+                  <circle
+                    r={isHovered ? 5 : 2.5}
+                    fill={isHovered ? "#f97316" : "#ea580c"}
+                    stroke="#fff"
+                    strokeWidth={isHovered ? 1.5 : 0.8}
+                    className="transition-all duration-150 pointer-events-none"
+                  />
+                </g>
               </Link>
             </Marker>
           );

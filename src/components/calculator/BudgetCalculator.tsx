@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { CATEGORIES, CATEGORY_ICONS, Category } from "@/lib/types";
 import { formatPrice, cities } from "@/lib/data";
-import { DEFAULT_QUANTITIES, getProfileExclusions, getProfileAccommodation, type ProfileKey } from "@/lib/budgetConfig";
+import { getProfileExclusions, getProfileAccommodation, getProfileQty, NON_VEG_ITEMS, type ProfileKey } from "@/lib/budgetConfig";
 import { trackEvent } from "@/lib/analytics";
 import ProfilePills from "@/components/ui/ProfilePills";
 import CategoryItemTable, { type BudgetItem } from "@/components/calculator/CategoryItemTable";
@@ -16,26 +16,30 @@ export default function BudgetCalculator() {
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
   const [initialized, setInitialized] = useState(false);
   const [activeProfile, setActiveProfile] = useState<ProfileKey>("professional");
+  const [nonVegMode, setNonVegMode] = useState(false);
 
-  const initializeFromCity = useCallback((citySlug: string, profileKey?: ProfileKey, isCentre?: boolean) => {
+  const initializeFromCity = useCallback((citySlug: string, profileKey?: ProfileKey, isCentre?: boolean, nonVeg?: boolean) => {
     const city = cities.find((c) => c.slug === citySlug);
     if (!city) return;
 
     const profile = profileKey ?? "professional";
     const defaultAcc = getProfileAccommodation(profile, isCentre ?? true);
     const exclusions = getProfileExclusions(profile);
+    const includeNonVeg = nonVeg ?? false;
 
     const items: BudgetItem[] = city.prices.map((p) => {
-      const qty = DEFAULT_QUANTITIES[p.item] ?? 1;
+      const qty = getProfileQty(profile, p.item);
       const isVehicle = p.item.includes("EMI");
       const isPerKm = p.item.includes("per km after min");
       const isAccommodation =
         p.category === "Accommodation - Rent (Monthly)" ||
         p.category === "PG / Shared Accommodation (Monthly)";
       const isDefaultAccommodation = p.item === defaultAcc;
+      const isNonVeg = NON_VEG_ITEMS.has(p.item);
 
       let selected = isAccommodation ? isDefaultAccommodation : (!isVehicle && !isPerKm);
       if (exclusions.has(p.item)) selected = false;
+      if (isNonVeg && !includeNonVeg) selected = false;
 
       return {
         item: p.item,
@@ -52,31 +56,40 @@ export default function BudgetCalculator() {
     setInitialized(true);
     setLocationName(city.name);
     setActiveProfile(profile);
-  // Deps are empty because imported functions (getProfileAccommodation, getProfileExclusions,
-  // DEFAULT_QUANTITIES) are module-level constants — they never change between renders.
+  // Imported helpers are module-level constants — never change between renders.
   }, []);
 
   const handleBaseCityChange = useCallback((slug: string) => {
     setSelectedBaseCity(slug);
-    initializeFromCity(slug, activeProfile);
+    initializeFromCity(slug, activeProfile, true, nonVegMode);
     trackEvent("budget_calculate", { city: slug, profile: activeProfile });
-  }, [activeProfile, initializeFromCity]);
+  }, [activeProfile, nonVegMode, initializeFromCity]);
 
   const handleProfileChange = useCallback((profileKey: ProfileKey) => {
     setActiveProfile(profileKey);
     if (selectedBaseCity) {
-      initializeFromCity(selectedBaseCity, profileKey);
+      initializeFromCity(selectedBaseCity, profileKey, true, nonVegMode);
     }
-  }, [selectedBaseCity, initializeFromCity]);
+  }, [selectedBaseCity, nonVegMode, initializeFromCity]);
+
+  const handleDietChange = useCallback((nonVeg: boolean) => {
+    setNonVegMode(nonVeg);
+    if (selectedBaseCity) {
+      initializeFromCity(selectedBaseCity, activeProfile, true, nonVeg);
+    }
+  }, [selectedBaseCity, activeProfile, initializeFromCity]);
 
   useEffect(() => {
     const cityParam = searchParams.get("city");
     const profileParam = searchParams.get("profile") as ProfileKey | null;
     const centreParam = searchParams.get("centre");
+    const dietParam = searchParams.get("diet");
     if (cityParam && !initialized && cities.some((c) => c.slug === cityParam)) {
       setSelectedBaseCity(cityParam);
       if (profileParam) setActiveProfile(profileParam);
-      initializeFromCity(cityParam, profileParam ?? "professional", centreParam !== "0");
+      const nonVeg = dietParam === "nonveg";
+      if (nonVeg) setNonVegMode(true);
+      initializeFromCity(cityParam, profileParam ?? "professional", centreParam !== "0", nonVeg);
     }
   }, [searchParams, initialized, initializeFromCity]);
 
@@ -182,9 +195,32 @@ export default function BudgetCalculator() {
         </div>
 
         {/* Profile Selector */}
-        <div>
+        <div className="mb-5">
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Your lifestyle</label>
           <ProfilePills active={activeProfile} onChange={handleProfileChange} />
+        </div>
+
+        {/* Diet toggle */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Diet</label>
+          <div className="inline-flex rounded-full border border-gray-200 p-0.5 bg-gray-50">
+            <button
+              onClick={() => handleDietChange(false)}
+              className={`px-4 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                !nonVegMode ? "bg-white text-orange-700 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              🥗 Veg
+            </button>
+            <button
+              onClick={() => handleDietChange(true)}
+              className={`px-4 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                nonVegMode ? "bg-white text-orange-700 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              🍗 Non-Veg
+            </button>
+          </div>
         </div>
 
       </div>
@@ -325,6 +361,12 @@ export default function BudgetCalculator() {
             </div>
             <div className="mt-2 text-right text-sm text-gray-500">
               ≈ {formatPrice(totalMonthly * 12)} per year
+            </div>
+
+            <div className="mt-5 pt-4 border-t border-gray-100 text-xs text-gray-500 leading-relaxed">
+              <span className="font-medium text-gray-700">Not yet included:</span> school & tuition fees,
+              childcare, healthcare insurance premiums, income tax, EPF/NPS contributions, and travel.
+              Add a Miscellaneous line above to estimate.
             </div>
           </div>
         </>
